@@ -34,7 +34,7 @@ export default function GeneralSettings() {
           Icon & Name
         </label>
         <div className="flex items-center gap-4 mb-4">
-          <Avatar src="/avatar.png" />
+          <Avatar src="/assets/svgs/user_profile.svg" />
           <SmallTextField defaultValue={user?.full_name} />
         </div>
 

@@ -2,10 +2,9 @@
 
 import { Button, Avatar, Switch } from "@mui/material";
 import GenericTable, { Column } from "../common/DynamicTable";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import IconButton from "../common/IconButton";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import {
   useCreateWorkspace,
   useDeleteWorkspace,
@@ -17,6 +16,10 @@ import axios from "axios";
 import { ApiErrorResponse } from "@/hooks/auth/useAuthMutations";
 import { useAllWorkspaces } from "@/hooks/workspace/useWorkspaceQueries";
 import { useQueryClient } from "@tanstack/react-query";
+import ConfirmModal from "../common/ConfirmModal";
+import NoTableData from "../common/NoTableData";
+import { useDispatch } from "react-redux";
+import { clearWorkspace } from "@/store/slices/workspaceSlice";
 
 type WorkspaceProps = {
   id: number;
@@ -34,7 +37,7 @@ type WorkspaceFormData = {
 
 export default function WorkSpaceSettings() {
   const queryClient = useQueryClient();
-
+  const dispatch = useDispatch();
   /** ---------------- Pagination ---------------- */
   const [page, setPage] = useState(0);
   const limit = 20;
@@ -45,6 +48,9 @@ export default function WorkSpaceSettings() {
   const [selectedMember, setSelectedMember] = useState<WorkspaceProps | null>(
     null,
   );
+  const [workspaceToDelete, setWorkspaceToDelete] =
+    useState<WorkspaceProps | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   /** ---------------- API ---------------- */
   const {
@@ -114,6 +120,18 @@ export default function WorkSpaceSettings() {
     }
   };
 
+  const handleConfirmDelete = async () => {
+    if (!workspaceToDelete) return;
+    try {
+      await deleteWorkspace(workspaceToDelete.id);
+      queryClient.invalidateQueries({ queryKey: ["allWorkspaces"] });
+      setDeleteOpen(false);
+      setWorkspaceToDelete(null);
+    } catch (error) {
+      toast.error("Failed to delete workspace");
+    }
+  };
+
   /** ---------------- Columns ---------------- */
   const columns: Column<WorkspaceProps>[] = [
     {
@@ -141,14 +159,13 @@ export default function WorkSpaceSettings() {
       label: "Actions",
       render: (row) => (
         <div className="flex gap-2">
-          <IconButton onClick={() => handleEdit(row)}>
-            <ModeEditOutlineOutlinedIcon
-              sx={{ fontSize: 16, cursor: "pointer" }}
-            />
-          </IconButton>
           <IconButton
             danger
-            onClick={() => handleDelete(row.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setWorkspaceToDelete(row);
+              setDeleteOpen(true);
+            }}
             disabled={deletePending}
           >
             <DeleteOutlineIcon sx={{ fontSize: 16, cursor: "pointer" }} />
@@ -157,6 +174,12 @@ export default function WorkSpaceSettings() {
       ),
     },
   ];
+
+  useEffect(() => {
+    if (tableData?.length === 0) {
+      dispatch(clearWorkspace());
+    }
+  }, [tableData?.length]);
 
   /** ---------------- States ---------------- */
   if (isLoading) return <div>Loading workspaces...</div>;
@@ -178,9 +201,17 @@ export default function WorkSpaceSettings() {
         </Button>
       </div>
 
-      <div className="bg-white shadow-sm rounded-lg p-4">
-        <GenericTable columns={columns} data={tableData} />
-      </div>
+      {tableData?.length > 0 ? (
+        <div className="bg-white shadow-sm rounded-lg p-4">
+          <GenericTable
+            columns={columns}
+            data={tableData}
+            onRowClick={(row) => handleEdit(row)}
+          />
+        </div>
+      ) : (
+        <NoTableData message="No workspaces found. Please add a workspace." />
+      )}
 
       <AddWorkspaceModal
         open={open}
@@ -195,6 +226,33 @@ export default function WorkSpaceSettings() {
         }
         onSubmit={handleSaveWorkspace}
       />
+      <ConfirmModal
+        open={deleteOpen}
+        title="Delete Workspace"
+        description="Are you sure you want to remove this workspace? This action cannot be undone."
+        confirmText="Delete"
+        variant="danger"
+        loading={deletePending}
+        onCancel={() => {
+          setDeleteOpen(false);
+          setWorkspaceToDelete(null);
+        }}
+        onConfirm={handleConfirmDelete}
+      >
+        {workspaceToDelete && (
+          <>
+            <div className="flex items-center gap-3">
+              <Avatar>{workspaceToDelete.name.charAt(0)}</Avatar>
+              <div>
+                <p className="font-medium">{workspaceToDelete.name}</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-500 mt-2">
+              {workspaceToDelete.description}
+            </p>
+          </>
+        )}
+      </ConfirmModal>
     </div>
   );
 }

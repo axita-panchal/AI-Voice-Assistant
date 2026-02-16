@@ -6,22 +6,22 @@ import http from "./http";
 
 export const workspaceService = {
   getAllWorkspaces: async (skip = 0, limit = 20) => {
-    const res = await http.get("/subaccount/list-subaccounts", {
+    const res = await http.get("/subaccount", {
       params: { skip, limit },
     });
     return res.data;
   },
 
   getWorkspaceById: (id: string) => {
-    return http.get(`/subaccount/get-subaccount/${id}`);
+    return http.get(`/subaccount/${id}`);
   },
   createWorkspace: (payload: CreateWorkSpacePayload) => {
-    return http.post("/subaccount/create-subaccount", payload);
+    return http.post("/subaccount/", payload);
   },
   deleteWorkspace: (id: number) => {
-    return http.delete(`/subaccount/delete-subaccount/${id}`);
+    return http.delete(`/subaccount/${id}`);
   },
   updateWorkspace: (payload: UpdateWorkSpacePayload) => {
-    return http.patch(`/subaccount/update-subaccount/${payload?.id}`, payload);
+    return http.patch(`/subaccount/${payload?.id}`, payload);
   },
 };

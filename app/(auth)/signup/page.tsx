@@ -38,7 +38,7 @@ const schema = z.object({
       message: "Enter a valid phone number",
     }),
 
-  email: z.string().email("Invalid email address"),
+  email: z.string().min(1, "Email is required").email("Invalid email address"),
 
   password: z
     .string()

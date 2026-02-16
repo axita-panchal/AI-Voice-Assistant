@@ -110,7 +110,7 @@ export default function TeamMembers() {
   const handleConfirmDelete = async () => {
     if (!memberToDelete) return;
 
-    await deleteUser(memberToDelete.id);
+    await deleteUser(Number(memberToDelete.id));
 
     setDeleteOpen(false);
     setMemberToDelete(null);
@@ -155,24 +155,14 @@ export default function TeamMembers() {
     },
     {
       key: "actions",
-      label: "Actions",
+      label: "",
       render: (row) => (
-        <div className="flex gap-2">
-          <IconButton
-            onClick={() => {
-              setSelectedMember(row);
-              setOpen(true);
-            }}
-          >
-            <ModeEditOutlineOutlinedIcon
-              sx={{ fontSize: 16, cursor: "pointer" }}
-            />
-          </IconButton>
-
+        <div className="flex justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           <IconButton
             danger
             disabled={isPending}
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation(); // 🔥 prevent edit modal
               setMemberToDelete(row);
               setDeleteOpen(true);
             }}
@@ -209,7 +199,14 @@ export default function TeamMembers() {
         {isLoading ? (
           <div className="text-center py-6">Loading team members…</div>
         ) : (
-          <GenericTable columns={columns} data={teamMembers} />
+          <GenericTable
+            columns={columns}
+            data={teamMembers}
+            onRowClick={(row) => {
+              setSelectedMember(row);
+              setOpen(true);
+            }}
+          />
         )}
       </div>
       {totalPages > 1 && (

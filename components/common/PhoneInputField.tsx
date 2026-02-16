@@ -47,7 +47,7 @@ export default function PhoneInputField<T extends FieldValues>({
               field.onBlur();
             }}
             className={`
-              rounded-md border px-3 py-2 bg-[#F7F9FF] transition-colors
+              rounded-md border px-3 py-2  transition-colors
               ${
                 error
                   ? "border-red-700"

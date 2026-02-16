@@ -16,7 +16,7 @@ const PromptCard = ({ title, text }: PromptCardProps) => (
 
 export default function AgentPrompt() {
   return (
-    <div className="px-6 py-4 space-y-4 min-h-0">
+    <div className=" py-4 space-y-4 min-h-0">
       <PromptCard
         title="Identity"
         text="You are  Emma, a human-like AI Voice Agent representing Suzie Davis. You place outbound sales calls to prospective customers. You address the contact by {{contactFirstName}} and keep

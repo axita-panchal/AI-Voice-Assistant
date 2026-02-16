@@ -57,7 +57,7 @@ export const useUpdateUser = () => {
     mutationFn: userService.updateUser,
 
     onSuccess: () => {
-      // ✅ refetch ALL paginated user queries
+      //  refetch ALL paginated user queries
       queryClient.invalidateQueries({
         queryKey: ["users"],
         exact: false,
@@ -68,14 +68,14 @@ export const useUpdateUser = () => {
 /* ---------------- DELETE ---------------- */
 
 export const useDeleteUser = () => {
-  const queryClient = useQueryClient(); // ✅ CORRECT PLACE
+  const queryClient = useQueryClient();
 
   return useMutation<
     AxiosResponse<CreateUserResponse>,
     AxiosError<ApiErrorResponse>,
-    string
+    number
   >({
-    mutationFn: (id: string) => userService.deleteUser(id),
+    mutationFn: (id: number) => userService.deleteUser(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },

@@ -21,7 +21,7 @@ import { ApiErrorResponse, useLogin } from "@/hooks/auth/useAuthMutations";
 import axios from "axios";
 
 const schema = z.object({
-  email: z.string().email("Invalid email address"),
+  email: z.string().min(1, "Email is required").email("Invalid email address"),
   password: z
     .string()
     .min(5, "Password must be at least 5 characters")

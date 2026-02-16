@@ -51,15 +51,19 @@ export default function ConfirmModal({
         {children && <div className="mt-2">{children}</div>}
 
         <div className="flex justify-end gap-3 mt-4">
-          <Button variant="outlined" onClick={onCancel}>
+          <Button
+            variant="outlined"
+            onClick={onCancel}
+            sx={{ textTransform: "none" }}
+          >
             {cancelText}
           </Button>
-
           <Button
             variant="contained"
             disabled={loading}
             className={VARIANT_STYLES[variant]}
             onClick={onConfirm}
+            sx={{ textTransform: "none" }}
           >
             {confirmText}
           </Button>

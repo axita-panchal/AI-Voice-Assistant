@@ -8,21 +8,21 @@ type GetUsersParams = {
 
 export const userService = {
   getUsers: ({ limit, skip }: GetUsersParams) => {
-    return http.get("/users/get-users", {
+    return http.get("/users", {
       params: { limit, skip },
     });
   },
 
   getUserById: (id: string) => {
-    return http.get(`/users/get-user/${id}`);
+    return http.get(`/users/${id}`);
   },
   createUser: (payload: CreateUserPayload) => {
-    return http.post("/users/create-user", payload);
+    return http.post("/users", payload);
   },
-  deleteUser: (id: string) => {
-    return http.delete(`/users/delete-user/${id}`);
+  deleteUser: (id: number) => {
+    return http.delete(`/users/${id}`);
   },
   updateUser: (payload: UpdateUserPayload) => {
-    return http.patch(`/users/update-user/${payload?.id}`, payload);
+    return http.patch(`/users/${payload?.id}`, payload);
   },
 };

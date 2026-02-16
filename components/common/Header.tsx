@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -22,6 +22,11 @@ import clsx from "clsx";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { logout } from "@/store/slices/authSlice";
+import {
+  setActiveWorkspace,
+  clearWorkspace,
+} from "@/store/slices/workspaceSlice";
+import { useAllWorkspaces } from "@/hooks/workspace/useWorkspaceQueries";
 
 const NAV_ITEMS = [
   {
@@ -29,11 +34,11 @@ const NAV_ITEMS = [
     href: "/dashboard",
     icon: "/assets/svgs/dashboard.svg",
   },
-  { label: "Agent", href: "/agent", icon: "/assets/svgs/agent.svg" },
+  { label: "Agent", href: "/agents", icon: "/assets/svgs/agent.svg" },
   { label: "Campaign", href: "/campaign", icon: "/assets/svgs/campaign.svg" },
   {
     label: "Contact List",
-    href: "/contacts",
+    href: "/contact-list",
     icon: "/assets/svgs/contacts.svg",
   },
   {
@@ -47,7 +52,46 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const dispatch = useDispatch();
-  const user = useSelector((state: RootState) => state?.auth?.user);
+
+  const user = useSelector((state: RootState) => state.auth.user);
+  const activeWorkspace = useSelector(
+    (state: RootState) => state.workspace.activeWorkspace,
+  );
+
+  const [page] = useState(0);
+  const limit = 20;
+  const skip = page * limit;
+
+  const { data: allWorkspaces, isLoading } = useAllWorkspaces(skip, limit);
+
+  const subaccounts = allWorkspaces?.data?.subaccounts || [];
+
+  useEffect(() => {
+    // No workspaces at all
+    if (!subaccounts || subaccounts.length === 0) {
+      dispatch(clearWorkspace());
+      localStorage.removeItem("activeWorkspace");
+      return;
+    }
+
+    // If no active workspace OR active workspace was deleted
+    const exists = subaccounts.some(
+      (workspace: any) => workspace.id === activeWorkspace?.id,
+    );
+
+    if (!activeWorkspace || !exists) {
+      const firstWorkspace = subaccounts[0];
+
+      dispatch(
+        setActiveWorkspace({
+          id: firstWorkspace.id,
+          name: firstWorkspace.name,
+        }),
+      );
+
+      localStorage.setItem("activeWorkspace", JSON.stringify(firstWorkspace));
+    }
+  }, [subaccounts, activeWorkspace, dispatch]);
 
   const isSmallScreen = useMediaQuery("(max-width:1000px)");
   const [open, setOpen] = useState(false);
@@ -66,33 +110,28 @@ export default function Header() {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
   const isNavItemActive = (itemHref: string, pathname: string) => {
     const path = pathname.replace(/\/$/, "");
-
-    if (itemHref === "/agent") {
-      return path === "/agent" || path.startsWith("/add-agent");
+    if (itemHref === "/agents") {
+      return path === "/agents" || path.startsWith("/add-agent");
     }
     return path === itemHref;
   };
 
   return (
     <>
-      {/* ================= HEADER ================= */}
       <AppBar
         position="sticky"
         elevation={0}
         className="border-b border-gray-200"
-        sx={{
-          backgroundColor: "#fff",
-          height: 84,
-          justifyContent: "center",
-        }}
+        sx={{ backgroundColor: "#fff", height: 84, justifyContent: "center" }}
       >
         <Toolbar
           sx={{ height: 84, minHeight: 84 }}
           className="flex justify-between px-4"
         >
-          {/* ========== LEFT SECTION ========== */}
+          {/* LEFT */}
           <Box className="flex items-center gap-4">
             {isSmallScreen && (
               <IconButton onClick={() => setOpen(true)}>
@@ -117,11 +156,9 @@ export default function Header() {
                   </span>
                 </div>
 
-                {/* NAVIGATION */}
-                <nav className="flex gap-1 xl:gap-6 ">
+                <nav className="flex gap-1 xl:gap-6">
                   {NAV_ITEMS.map((item) => {
                     const isActive = isNavItemActive(item.href, pathname || "");
-
                     return (
                       <Link
                         key={item.href}
@@ -143,37 +180,79 @@ export default function Header() {
             )}
           </Box>
 
-          {/* ========== RIGHT SECTION ========== */}
           <Box className="flex items-center gap-3">
-            <Select
-              size="small"
-              defaultValue="sub1"
-              sx={{
-                height: 32,
-                borderRadius: "8px",
-                backgroundColor: "#7070701A",
-                "& fieldset": { border: "none" },
+            {/* Workspace Selector */}
+            {subaccounts?.length > 0 && (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  backgroundColor: "#F3F4F6",
+                  borderRadius: "12px",
+                  px: 2,
+                  py: 1,
+                  minWidth: 220,
+                }}
+              >
+                {/* Left Icon */}
+                <img
+                  src="/assets/svgs/subaccounts.svg"
+                  alt="workspace"
+                  width={18}
+                  height={18}
+                  style={{ marginRight: 8, opacity: 0.7 }}
+                />
 
-                display: "flex",
-                "@media (max-width:1050px)": {
-                  display: "none",
-                },
-              }}
-              renderValue={(selected) => (
-                <Box className="flex items-center gap-2">
-                  <img
-                    src="/assets/svgs/user_account.svg"
-                    className="w-4 h-4"
-                  />
-                  <span className="text-sm text-gray-600">
-                    {selected === "sub1" ? "Subaccount 1" : "Subaccount 2"}
-                  </span>
-                </Box>
-              )}
-            >
-              <MenuItem value="sub1">Subaccount 1</MenuItem>
-              <MenuItem value="sub2">Subaccount 2</MenuItem>
-            </Select>
+                {/* Select */}
+                <Select
+                  value={activeWorkspace?.id || ""}
+                  variant="standard"
+                  disableUnderline
+                  disabled={isLoading}
+                  onChange={(e) => {
+                    const selected = subaccounts?.find(
+                      (item: any) => item.id === e.target.value,
+                    );
+
+                    if (selected) {
+                      dispatch(
+                        setActiveWorkspace({
+                          id: selected.id,
+                          name: selected.name,
+                        }),
+                      );
+                      localStorage.setItem(
+                        "activeWorkspace",
+                        JSON.stringify(selected),
+                      );
+                    }
+                  }}
+                  sx={{
+                    flex: 1,
+                    fontWeight: 500,
+                    fontSize: 16,
+                    color: "#374151",
+                    "& .MuiSelect-select": {
+                      padding: 0,
+                    },
+                  }}
+                  IconComponent={() => (
+                    <img
+                      src="/assets/svgs/down_vector.svg"
+                      className="w-3 h-3 ml-2"
+                    />
+                  )}
+                >
+                  {subaccounts?.map((workspace: any) => (
+                    <MenuItem key={workspace.id} value={workspace.id}>
+                      {workspace.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </Box>
+            )}
+
+            {/* User Section */}
             <Box
               className="flex items-center gap-1 cursor-pointer"
               onClick={handleUserClick}
@@ -304,8 +383,8 @@ export default function Header() {
         <MenuItem
           onClick={() => {
             dispatch(logout());
+            dispatch(clearWorkspace());
             localStorage.clear();
-            handleClose();
             router.push("/login");
           }}
           className="text-red-600"

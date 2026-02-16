@@ -18,6 +18,9 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useCreateAgent } from "@/hooks/agent/useAgentMutations";
+import { useQueryClient } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 /* ---------------------------------- */
 /* Constants */
@@ -56,6 +59,11 @@ type Props = {
 /* ---------------------------------- */
 
 export default function AddAgentModal({ open, onClose }: Props) {
+  const queryClient = useQueryClient();
+  const subaccountId = useSelector(
+    (state: RootState) => state?.workspace?.activeWorkspace?.id,
+  );
+
   const { mutate: createAgent } = useCreateAgent();
 
   const {
@@ -68,7 +76,7 @@ export default function AddAgentModal({ open, onClose }: Props) {
     resolver: zodResolver(schema),
     defaultValues: {
       first_name: "",
-      phone_collection: "", // ✅ critical fix
+      phone_collection: PHONE_COLLECTIONS[0]?.value || "",
       description: "",
     },
   });
@@ -81,22 +89,22 @@ export default function AddAgentModal({ open, onClose }: Props) {
 
   const onSubmit = async (data: FormData) => {
     try {
+      if (!subaccountId) {
+        console.error("Subaccount ID is missing");
+        return;
+      }
       const payload = {
         name: data.first_name,
         phone_number_option: data.phone_collection,
         description: data.description,
+        subaccount_id: subaccountId,
       };
 
       console.log("Final Payload:", payload);
 
-      // 🔥 API call here
-      //   const createAgentRes = await createAgent(payload);
-      //   console.log("createAgentRes: ", createAgentRes);
-
+      const createAgentRes = await createAgent(payload);
+      queryClient.invalidateQueries({ queryKey: ["allAgents"] });
       onClose();
-
-      // 👉 redirect after creation
-      // router.push("/add-agent");
     } catch (error) {
       console.error(error);
     }
@@ -150,22 +158,15 @@ export default function AddAgentModal({ open, onClose }: Props) {
           name="phone_collection"
           control={control}
           render={({ field }) => (
-            <FormControl size="small" error={!!errors.phone_collection}>
+            <FormControl size="small">
               <InputLabel id="phone-label">Phone number</InputLabel>
               <Select {...field} label="Phone number">
-                <MenuItem value="">
-                  <em>Select phone number</em>
-                </MenuItem>
-
                 {PHONE_COLLECTIONS.map((item) => (
                   <MenuItem key={item.value} value={item.value}>
                     {item.label}
                   </MenuItem>
                 ))}
               </Select>
-              <FormHelperText>
-                {errors.phone_collection?.message}
-              </FormHelperText>
             </FormControl>
           )}
         />
