@@ -30,7 +30,7 @@ export default function AgentAction() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
       <ActionRow
         title="Calendar Booking"
         description="Connect calendars here so your Agent can schedule meetings."
@@ -104,15 +104,19 @@ function ActionRow({
 }) {
   return (
     <div className="border border-gray-200 rounded-lg bg-[#F5F8FF]">
-      <div className="flex items-start justify-between p-7">
-        <div className="max-w-[75%]">
-          <h3 className="text-base font-medium text-gray-600">{title}</h3>
-          <p className="text-[15px] text-gray-500 mt-1">{description}</p>
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 p-4 sm:p-7">
+        <div className="w-full sm:max-w-[75%]">
+          <h3 className="text-sm sm:text-base font-medium text-gray-600">
+            {title}
+          </h3>
+          <p className="text-sm sm:text-[15px] text-gray-500 mt-1">
+            {description}
+          </p>
         </div>
 
         <button
           onClick={onAdd}
-          className={`flex items-center gap-1 px-3 py-1.5 text-xs rounded-lg shrink-0 transition cursor-pointer
+          className={`flex items-center justify-center gap-1 px-3 py-1.5 text-xs rounded-lg shrink-0 transition cursor-pointer w-fit
             ${
               isOpen
                 ? "bg-gray-200 text-gray-700"
@@ -124,7 +128,7 @@ function ActionRow({
         </button>
       </div>
 
-      {isOpen && <div className="px-7 pb-6">{children}</div>}
+      {isOpen && <div className="px-4 sm:px-7 pb-4 sm:pb-6">{children}</div>}
     </div>
   );
 }
@@ -143,17 +147,17 @@ function CommonInput({
   actionLabel?: string;
 }) {
   return (
-    <div className="flex gap-3">
+    <div className="flex flex-col sm:flex-row gap-3">
       <input
         type="text"
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm"
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
       />
 
       {actionLabel && (
-        <button className="px-4 py-2 border border-gray-300 rounded-lg text-sm">
+        <button className="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-lg text-sm">
           {actionLabel}
         </button>
       )}

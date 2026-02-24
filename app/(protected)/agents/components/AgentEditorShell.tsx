@@ -29,7 +29,6 @@ export default function AgentEditorShell({ agentId }: Props) {
   const { mutateAsync: updateAgent, isPending: isUpdatingAgent } =
     useUpdateAgent();
   const { data: agentData, isPending } = useAgentById(agentId);
-  console.log("agentData: ", agentData);
 
   const searchParams = useSearchParams();
   const activeTab = searchParams.get("setting") || "agent-prompt";
@@ -41,7 +40,6 @@ export default function AgentEditorShell({ agentId }: Props) {
         payload: form,
       });
 
-      console.log("Updated:", response.data);
       if (response.data?.status_code === 200) {
         toast.success(response.data?.message || "Agent updated successfully");
         router.push("/agents");
@@ -98,7 +96,8 @@ export default function AgentEditorShell({ agentId }: Props) {
             form={form}
             setForm={setForm}
             onPublish={updateAgentDataById}
-            isUpdating={isPending}
+            isUpdating={isUpdatingAgent}
+            agentDataByIdLoading={isPending}
           />
         </div>
 
@@ -116,7 +115,8 @@ export default function AgentEditorShell({ agentId }: Props) {
               form={form}
               setForm={setForm}
               onPublish={updateAgentDataById}
-              isUpdating={isPending}
+              isUpdating={isUpdatingAgent}
+              agentDataByIdLoading={isPending}
             />
           </aside>
 
@@ -128,7 +128,7 @@ export default function AgentEditorShell({ agentId }: Props) {
             </div>
 
             {/* Scroll area */}
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto custom-scroll">
               <div className="p-6 max-w-5xl mx-auto">{content}</div>
             </div>
           </section>

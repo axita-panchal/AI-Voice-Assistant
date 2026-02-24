@@ -1,6 +1,12 @@
 "use client";
 
-import { Modal, Box, Typography, Button } from "@mui/material";
+import {
+  Modal,
+  Box,
+  Typography,
+  Button,
+  CircularProgress,
+} from "@mui/material";
 import React from "react";
 
 type ConfirmVariant = "danger" | "primary";
@@ -53,17 +59,40 @@ export default function ConfirmModal({
         <div className="flex justify-end gap-3 mt-4">
           <Button
             variant="outlined"
+            color="inherit"
             onClick={onCancel}
-            sx={{ textTransform: "none" }}
+            sx={{
+              textTransform: "none",
+              borderColor: "grey.300",
+              "&:hover": {
+                borderColor: "grey.400",
+                backgroundColor: "grey.100",
+              },
+            }}
           >
             {cancelText}
           </Button>
           <Button
             variant="contained"
             disabled={loading}
+            sx={{
+              textTransform: "none",
+              "&.Mui-disabled": {
+                backgroundColor: "lab(48.4493% 77.4328 61.5452)",
+                color: "#fff",
+                opacity: 1, // prevent faded look
+              },
+            }}
             className={VARIANT_STYLES[variant]}
             onClick={onConfirm}
-            sx={{ textTransform: "none" }}
+            endIcon={
+              loading ? (
+                <CircularProgress
+                  size={20}
+                  sx={{ color: "#fff" }} // force white loader
+                />
+              ) : null
+            }
           >
             {confirmText}
           </Button>

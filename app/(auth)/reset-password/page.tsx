@@ -20,6 +20,7 @@ import {
   useResetPassword,
 } from "@/hooks/auth/useAuthMutations";
 import axios from "axios";
+import Image from "next/image";
 
 const schema = z
   .object({
@@ -36,7 +37,7 @@ const schema = z
 
 type FormData = z.infer<typeof schema>;
 
-export default function LoginPage() {
+export default function ResetPasswordPage() {
   const router = useRouter();
 
   const searchParams = useSearchParams();
@@ -63,7 +64,6 @@ export default function LoginPage() {
         token,
       };
       const res = await mutateAsync(payload);
-      console.log("reset password res: ", res);
 
       toast.success("Password reset successfully");
       router.push("/login");
@@ -71,10 +71,22 @@ export default function LoginPage() {
       let message = "Something went wrong";
 
       if (axios.isAxiosError<ApiErrorResponse>(error)) {
-        message =
-          error.response?.data?.detail ||
-          error.response?.data?.message ||
-          message;
+        const responseData = error.response?.data;
+
+        if (Array.isArray(responseData?.detail)) {
+          message = responseData.detail
+            .map((err) => {
+              const field = err?.loc?.[1];
+              const msg = err?.msg;
+
+              return field ? `${field}: ${msg}` : msg;
+            })
+            .join(", ");
+        } else if (typeof responseData?.detail === "string") {
+          message = responseData.detail;
+        } else if (responseData?.message) {
+          message = responseData.message;
+        }
       }
 
       toast.error(message);
@@ -190,11 +202,18 @@ export default function LoginPage() {
         </div>
 
         {/* RIGHT IMAGE */}
-        <div className="hidden min-[800px]:flex w-1/2 p-10 items-center justify-center">
-          <img
+        <div className="hidden min-[800px]:flex w-1/2 p-10 items-center justify-center ">
+          {/* <img
             src="/assets/svgs/login_logo.png"
             alt="Login"
             className="w-full h-full object-contain"
+          /> */}
+          <Image
+            src="/assets/svgs/login_logo.png"
+            alt="Login"
+            className="object-contain"
+            width={600}
+            height={600}
           />
         </div>
       </div>

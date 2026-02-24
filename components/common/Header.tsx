@@ -27,6 +27,8 @@ import {
   clearWorkspace,
 } from "@/store/slices/workspaceSlice";
 import { useAllWorkspaces } from "@/hooks/workspace/useWorkspaceQueries";
+import { subAccountsType } from "@/types/workspace.types";
+import Image from "next/image";
 
 const NAV_ITEMS = [
   {
@@ -67,7 +69,6 @@ export default function Header() {
   const subaccounts = allWorkspaces?.data?.subaccounts || [];
 
   useEffect(() => {
-    // No workspaces at all
     if (!subaccounts || subaccounts.length === 0) {
       dispatch(clearWorkspace());
       localStorage.removeItem("activeWorkspace");
@@ -76,7 +77,7 @@ export default function Header() {
 
     // If no active workspace OR active workspace was deleted
     const exists = subaccounts.some(
-      (workspace: any) => workspace.id === activeWorkspace?.id,
+      (workspace: subAccountsType) => workspace.id === activeWorkspace?.id,
     );
 
     if (!activeWorkspace || !exists) {
@@ -141,13 +142,18 @@ export default function Header() {
 
             {!isSmallScreen && (
               <>
-                <img
+                <Image
                   src="/assets/svgs/ai_voice.svg"
                   alt="AI Voice"
-                  className="w-10 h-10 rounded-lg"
+                  className=" rounded-lg cursor-pointer"
+                  height={40}
+                  width={40}
+                  onClick={() => router?.push("/dashboard")}
                 />
-
-                <div className="flex flex-col leading-none">
+                <div
+                  className="flex flex-col leading-none cursor-pointer"
+                  onClick={() => router?.push("/dashboard")}
+                >
                   <span className="font-medium text-gray-800 text-base">
                     AI Voice
                   </span>
@@ -170,7 +176,12 @@ export default function Header() {
                             : "text-gray-500 hover:text-gray-900",
                         )}
                       >
-                        <img src={item.icon} className="w-5 h-5" />
+                        <Image
+                          src={item.icon}
+                          alt={item?.label}
+                          height={20}
+                          width={20}
+                        />
                         {item.label}
                       </Link>
                     );
@@ -195,12 +206,12 @@ export default function Header() {
                 }}
               >
                 {/* Left Icon */}
-                <img
+                <Image
                   src="/assets/svgs/subaccounts.svg"
                   alt="workspace"
                   width={18}
                   height={18}
-                  style={{ marginRight: 8, opacity: 0.7 }}
+                  style={{ marginRight: 8 }}
                 />
 
                 {/* Select */}
@@ -211,7 +222,7 @@ export default function Header() {
                   disabled={isLoading}
                   onChange={(e) => {
                     const selected = subaccounts?.find(
-                      (item: any) => item.id === e.target.value,
+                      (item: subAccountsType) => item.id === e.target.value,
                     );
 
                     if (selected) {
@@ -237,13 +248,15 @@ export default function Header() {
                     },
                   }}
                   IconComponent={() => (
-                    <img
+                    <Image
                       src="/assets/svgs/down_vector.svg"
-                      className="w-3 h-3 ml-2"
+                      alt="down_vector"
+                      height={12}
+                      width={12}
                     />
                   )}
                 >
-                  {subaccounts?.map((workspace: any) => (
+                  {subaccounts?.map((workspace: subAccountsType) => (
                     <MenuItem key={workspace.id} value={workspace.id}>
                       {workspace.name}
                     </MenuItem>
@@ -258,7 +271,12 @@ export default function Header() {
               onClick={handleUserClick}
             >
               <Avatar src="/assets/svgs/user_profile.svg" className="w-8 h-8" />
-              <img src="/assets/svgs/down_vector.svg" className="w-2 h-2" />
+              <Image
+                src="/assets/svgs/down_vector.svg"
+                alt="down_vector"
+                height={8}
+                width={8}
+              />
             </Box>
           </Box>
         </Toolbar>
@@ -268,9 +286,12 @@ export default function Header() {
       <Drawer anchor="left" open={open} onClose={() => setOpen(false)}>
         <Box className="w-65 p-4">
           <Box className="flex items-center gap-3 mb-6">
-            <img
+            <Image
               src="/assets/svgs/ai_voice.svg"
-              className="w-10 h-10 rounded-lg"
+              className="rounded-lg"
+              alt="ai_voice_logo"
+              height={40}
+              width={40}
             />
             <div>
               <p className="font-semibold">AI Voice</p>
@@ -294,7 +315,12 @@ export default function Header() {
                       : "text-gray-600 hover:bg-gray-100",
                   )}
                 >
-                  <img src={item.icon} className="w-5 h-5" />
+                  <Image
+                    src={item.icon}
+                    height={20}
+                    width={20}
+                    alt={item?.label}
+                  />
                   {item.label}
                 </Link>
               );
@@ -343,7 +369,12 @@ export default function Header() {
           sx={{ fontSize: "16px", color: "#565656" }}
         >
           <ListItemIcon>
-            <img src="/assets/svgs/userProfile.svg" className="w-5 h-5" />
+            <Image
+              src="/assets/svgs/userProfile.svg"
+              alt="user_profile"
+              height={20}
+              width={20}
+            />
           </ListItemIcon>
           Profile
         </MenuItem>
@@ -353,7 +384,12 @@ export default function Header() {
           sx={{ fontSize: "16px", color: "#565656" }}
         >
           <ListItemIcon>
-            <img src="/assets/svgs/settings.svg" className="w-5 h-5" />
+            <Image
+              src="/assets/svgs/settings.svg"
+              height={20}
+              width={20}
+              alt="settings"
+            />
           </ListItemIcon>
           Settings
         </MenuItem>
@@ -363,7 +399,12 @@ export default function Header() {
           sx={{ fontSize: "16px", color: "#565656" }}
         >
           <ListItemIcon>
-            <img src="/assets/svgs/integration.svg" className="w-5 h-5" />
+            <Image
+              src="/assets/svgs/integration.svg"
+              height={20}
+              width={20}
+              alt="intergration"
+            />
           </ListItemIcon>
           Integrations
         </MenuItem>
@@ -373,7 +414,12 @@ export default function Header() {
           sx={{ fontSize: "16px", color: "#565656" }}
         >
           <ListItemIcon>
-            <img src="/assets/svgs/billing.svg" className="w-5 h-5" />
+            <Image
+              src="/assets/svgs/billing.svg"
+              height={20}
+              width={20}
+              alt="billings"
+            />
           </ListItemIcon>
           Billing
         </MenuItem>
@@ -391,7 +437,12 @@ export default function Header() {
           sx={{ fontSize: "16px", color: "#565656" }}
         >
           <ListItemIcon className="text-red-600!">
-            <img src="/assets/svgs/logout.svg" className="w-5 h-5" />
+            <Image
+              src="/assets/svgs/logout.svg"
+              height={20}
+              width={20}
+              alt="logout"
+            />
           </ListItemIcon>
           Log out
         </MenuItem>

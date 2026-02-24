@@ -58,12 +58,13 @@ export default function WorkSpaceSettings() {
     isLoading,
     isError,
   } = useAllWorkspaces(skip, limit);
-  console.log("allWorkspaces: ", allWorkspaces);
 
   const { mutateAsync: deleteWorkspace, isPending: deletePending } =
     useDeleteWorkspace();
-  const { mutateAsync: createWorkspace } = useCreateWorkspace();
-  const { mutateAsync: updateWorkspace } = useUpdateWorkspace();
+  const { mutateAsync: createWorkspace, isPending: createPending } =
+    useCreateWorkspace();
+  const { mutateAsync: updateWorkspace, isPending: updatePending } =
+    useUpdateWorkspace();
 
   /** ---------------- Derived table data ---------------- */
   const tableData: WorkspaceProps[] = useMemo(() => {
@@ -97,11 +98,24 @@ export default function WorkSpaceSettings() {
   const handleSaveWorkspace = async (data: WorkspaceFormData) => {
     try {
       if (selectedMember) {
-        await updateWorkspace({ id: selectedMember.id, ...data });
-        toast.success("Workspace updated");
+        const updatedWorkspaceRes = await updateWorkspace({
+          id: selectedMember.id,
+          ...data,
+        });
+        if (updatedWorkspaceRes?.data?.status_code === 200) {
+          toast.success(
+            updatedWorkspaceRes?.data?.message ||
+              "Subaccount Updated Successfully",
+          );
+        }
       } else {
-        await createWorkspace(data);
-        toast.success("Workspace created");
+        const createdWorkspaceRes = await createWorkspace(data);
+        if (createdWorkspaceRes?.data?.status_code === 201) {
+          toast.success(
+            createdWorkspaceRes?.data?.message ||
+              "Subaccount Created Successfully",
+          );
+        }
       }
       queryClient.invalidateQueries({ queryKey: ["allWorkspaces"] });
       setOpen(false);
@@ -123,10 +137,15 @@ export default function WorkSpaceSettings() {
   const handleConfirmDelete = async () => {
     if (!workspaceToDelete) return;
     try {
-      await deleteWorkspace(workspaceToDelete.id);
-      queryClient.invalidateQueries({ queryKey: ["allWorkspaces"] });
+      const deletedWorkspaceRes = await deleteWorkspace(workspaceToDelete.id);
+      if (deletedWorkspaceRes?.data?.status_code === 200) {
+        toast.success(
+          deletedWorkspaceRes?.data?.message || "Subaccount deleted",
+        );
+      }
       setDeleteOpen(false);
       setWorkspaceToDelete(null);
+      queryClient.invalidateQueries({ queryKey: ["allWorkspaces"] });
     } catch (error) {
       toast.error("Failed to delete workspace");
     }
@@ -147,7 +166,16 @@ export default function WorkSpaceSettings() {
     {
       key: "rebilling",
       label: "Rebilling",
-      render: (row) => <Switch size="small" checked={row.rebilling} />,
+      render: (row) => (
+        <Switch
+          size="small"
+          checked={row.rebilling}
+          onClick={async (e) => {
+            e.stopPropagation();
+            await updateWorkspace({ ...row, rebilling: !row.rebilling });
+          }}
+        />
+      ),
     },
     {
       key: "limitMinutes",
@@ -225,10 +253,12 @@ export default function WorkSpaceSettings() {
             : undefined
         }
         onSubmit={handleSaveWorkspace}
+        updatePending={updatePending}
+        createPending={createPending}
       />
       <ConfirmModal
         open={deleteOpen}
-        title="Delete Workspace"
+        title="Delete Workspace ?"
         description="Are you sure you want to remove this workspace? This action cannot be undone."
         confirmText="Delete"
         variant="danger"

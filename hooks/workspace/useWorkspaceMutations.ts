@@ -17,6 +17,7 @@ export type UpdateWorkSpacePayload = {
   name: string;
   description?: string;
   id: number;
+  rebilling?: boolean;
 };
 
 export type Workspace = {

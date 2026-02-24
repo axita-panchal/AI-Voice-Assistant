@@ -12,6 +12,7 @@ import {
   FormControl,
   FormHelperText,
   InputLabel,
+  CircularProgress,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
@@ -166,13 +167,10 @@ export default function AddTeamMemberModal({
           id: member.id,
           ...payload,
         });
-        console.log("updatedUserRes: ", updatedUserRes);
-
         toast.success("User updated successfully");
       } else {
         // create user
         const createdUserRes = await createUser(payload);
-        console.log("createdUserRes: ", createdUserRes);
         toast.success("User created successfully");
       }
 
@@ -279,7 +277,25 @@ export default function AddTeamMemberModal({
             variant="contained"
             disabled={isCreating || isUpdating}
             onClick={handleSubmit(onSubmit)}
-            sx={{ textTransform: "capitalize" }}
+            sx={{
+              textTransform: "capitalize",
+              backgroundColor: "#1976d2",
+              color: "#fff",
+              "&:hover": {
+                backgroundColor: "#1976d2",
+                color: "#fff",
+              },
+              "&.Mui-disabled": {
+                backgroundColor: "#1976d2",
+                color: "#fff",
+                opacity: 1,
+              },
+            }}
+            endIcon={
+              isUpdating || isCreating ? (
+                <CircularProgress size={20} sx={{ color: "#fff" }} />
+              ) : null
+            }
           >
             {member ? "Save Changes" : "Add Team Member"}
           </Button>

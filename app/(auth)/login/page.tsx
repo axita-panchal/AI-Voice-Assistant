@@ -19,6 +19,7 @@ import { useDispatch } from "react-redux";
 import { loginSuccess } from "@/store/slices/authSlice";
 import { ApiErrorResponse, useLogin } from "@/hooks/auth/useAuthMutations";
 import axios from "axios";
+import Image from "next/image";
 
 const schema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email address"),
@@ -190,11 +191,19 @@ export default function LoginPage() {
         </div>
 
         {/* RIGHT IMAGE */}
-        <div className="hidden min-[800px]:flex w-1/2 p-10 items-center justify-center">
-          <img
+        <div className="hidden min-[800px]:flex w-1/2 p-10 items-center justify-center ">
+          {/* <img
             src="/assets/svgs/login_logo.png"
             alt="Login"
             className="w-full h-full object-contain"
+          /> */}
+          <Image
+            src="/assets/svgs/login_logo.png"
+            alt="Login"
+            width={600}
+            height={600}
+            className="w-full h-full object-contain"
+            priority
           />
         </div>
       </div>

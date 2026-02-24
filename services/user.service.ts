@@ -19,7 +19,7 @@ export const userService = {
   createUser: (payload: CreateUserPayload) => {
     return http.post("/users", payload);
   },
-  deleteUser: (id: number) => {
+  deleteUser: (id: string) => {
     return http.delete(`/users/${id}`);
   },
   updateUser: (payload: UpdateUserPayload) => {

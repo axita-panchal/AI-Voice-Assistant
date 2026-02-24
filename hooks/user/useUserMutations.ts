@@ -73,9 +73,9 @@ export const useDeleteUser = () => {
   return useMutation<
     AxiosResponse<CreateUserResponse>,
     AxiosError<ApiErrorResponse>,
-    number
+    string
   >({
-    mutationFn: (id: number) => userService.deleteUser(id),
+    mutationFn: (id: string) => userService.deleteUser(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },

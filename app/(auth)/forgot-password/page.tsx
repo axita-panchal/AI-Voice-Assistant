@@ -12,6 +12,7 @@ import {
   useForgotPassword,
 } from "@/hooks/auth/useAuthMutations";
 import axios from "axios";
+import Image from "next/image";
 
 const schema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email address"),
@@ -40,7 +41,6 @@ export default function ForgotPasswordPage() {
         router.push("/login");
       }
     } catch (error: unknown) {
-      console.log("forgot error: ", error);
       let message = "Invalid credentials";
 
       if (axios.isAxiosError<ApiErrorResponse>(error)) {
@@ -57,7 +57,6 @@ export default function ForgotPasswordPage() {
   return (
     <div className="h-screen bg-linear-to-br from-indigo-500 via-blue-500 to-purple-600 p-6 flex items-center">
       <div className="bg-white w-full flex rounded-3xl shadow-xl overflow-hidden max-w-6xl mx-auto">
-        {/* LEFT FORM */}
         <div className="w-full min-[800px]:w-1/2 px-10 py-8 flex flex-col justify-center">
           <h1 className="text-lg sm:text-3xl font-semibold text-gray-900">
             Forgot your Password?
@@ -83,7 +82,6 @@ export default function ForgotPasswordPage() {
               />
             </div>
 
-            {/* Submit */}
             <Button
               type="submit"
               fullWidth
@@ -114,12 +112,18 @@ export default function ForgotPasswordPage() {
           </form>
         </div>
 
-        {/* RIGHT IMAGE */}
-        <div className="hidden min-[800px]:flex w-1/2 p-10 items-center justify-center">
-          <img
+        <div className="hidden min-[800px]:flex w-1/2 p-10 items-center justify-center ">
+          {/* <img
             src="/assets/svgs/login_logo.png"
             alt="Login"
             className="w-full h-full object-contain"
+          /> */}
+          <Image
+            src="/assets/svgs/login_logo.png"
+            alt="Login"
+            className="object-contain"
+            width={600}
+            height={600}
           />
         </div>
       </div>

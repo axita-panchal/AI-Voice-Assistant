@@ -168,11 +168,11 @@ export default function AddAgentShell({
                 {/* Input row */}
                 <div className="flex items-center gap-2">
                   <button className="p-2 rounded-lg border border-gray-400  hover:border-gray-500 cursor-pointer">
-                    <img src="/assets/svgs/recordings.svg" />
+                    <img src="/assets/svgs/recordings.svg" alt="recording" />
                   </button>
 
                   <button className="p-2 rounded-lg border bg-[#2F6AFF1A] text-white hover:border-[#2F6AFF] cursor-pointer">
-                    <img src="/assets/svgs/send.svg" />
+                    <img src="/assets/svgs/send.svg" alt="send" />
                   </button>
                 </div>
               </div>

@@ -1,4 +1,5 @@
 import { Box, Typography } from "@mui/material";
+import Image from "next/image";
 
 export default function StatCommonCard({
   title,
@@ -54,9 +55,19 @@ export default function StatCommonCard({
             }}
           >
             {upIcon ? (
-              <img src="/assets/svgs/up_vector.svg" alt="Up" />
+              <Image
+                src="/assets/svgs/up_vector.svg"
+                alt="Up"
+                width={10}
+                height={10}
+              />
             ) : (
-              <img src="/assets/svgs/down_stat_vector.svg" alt="Down" />
+              <Image
+                src="/assets/svgs/down_stat_vector.svg"
+                alt="Down"
+                width={10}
+                height={10}
+              />
             )}
             {subText}
           </Box>

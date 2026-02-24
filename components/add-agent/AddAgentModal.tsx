@@ -10,21 +10,17 @@ import {
   MenuItem,
   Select,
   FormControl,
-  FormHelperText,
   InputLabel,
+  CircularProgress,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { useCreateAgent } from "@/hooks/agent/useAgentMutations";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-
-/* ---------------------------------- */
-/* Constants */
-/* ---------------------------------- */
+import { toast } from "@/utils/toast";
 
 const PHONE_COLLECTIONS = [
   {
@@ -36,10 +32,6 @@ const PHONE_COLLECTIONS = [
     label: "Shared UK Phone Collection",
   },
 ];
-
-/* ---------------------------------- */
-/* Schema */
-/* ---------------------------------- */
 
 const schema = z.object({
   first_name: z.string().min(1, "First name is required"),
@@ -54,17 +46,13 @@ type Props = {
   onClose: () => void;
 };
 
-/* ---------------------------------- */
-/* Component */
-/* ---------------------------------- */
-
 export default function AddAgentModal({ open, onClose }: Props) {
   const queryClient = useQueryClient();
   const subaccountId = useSelector(
     (state: RootState) => state?.workspace?.activeWorkspace?.id,
   );
 
-  const { mutate: createAgent } = useCreateAgent();
+  const { mutateAsync: createAgent } = useCreateAgent();
 
   const {
     handleSubmit,
@@ -90,7 +78,6 @@ export default function AddAgentModal({ open, onClose }: Props) {
   const onSubmit = async (data: FormData) => {
     try {
       if (!subaccountId) {
-        console.error("Subaccount ID is missing");
         return;
       }
       const payload = {
@@ -99,10 +86,12 @@ export default function AddAgentModal({ open, onClose }: Props) {
         description: data.description,
         subaccount_id: subaccountId,
       };
-
-      console.log("Final Payload:", payload);
-
       const createAgentRes = await createAgent(payload);
+      if (createAgentRes?.data?.status_code === 201) {
+        toast.success(
+          createAgentRes?.data?.message || "Agent created successfully",
+        );
+      }
       queryClient.invalidateQueries({ queryKey: ["allAgents"] });
       onClose();
     } catch (error) {
@@ -142,7 +131,6 @@ export default function AddAgentModal({ open, onClose }: Props) {
             ✕
           </button>
         </div>
-
         {/* First Name */}
         <TextField
           label="First name"
@@ -152,7 +140,6 @@ export default function AddAgentModal({ open, onClose }: Props) {
           error={!!errors.first_name}
           helperText={errors.first_name?.message}
         />
-
         {/* Phone Collection */}
         <Controller
           name="phone_collection"
@@ -170,7 +157,6 @@ export default function AddAgentModal({ open, onClose }: Props) {
             </FormControl>
           )}
         />
-
         {/* Description */}
         <TextField
           label="Description"
@@ -180,7 +166,6 @@ export default function AddAgentModal({ open, onClose }: Props) {
           fullWidth
           {...register("description")}
         />
-
         {/* Actions */}
         <div className="flex gap-3 mt-4">
           <Button
@@ -188,11 +173,28 @@ export default function AddAgentModal({ open, onClose }: Props) {
             variant="contained"
             onClick={handleSubmit(onSubmit)}
             disabled={isSubmitting}
-            sx={{ textTransform: "capitalize" }}
+            sx={{
+              textTransform: "capitalize",
+              backgroundColor: "#1976d2",
+              color: "#fff",
+              "&:hover": {
+                backgroundColor: "#1976d2",
+                color: "#fff",
+              },
+              "&.Mui-disabled": {
+                backgroundColor: "#1976d2",
+                color: "#fff",
+                opacity: 1,
+              },
+            }}
+            endIcon={
+              isSubmitting ? (
+                <CircularProgress size={20} sx={{ color: "#fff" }} />
+              ) : null
+            }
           >
             Create Agent
           </Button>
-
           <Button
             fullWidth
             variant="outlined"

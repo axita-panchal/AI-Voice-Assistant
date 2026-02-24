@@ -19,6 +19,7 @@ import { AxiosError } from "axios";
 import PhoneInputField from "@/components/common/PhoneInputField";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { useRegister } from "@/hooks/auth/useAuthMutations";
+import Image from "next/image";
 
 /* ================= VALIDATION ================= */
 const schema = z.object({
@@ -252,10 +253,17 @@ export default function SignupPage() {
 
         {/* ================= RIGHT IMAGE ================= */}
         <div className="hidden min-[1000px]:flex w-1/2 p-10 items-center justify-center">
-          <img
+          {/* <img
             src="/assets/svgs/login_logo.png"
             alt="Signup"
             className="w-full h-full object-contain"
+          /> */}
+          <Image
+            src="/assets/svgs/login_logo.png"
+            alt="Signup"
+            className="object-contain"
+            width={600}
+            height={600}
           />
         </div>
       </div>

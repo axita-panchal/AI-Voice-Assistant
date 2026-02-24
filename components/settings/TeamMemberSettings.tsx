@@ -11,6 +11,7 @@ import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutl
 import { useDeleteUser } from "@/hooks/user/useUserMutations";
 import { useTeamMemberUsers } from "@/hooks/user/useUserQueries";
 import ConfirmModal from "../common/ConfirmModal";
+import { toast } from "@/utils/toast";
 
 /* -------------------------------------------------------
    API TYPES
@@ -87,7 +88,6 @@ export default function TeamMembers() {
   --------------------------------------------------- */
 
   const users = usersResponse?.data?.data?.users ?? [];
-  console.log("users: ", users);
   const meta = usersResponse?.data?.data?.meta;
 
   const totalCount = meta?.totalCount ?? 0;
@@ -110,7 +110,12 @@ export default function TeamMembers() {
   const handleConfirmDelete = async () => {
     if (!memberToDelete) return;
 
-    await deleteUser(Number(memberToDelete.id));
+    const deletedUserRes = await deleteUser(memberToDelete.id);
+    if (deletedUserRes?.data?.status_code === 200) {
+      toast.success(
+        deletedUserRes?.data?.message || "User deleted successfully",
+      );
+    }
 
     setDeleteOpen(false);
     setMemberToDelete(null);
@@ -157,12 +162,12 @@ export default function TeamMembers() {
       key: "actions",
       label: "",
       render: (row) => (
-        <div className="flex justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <div className="flex justify-end ">
           <IconButton
             danger
             disabled={isPending}
             onClick={(e) => {
-              e.stopPropagation(); // 🔥 prevent edit modal
+              e.stopPropagation();
               setMemberToDelete(row);
               setDeleteOpen(true);
             }}
@@ -235,7 +240,7 @@ export default function TeamMembers() {
       />
       <ConfirmModal
         open={deleteOpen}
-        title="Delete Team Member"
+        title="Delete Team Member ?"
         description="Are you sure you want to remove this user? This action cannot be undone."
         confirmText="Delete"
         variant="danger"

@@ -11,7 +11,7 @@ export const agentService = {
       params: { limit, skip },
     });
   },
-  getAgentById: ({ agentId }: any) => {
+  getAgentById: ({ agentId }: { agentId: string }) => {
     return http.get(`/agents/${agentId}`);
   },
   updateAgent: ({
@@ -24,7 +24,6 @@ export const agentService = {
     return http.patch(`/agents/${agentId}`, payload);
   },
   deleteAgent: (agentId: string) => {
-    console.log("agentId: ", agentId);
     return http.delete(`/agents/${agentId}`);
   },
 };

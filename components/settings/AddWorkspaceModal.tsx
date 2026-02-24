@@ -7,6 +7,7 @@ import {
   TextField,
   Button,
   Avatar,
+  CircularProgress,
 } from "@mui/material";
 import { z } from "zod";
 
@@ -20,6 +21,8 @@ type Props = {
   onClose: () => void;
   onSubmit: (data: WorkspaceFormData) => void;
   initialData?: WorkspaceFormData;
+  updatePending?: boolean;
+  createPending?: boolean;
 };
 
 const workspaceSchema = z.object({
@@ -37,6 +40,8 @@ export default function AddWorkspaceModal({
   onClose,
   onSubmit,
   initialData,
+  updatePending = false,
+  createPending = false,
 }: Props) {
   const {
     register,
@@ -134,10 +139,29 @@ export default function AddWorkspaceModal({
         <div className="flex gap-3 mt-6">
           <Button
             variant="contained"
-            className="bg-blue-600! capitalize!"
-            sx={{ fontSize: "14px" }}
+            className="capitalize!"
+            sx={{
+              fontSize: "14px",
+              backgroundColor: "#2563eb", // blue-600
+              "&:hover": {
+                backgroundColor: "#2563eb",
+              },
+              "&.Mui-disabled": {
+                backgroundColor: "#2563eb",
+                color: "#fff",
+                opacity: 1, // prevent faded look
+              },
+            }}
             onClick={handleSubmit(onSubmit)}
-            disabled={isSubmitting}
+            disabled={isSubmitting || updatePending || createPending}
+            endIcon={
+              isSubmitting || updatePending || createPending ? (
+                <CircularProgress
+                  size={20}
+                  sx={{ color: "#fff" }} // force white loader
+                />
+              ) : null
+            }
           >
             {initialData ? "Save Changes" : "Add Workspace"}
           </Button>

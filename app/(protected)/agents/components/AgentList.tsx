@@ -26,6 +26,7 @@ import { useAgents } from "@/hooks/agent/useAgentQueries";
 import { toast } from "@/utils/toast";
 import axios from "axios";
 import { ApiErrorResponse } from "@/hooks/auth/useAuthMutations";
+import Image from "next/image";
 
 type Agent = {
   id: number;
@@ -103,9 +104,13 @@ const AgentList = () => {
       key: "id",
       label: "Actions",
       render: (row) => (
-        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition">
-          <IconButton>
-            <ContentCopyIcon sx={{ fontSize: 16 }} />
+        <div className="flex gap-2">
+          <IconButton
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            <ContentCopyIcon sx={{ fontSize: 16, cursor: "pointer" }} />
           </IconButton>
 
           <IconButton
@@ -116,7 +121,7 @@ const AgentList = () => {
               setDeleteOpen(true);
             }}
           >
-            <DeleteOutlineIcon sx={{ fontSize: 16 }} />
+            <DeleteOutlineIcon sx={{ fontSize: 16, cursor: "pointer" }} />
           </IconButton>
         </div>
       ),
@@ -140,8 +145,8 @@ const AgentList = () => {
         <Box className="p-6 rounded-2xl bg-white shadow-sm border border-gray-200">
           {/* Header */}
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-              <img
+            <h2 className="text-base sm:text-lg font-semibold text-gray-800 flex items-center gap-2">
+              <Image
                 src="/assets/svgs/agent.svg"
                 alt="Agent Icon"
                 width={24}
@@ -152,7 +157,7 @@ const AgentList = () => {
 
             <button
               onClick={() => setOpenModal(true)}
-              className="flex items-center gap-2 bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+              className="flex items-center gap-2 bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
             >
               <AddIcon sx={{ fontSize: 16 }} />
               New Agent
@@ -203,7 +208,7 @@ const AgentList = () => {
       {/* Delete Modal */}
       <ConfirmModal
         open={deleteOpen}
-        title="Delete Agent"
+        title="Delete Agent ?"
         description="Are you sure you want to remove this agent? This action cannot be undone."
         confirmText="Delete"
         variant="danger"

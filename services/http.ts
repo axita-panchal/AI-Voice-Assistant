@@ -90,7 +90,6 @@ http.interceptors.response.use(
 
       try {
         const refreshToken = localStorage.getItem("refresh_token");
-        console.log("refreshToken: ", refreshToken);
 
         const res = await refreshHttp.post("/authentication/refresh-token", {
           refresh_token: refreshToken,
@@ -98,7 +97,6 @@ http.interceptors.response.use(
 
         // ✅ CORRECT PATH
         const newToken = res.data?.data?.access_token;
-        console.log("newToken: ", newToken);
 
         if (!newToken) throw new Error("No access token from refresh");
 
@@ -109,7 +107,6 @@ http.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return http(originalRequest);
       } catch (err) {
-        console.log("err: ", err);
         processQueue(err);
 
         localStorage.removeItem("access_token");
