@@ -3,7 +3,7 @@ import { ApiErrorResponse } from "../auth/useAuthMutations";
 import { AxiosError, AxiosResponse } from "axios";
 import { contactListService } from "@/services/contactList.service";
 import {
-  Contact,
+  BulkDncUpdate,
   ContactList,
   UpdateContactListPayload,
   UpdateContactPayload,
@@ -85,7 +85,7 @@ export const useUpdateContactList = () => {
 
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["contact-lists"],
+        queryKey: ["contact_lists"],
       });
 
       queryClient.invalidateQueries({
@@ -188,7 +188,7 @@ export const useBulkUpdateContacts = () => {
   return useMutation<
     AxiosResponse<CreateContactResponse>,
     AxiosError<ApiErrorResponse>,
-    Contact[]
+    BulkDncUpdate[]
   >({
     mutationFn: (contacts) => contactListService.updateBulkContacts(contacts),
     onSuccess: () => {

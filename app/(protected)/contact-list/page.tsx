@@ -65,6 +65,34 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import IconButtonComp from "@/components/common/IconButton";
+import z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { isValidPhoneNumber } from "react-phone-number-input";
+
+const listSchema = z.object({
+  listName: z
+    .string()
+    .min(1, "List name is required")
+    .trim()
+    .min(1, "List name is required"),
+});
+
+const contactFilterSchema = z.object({
+  first_name: z.string().optional(),
+  last_name: z.string().optional(),
+  phone: z
+    .string()
+    .optional()
+    .refine((val) => !!val, {
+      message: "Phone number is required",
+    })
+    .refine((val) => !val || isValidPhoneNumber(val), {
+      message: "Enter a valid phone number",
+    }),
+  outcome: z.enum(["all", "answered", "missed"]).optional(),
+});
+
+type ListFormValues = z.infer<typeof listSchema>;
 
 export default function ContactListPage() {
   const queryClient = useQueryClient();
@@ -93,10 +121,16 @@ export default function ContactListPage() {
 
   const { mutateAsync: updateBulkConats } = useBulkUpdateContacts();
 
-  const { control, handleSubmit, reset } = useForm<ContactFilterValues>({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors: contactFilterErrors },
+  } = useForm<ContactFilterValues>({
+    resolver: zodResolver(contactFilterSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      first_name: "",
+      last_name: "",
       phone: "",
       outcome: "all",
     },
@@ -112,7 +146,6 @@ export default function ContactListPage() {
   const [contactToDelete, setContactToDelete] = useState<Contact | null>(null);
   const [selectedRows, setSelectedRows] = useState<Contact[]>([]);
   const [isListModalOpen, setIsListModalOpen] = useState(false);
-  const [newListName, setNewListName] = useState("");
   const [createContactDrawerOpen, setCreateContactDrawerOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
@@ -137,6 +170,15 @@ export default function ContactListPage() {
     selectedContactList?.id,
   );
 
+  const {
+    register,
+    handleSubmit: createContactListHandleSubmit,
+    formState: { errors },
+    reset: resetCreateContactList,
+  } = useForm<ListFormValues>({
+    resolver: zodResolver(listSchema),
+  });
+
   const lists = useMemo(() => {
     return apiLists.map((list) => ({
       id: list.id,
@@ -144,20 +186,91 @@ export default function ContactListPage() {
     }));
   }, [apiLists]);
 
-  const mappedContacts: Contact[] = useMemo(() => {
-    return apiContacts.map((contact: ApiContact) => ({
-      id: contact.id,
-      firstName: contact.first_name,
-      lastName: contact.last_name,
-      phone: contact.phone,
-      email: contact.email,
-      lastOutcome: contact.most_recent_outcome,
-      lastDial: contact.last_dial_time,
-      listId: contact.contact_list_id,
-      status: contact.status,
-      dnc: contact.dnc,
-    }));
-  }, [apiContacts]);
+  // const mappedContacts: Contact[] = useMemo(() => {
+  //   return apiContacts.map((contact: ApiContact) => ({
+  //     id: contact.id,
+  //     first_name: contact.first_name,
+  //     last_name: contact.last_name,
+  //     phone: contact.phone,
+  //     email: contact.email,
+  //     lastOutcome: contact.most_recent_outcome,
+  //     last_dial_time: contact.last_dial_time,
+  //     listId: contact.contact_list_id,
+  //     status: contact.status,
+  //     dnc: contact.dnc,
+  //   }));
+  // }, [apiContacts]);
+
+  const mapApiContactToContact = (contact: ApiContact): Contact => ({
+    id: contact.id,
+    first_name: contact.first_name,
+    last_name: contact.last_name,
+    phone: contact.phone,
+    email: contact.email,
+    lastOutcome: contact.most_recent_outcome,
+    last_dial_time: contact.last_dial_time,
+    listId: contact.contact_list_id ?? "",
+    contact_list_id: contact.contact_list_id,
+    status: contact.status,
+    dnc: contact.dnc,
+    timezone: contact?.timezone ?? "",
+    full_address: contact?.full_address ?? "",
+    job_title: contact?.job_title ?? "",
+    business_name: contact?.business_name ?? "",
+    city: contact?.city ?? "",
+    state: contact?.state ?? "",
+    country: contact?.country ?? "",
+    postal_code: contact?.postal_code ?? "",
+  });
+
+  const mappedContacts = useMemo(
+    () => apiContacts.map(mapApiContactToContact),
+    [apiContacts],
+  );
+
+  // const mapContactToApiPayload = (contact: Contact): Partial<ApiContact> => ({
+  //   first_name: contact.first_name,
+  //   last_name: contact.last_name,
+  //   email: contact.email,
+  //   phone: contact.phone,
+  //   status: contact.status,
+  //   dnc: contact.dnc,
+  //   contact_list_id: contact.contact_list_id ?? undefined,
+  //   most_recent_outcome: contact.lastOutcome ?? undefined,
+  //   last_dial_time: contact.last_dial_time ?? undefined,
+
+  //   // If you support these in UI, include them:
+  //   business_name: (contact as any).businessName ?? "",
+  //   job_title: (contact as any).jobTitle ?? "",
+  //   full_address: (contact as any).address ?? "",
+  //   city: (contact as any).city ?? "",
+  //   state: (contact as any).state ?? "",
+  //   postal_code: (contact as any).zip ?? "",
+  //   country: (contact as any).country ?? "",
+  //   timezone: (contact as any).timezone ?? "",
+  //   custom_fields: (contact as any).customFields ?? [],
+  // });
+
+  const mapContactToApiPayload = (contact: Contact): Partial<ApiContact> => ({
+    first_name: contact.first_name,
+    last_name: contact.last_name,
+    email: contact.email,
+    phone: contact.phone,
+    status: contact.status,
+    dnc: contact.dnc,
+    contact_list_id: contact.contact_list_id ?? undefined,
+    most_recent_outcome: contact.lastOutcome ?? undefined,
+    last_dial_time: contact.last_dial_time ?? undefined,
+    business_name: contact.business_name ?? "",
+    job_title: contact.job_title ?? "",
+    full_address: contact.full_address ?? "",
+    city: contact.city ?? "",
+    state: contact.state ?? "",
+    postal_code: contact.postal_code ?? "",
+    country: contact.country ?? "",
+    timezone: contact.timezone ?? "",
+    custom_fields: contact.custom_fields ?? [],
+  });
 
   const listsWithCounts = useMemo(() => {
     const mapped = apiLists.map((list) => {
@@ -181,13 +294,20 @@ export default function ContactListPage() {
     );
   }, [mappedContacts, activeListId]);
 
-  const handleCreateContactList = async () => {
-    if (!newListName.trim()) return;
+  const handleCreateContactList = async (data: ListFormValues) => {
     try {
-      await createContactList({ name: newListName });
-      toast.success("Contact list created successfully");
+      const createdContactListRes = await createContactList({
+        name: data?.listName,
+      });
+      if (createdContactListRes?.data?.status_code === 201) {
+        toast.success(
+          createdContactListRes?.data?.message ||
+            "Contact list created successfully",
+        );
+        resetCreateContactList();
+      }
     } catch (error: unknown) {
-      let message = "Invalid credentials";
+      let message = "Something went wrong";
       if (axios.isAxiosError<ApiErrorResponse>(error)) {
         message =
           error.response?.data?.detail ||
@@ -195,8 +315,9 @@ export default function ContactListPage() {
           message;
       }
       toast.error(message);
+      resetCreateContactList();
     }
-    setNewListName("");
+    resetCreateContactList();
     setIsListModalOpen(false);
   };
 
@@ -209,7 +330,7 @@ export default function ContactListPage() {
         setActiveListId("all");
       }
     } catch (error: unknown) {
-      let message = "Invalid credentials";
+      let message = "Something went wrong";
       if (axios.isAxiosError<ApiErrorResponse>(error)) {
         message =
           error.response?.data?.detail ||
@@ -237,7 +358,7 @@ export default function ContactListPage() {
         );
       }
     } catch (error: unknown) {
-      let message = "Invalid credentials";
+      let message = "Something went wrong";
       if (axios.isAxiosError<ApiErrorResponse>(error)) {
         const detail = error.response?.data?.detail;
         const fallbackMessage = error.response?.data?.message;
@@ -275,7 +396,7 @@ export default function ContactListPage() {
         setContactToDelete(null);
       }
     } catch (error: unknown) {
-      let message = "Invalid credentials";
+      let message = "Something went wrong";
       if (axios.isAxiosError<ApiErrorResponse>(error)) {
         message =
           error.response?.data?.detail ||
@@ -295,28 +416,60 @@ export default function ContactListPage() {
     reset();
   };
 
-  const handleEditContact = async (id: string, data: Contact) => {
+  // const handleEditContact = async (id: string, data: Partial<ApiContact>) => {
+  //   try {
+  //     console.log("update contact payload: ", data);
+  //     const updatedcontactRes = await updateContact({
+  //       contactId: id,
+  //       payload: data,
+  //     });
+  //     if (updatedcontactRes?.data?.status_code === 200) {
+  //       toast.success(
+  //         updatedcontactRes?.data?.message || "Contact updated successfully",
+  //       );
+  //     }
+  //     if (
+  //       data?.contact_list_id &&
+  //       updatedcontactRes?.data?.status_code === 200
+  //     ) {
+  //       await queryClient.invalidateQueries({
+  //         queryKey: ["contact-lists"],
+  //       });
+  //       // when ever this condition get true at time call contact-list get api
+  //     }
+  //     setSelectedContact(null);
+  //     setEditOpen(false);
+  //   } catch (error) {}
+  // };
+
+  const handleEditContact = async (
+    id: string,
+    payload: Partial<ApiContact>,
+  ) => {
     try {
-      const updatedcontactRes = await updateContact({
+      const res = await updateContact({
         contactId: id,
-        payload: data,
+        payload,
       });
-      if (
-        data?.contact_list_id &&
-        updatedcontactRes?.data?.status_code === 200
-      ) {
+
+      if (res?.data?.status_code === 200) {
+        toast.success(res?.data?.message || "Contact updated successfully");
+
         await queryClient.invalidateQueries({
-          queryKey: ["contact-lists"],
+          queryKey: ["contacts"],
         });
-        // when ever this condition get true at time call contact-list get api
+        setEditOpen(false);
       }
+
       setSelectedContact(null);
-      setEditOpen(false);
-    } catch (error) {}
+    } catch (error) {
+      toast.error("Failed to update contact");
+    }
   };
 
   const onApplyFilters = (values: ContactFilterValues) => {
-    handleCloseFilter();
+    console.log("values: ", values);
+    // handleCloseFilter();
   };
 
   const handleOpenSelectMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -328,20 +481,20 @@ export default function ContactListPage() {
   };
   const columns: Column<Contact>[] = [
     {
-      key: "name",
+      key: "first_name",
       label: "Name",
       render: (row) => (
         <Box className="flex items-center gap-3">
           <Avatar />
           <Typography fontSize={14} noWrap>
-            {row.firstName} {row.lastName}
+            {row.first_name} {row.last_name}
           </Typography>
         </Box>
       ),
     },
     { key: "phone", label: "Phone" },
     { key: "lastOutcome", label: "Last Outcome" },
-    { key: "lastDial", label: "Last Dial" },
+    { key: "last_dial_time", label: "Last Dial" },
     {
       key: "dnc",
       label: "Do not call",
@@ -351,7 +504,7 @@ export default function ContactListPage() {
           checked={!!row.dnc}
           onClick={(e) => {
             e.stopPropagation();
-            handleEditContact(row?.id, { ...row, dnc: !row?.dnc });
+            handleEditContact(row?.id, { dnc: !row.dnc });
           }}
         />
       ),
@@ -432,8 +585,12 @@ export default function ContactListPage() {
       }
 
       if (selectedBulkAction === "enableDNC") {
+        // const payload = selectedRows.map((contact) => ({
+        //   ...contact,
+        //   dnc: true,
+        // }));
         const payload = selectedRows.map((contact) => ({
-          ...contact,
+          id: contact.id,
           dnc: true,
         }));
 
@@ -448,8 +605,12 @@ export default function ContactListPage() {
       }
 
       if (selectedBulkAction === "disableDNC") {
+        // const payload = selectedRows.map((contact) => ({
+        //   ...contact,
+        //   dnc: false,
+        // }));
         const payload = selectedRows.map((contact) => ({
-          ...contact,
+          id: contact.id,
           dnc: false,
         }));
 
@@ -457,7 +618,8 @@ export default function ContactListPage() {
         const disabledDNCRes = await updateBulkConats(payload);
         if (disabledDNCRes?.data?.status_code === 200) {
           toast?.success(
-            disabledDNCRes?.data?.message || "Bulk edit successfully done",
+            disabledDNCRes?.data?.message ||
+              "Bulk contact edited successfully done",
           );
           setSelectedRows([]);
         }
@@ -686,15 +848,6 @@ export default function ContactListPage() {
         </Box>
         {/* TABLE */}
         <Box mt={4}>
-          {/* <GenericTable
-            columns={columns}
-            data={filteredContacts}
-            selectedIds={selectedIds}
-            onRowClick={(row) => handleOpenEdit(row)}
-            showCheckBoxes
-            // onSelectionChange={(ids) => setSelectedIds(ids.map(String))}
-            onSelectionChange={(row) => setSelectedIds(row)}
-          /> */}
           <GenericTable
             columns={columns}
             data={filteredContacts}
@@ -707,54 +860,64 @@ export default function ContactListPage() {
         {/* CREATE LIST MODAL */}
         <Dialog
           open={isListModalOpen}
-          onClose={() => setIsListModalOpen(false)}
+          onClose={() => {
+            setIsListModalOpen(false);
+            resetCreateContactList();
+          }}
           fullWidth
           maxWidth="xs"
+          sx={{ padding: "10px 24px" }}
         >
           <DialogTitle>Add Contact List</DialogTitle>
-          <DialogContent>
-            <TextField
-              fullWidth
-              label="List name"
-              margin="normal"
-              value={newListName}
-              onChange={(e) => setNewListName(e.target.value)}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button
-              onClick={() => setIsListModalOpen(false)}
-              sx={{ textTransform: "none" }}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              onClick={handleCreateContactList}
-              sx={{
-                textTransform: "capitalize",
-                backgroundColor: "#1976d2",
-                color: "#fff",
-                "&:hover": {
+          <form
+            onSubmit={createContactListHandleSubmit(handleCreateContactList)}
+          >
+            <DialogContent sx={{ padding: "10px 24px" }}>
+              <TextField
+                fullWidth
+                label="List name"
+                margin="normal"
+                {...register("listName")}
+                error={!!errors.listName}
+                helperText={errors.listName?.message}
+                sx={{ marginTop: 0 }}
+              />
+            </DialogContent>
+
+            <DialogActions>
+              <Button
+                onClick={() => {
+                  setIsListModalOpen(false);
+                  resetCreateContactList();
+                }}
+                sx={{ textTransform: "none" }}
+              >
+                Cancel
+              </Button>
+
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{
+                  textTransform: "capitalize",
                   backgroundColor: "#1976d2",
                   color: "#fff",
-                },
-                "&.Mui-disabled": {
-                  backgroundColor: "#1976d2",
-                  color: "#fff",
-                  opacity: 1,
-                },
-              }}
-              disabled={isCreatingContactList}
-              endIcon={
-                isCreatingContactList ? (
-                  <CircularProgress size={20} sx={{ color: "#fff" }} />
-                ) : null
-              }
-            >
-              Create
-            </Button>
-          </DialogActions>
+                  "&:hover": {
+                    backgroundColor: "#1976d2",
+                    color: "#fff",
+                  },
+                }}
+                disabled={isCreatingContactList}
+                endIcon={
+                  isCreatingContactList ? (
+                    <CircularProgress size={20} sx={{ color: "#fff" }} />
+                  ) : null
+                }
+              >
+                Create
+              </Button>
+            </DialogActions>
+          </form>
         </Dialog>
         {/* DELETE DIALOG */}
         <Dialog
@@ -811,12 +974,37 @@ export default function ContactListPage() {
           onSubmit={handleCreateContact}
           isCreatingContact={isCreatingContact}
         />
-        <EditContactDrawer
+        {/* <EditContactDrawer
           open={editOpen}
           onClose={() => setEditOpen(false)}
           contact={selectedContact}
           lists={lists}
           onSubmit={handleEditContact}
+          isUpdatingContact={isUpdatingContact}
+        /> */}
+        <EditContactDrawer
+          open={editOpen}
+          onClose={() => setEditOpen(false)}
+          contact={selectedContact}
+          lists={lists}
+          // onSubmit={(id, data: Partial<ApiContact>) => {
+          //   console.log("edit data: ", data);
+          //   handleEditContact(id, {
+          //     first_name: data.first_name,
+          //     last_name: data.last_name,
+          //     email: data.email,
+          //     phone: data.phone,
+          //     status: data.status,
+          //     dnc: data.dnc,
+          //     contact_list_id: data.contact_list_id ?? undefined,
+          //     most_recent_outcome: data.lastOutcome ?? undefined,
+          //     last_dial_time: data.last_dial_time ?? undefined,
+          //   });
+          // }}
+          onSubmit={(id, data: Contact) => {
+            const payload = mapContactToApiPayload(data);
+            handleEditContact(id, payload);
+          }}
           isUpdatingContact={isUpdatingContact}
         />
         <ContactFilterPopover
@@ -825,6 +1013,7 @@ export default function ContactListPage() {
           onClose={handleCloseFilter}
           control={control}
           onClear={handleClearFilters}
+          contactFilterErrors={contactFilterErrors}
           onApply={handleSubmit(onApplyFilters)}
         />
         <EditContactListDrawer
@@ -853,7 +1042,7 @@ export default function ContactListPage() {
           {contactToDelete && (
             <div>
               <p className="font-medium">
-                {contactToDelete?.firstName} {contactToDelete?.lastName}
+                {contactToDelete?.first_name} {contactToDelete?.last_name}
               </p>
               <p className="text-sm text-gray-500">{contactToDelete?.email}</p>
             </div>

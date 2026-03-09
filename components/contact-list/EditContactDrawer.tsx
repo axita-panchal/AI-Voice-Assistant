@@ -18,7 +18,7 @@ import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Contact } from "@/types/contact-list.types";
-import { z, email } from "zod";
+import { z } from "zod";
 interface Props {
   open: boolean;
   onClose: () => void;
@@ -29,18 +29,18 @@ interface Props {
 }
 
 const schema = z.object({
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
+  first_name: z.string().optional(),
+  last_name: z.string().optional(),
   phone: z.string().optional(),
   email: z.string().email().optional().or(z.literal("")),
   contact_list_id: z.string().optional(),
   dnc: z.boolean().optional(),
   timezone: z.string().optional(),
-  businessName: z.string().optional(),
-  jobTitle: z.string().optional(),
-  address: z.string().optional(),
+  business_name: z.string().optional(),
+  job_title: z.string().optional(),
+  full_address: z.string().optional(),
   city: z.string().optional(),
-  zip: z.string().optional(),
+  postal_code: z.string().optional(),
   state: z.string().optional(),
   country: z.string().optional(),
   customFields: z
@@ -70,8 +70,6 @@ const customFieldKeys = [
   "custom_8",
 ] as const;
 
-type CustomFieldKey = (typeof customFieldKeys)[number];
-
 export default function EditContactDrawer({
   open,
   onClose,
@@ -91,21 +89,37 @@ export default function EditContactDrawer({
   useEffect(() => {
     if (contact) {
       reset({
-        firstName: contact.firstName,
-        lastName: contact.lastName,
+        first_name: contact.first_name,
+        last_name: contact.last_name,
         phone: contact.phone,
         contact_list_id: contact.listId ?? "",
         email: contact?.email ?? "",
         dnc: contact?.dnc ?? false,
+        timezone: contact?.timezone ?? "",
+        business_name: contact?.business_name ?? "",
+        job_title: contact?.job_title ?? "",
+        full_address: contact?.full_address ?? "",
+        city: contact?.city ?? "",
+        postal_code: contact?.postal_code ?? "",
+        state: contact?.state ?? "",
+        country: contact?.country ?? "",
       });
     } else {
       reset({
-        firstName: "",
-        lastName: "",
+        first_name: "",
+        last_name: "",
         phone: "",
         contact_list_id: "",
         email: "",
         dnc: false,
+        timezone: "",
+        business_name: "",
+        job_title: "",
+        full_address: "",
+        city: "",
+        postal_code: "",
+        state: "",
+        country: "",
       });
     }
   }, [contact, reset]);
@@ -115,10 +129,11 @@ export default function EditContactDrawer({
     const mergedContact: Contact = {
       ...contact,
       ...data,
+      contact_list_id:
+        data.contact_list_id === "" ? null : data.contact_list_id,
     };
     onSubmit(contact.id, mergedContact);
-    onClose();
-    reset();
+    // onClose();
   };
 
   const tabButtonStyle = (isActive: boolean) => ({
@@ -139,8 +154,8 @@ export default function EditContactDrawer({
       anchor="right"
       open={open}
       onClose={() => {
-        reset();
         onClose();
+        reset();
       }}
       PaperProps={{
         sx: { width: { xs: "100%", sm: 460 } },
@@ -153,18 +168,16 @@ export default function EditContactDrawer({
             <Typography
               sx={{ fontSize: 16, fontWeight: 500, color: "#464646" }}
             >
-              {contact?.firstName} {contact?.lastName}
+              {contact?.first_name} {contact?.last_name}
             </Typography>
             <Typography className="text-xs text-gray-500">
               Last updated: Dec 4th, 2025, 1:13 am
             </Typography>
           </Box>
-
           <IconButton onClick={onClose}>
             <CloseIcon />
           </IconButton>
         </Box>
-
         {/* Tabs */}
         <Box className="px-4 sm:px-6 pb-4 flex gap-2">
           <Button
@@ -174,7 +187,6 @@ export default function EditContactDrawer({
           >
             Contact Info
           </Button>
-
           <Button
             variant="outlined"
             onClick={() => setActiveTab("conversations")}
@@ -183,7 +195,6 @@ export default function EditContactDrawer({
             Conversations
           </Button>
         </Box>
-
         <Divider />
 
         {/* CONTACT INFO TAB */}
@@ -191,17 +202,18 @@ export default function EditContactDrawer({
           <form
             onSubmit={handleSubmit(submit)}
             className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 space-y-5"
+            id="edit-contact-form"
           >
             {/* Name */}
             <Box className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <TextField
                 label="First name"
-                {...register("firstName")}
+                {...register("first_name")}
                 fullWidth
               />
               <TextField
                 label="Last name"
-                {...register("lastName")}
+                {...register("last_name")}
                 fullWidth
               />
             </Box>
@@ -246,17 +258,17 @@ export default function EditContactDrawer({
             </Typography>
 
             <Box className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
-              <TextField label="Business name" {...register("businessName")} />
-              <TextField label="Job title" {...register("jobTitle")} />
+              <TextField label="Business name" {...register("business_name")} />
+              <TextField label="Job title" {...register("job_title")} />
             </Box>
 
             <Box className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <TextField label="Address" {...register("address")} />
+              <TextField label="Address" {...register("full_address")} />
               <TextField label="City" {...register("city")} />
             </Box>
 
             <Box className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <TextField label="ZIP code" {...register("zip")} />
+              <TextField label="ZIP code" {...register("postal_code")} />
               <TextField label="State" {...register("state")} />
             </Box>
 
@@ -295,8 +307,9 @@ export default function EditContactDrawer({
             <Box className="flex flex-col sm:flex-row gap-3 pt-4">
               <Button
                 type="submit"
-                variant="contained"
+                form="edit-contact-form"
                 fullWidth
+                variant="contained"
                 disabled={isUpdatingContact}
                 sx={{
                   textTransform: "none",
@@ -328,6 +341,7 @@ export default function EditContactDrawer({
                 variant="outlined"
                 fullWidth
                 onClick={onClose}
+                disabled={isUpdatingContact}
                 sx={{ textTransform: "none", borderRadius: "10px" }}
               >
                 Cancel

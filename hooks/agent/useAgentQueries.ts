@@ -18,6 +18,7 @@ export const useAgents = (
     staleTime: 0,
   });
 };
+
 export const useAgentById = (agentId?: string) => {
   return useQuery({
     queryKey: ["agent", agentId],

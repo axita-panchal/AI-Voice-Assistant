@@ -19,7 +19,7 @@ type Props = {
 type AgentForm = {
   name: string;
   description: string;
-  openingLine: string;
+  first_message: string;
   language: string;
   voice: string;
 };
@@ -56,17 +56,17 @@ export default function AgentEditorShell({ agentId }: Props) {
 
     setForm({
       name: agent.name ?? "",
-      description: "",
-      openingLine: "",
+      description: agent?.description ?? "",
       language: agent.language ?? "English",
       voice: agent.voice,
+      first_message: agent?.first_message ?? "",
     });
   }, [agentData?.data?.data?.agent]);
 
   const [form, setForm] = useState<AgentForm>({
     name: "",
     description: "",
-    openingLine: "",
+    first_message: "",
     language: "English",
     voice: "Joseph (English)",
   });
@@ -110,7 +110,7 @@ export default function AgentEditorShell({ agentId }: Props) {
       <div className="hidden lg:flex min-h-screen bg-[#F6F8FB] items-start justify-center ">
         <div className="w-full max-w-[1400px] h-[85vh] bg-white rounded-2xl border border-gray-200 flex overflow-hidden shadow-sm">
           {/* LEFT PANEL */}
-          <aside className="w-96 border-r border-gray-200 p-6 overflow-y-auto">
+          <aside className="w-96 border-r border-gray-200 p-6 overflow-y-auto custom-scroll">
             <LeftForm
               form={form}
               setForm={setForm}

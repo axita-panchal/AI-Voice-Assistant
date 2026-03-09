@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 type AgentForm = {
   name: string;
   description: string;
-  openingLine: string;
+  first_message: string;
   language: string;
   voice: string;
 };
@@ -62,7 +62,7 @@ export default function LeftForm({
         <span>Back</span>
       </button>
 
-      <div className="flex-1 overflow-y-auto pb-6 space-y-4 pr-2">
+      <div className="flex-1 overflow-y-auto pb-6 space-y-4 pr-2 ">
         <Field label="Name" htmlFor="agent-name">
           <TextField
             id="agent-name"
@@ -85,15 +85,17 @@ export default function LeftForm({
           />
         </Field>
 
-        <Field label="Opening Line" htmlFor="agent-openingLine">
+        <Field label="Opening Line" htmlFor="agent-first_message">
           <TextField
-            id="agent-openingLine"
+            id="agent-first_message"
             fullWidth
             size="small"
             multiline
             minRows={2}
-            value={form.openingLine}
-            onChange={(e) => setForm({ ...form, openingLine: e.target.value })}
+            value={form.first_message}
+            onChange={(e) =>
+              setForm({ ...form, first_message: e.target.value })
+            }
           />
         </Field>
 

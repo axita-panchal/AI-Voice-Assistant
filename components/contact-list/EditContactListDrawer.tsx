@@ -129,19 +129,11 @@ export default function EditContactListDrawer({
             onChange={(e) => setName(e.target.value)}
             margin="normal"
           />
-
-          {/* <TextField
-            fullWidth
-            label="Campaign"
-            value={campaign}
-            onChange={(e) => setCampaign(e.target.value)}
-            margin="normal"
-          /> */}
           <TextField
             select
             fullWidth
             label="Campaign"
-            value={campaign ?? null}
+            value={campaign ?? ""}
             onChange={(e) => setCampaign(e.target.value)}
             margin="normal"
             disabled={isPendingCampaign}
@@ -178,7 +170,7 @@ export default function EditContactListDrawer({
                 <Avatar />
                 <Box>
                   <Typography fontSize={14}>
-                    {contact.firstName} {contact.lastName}
+                    {contact.first_name} {contact?.last_name}
                   </Typography>
                   <Typography fontSize={12} color="gray">
                     {contact.phone}

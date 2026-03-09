@@ -1,12 +1,33 @@
 import { Popover, TextField, MenuItem, Button } from "@mui/material";
-import { Control, Controller } from "react-hook-form";
+import { Control, Controller, FieldErrors } from "react-hook-form";
 import PhoneInputField from "@/components/common/PhoneInputField";
+import { isValidPhoneNumber } from "react-phone-number-input";
+import z from "zod";
 
-export interface ContactFilterValues {
-  firstName?: string;
-  lastName?: string;
-  phone?: string;
-  outcome?: string;
+// export interface ContactFilterValues {
+//   first_name?: string;
+//   last_name?: string;
+//   phone?: string;
+//   outcome?: string;
+// }
+const contactFilterSchema = z.object({
+  first_name: z.string().optional(),
+  last_name: z.string().optional(),
+  phone: z
+    .string()
+    .optional()
+    .refine((val) => !!val, {
+      message: "Phone number is required",
+    })
+    .refine((val) => !val || isValidPhoneNumber(val), {
+      message: "Enter a valid phone number",
+    }),
+  outcome: z.enum(["all", "answered", "missed"]).optional(),
+});
+
+export type ContactFilterValues = z.infer<typeof contactFilterSchema>;
+export interface errorFilterValue {
+  phone: string;
 }
 
 interface Props {
@@ -16,6 +37,7 @@ interface Props {
   control: Control<ContactFilterValues>;
   onClear: () => void;
   onApply: () => void;
+  contactFilterErrors: FieldErrors<ContactFilterValues>;
 }
 
 export default function ContactFilterPopover({
@@ -25,6 +47,7 @@ export default function ContactFilterPopover({
   control,
   onClear,
   onApply,
+  contactFilterErrors,
 }: Props) {
   return (
     <Popover
@@ -41,7 +64,7 @@ export default function ContactFilterPopover({
           <div>
             <p className="text-sm font-medium">First Name</p>
             <Controller
-              name="firstName"
+              name="first_name"
               control={control}
               render={({ field }) => (
                 <TextField {...field} fullWidth size="small" />
@@ -53,7 +76,7 @@ export default function ContactFilterPopover({
           <div>
             <p className="text-sm font-medium">Last Name</p>
             <Controller
-              name="lastName"
+              name="last_name"
               control={control}
               render={({ field }) => (
                 <TextField {...field} fullWidth size="small" />
@@ -63,7 +86,11 @@ export default function ContactFilterPopover({
 
           {/* Phone */}
           <div>
-            <PhoneInputField name="phone" control={control} />
+            <PhoneInputField
+              name="phone"
+              control={control}
+              error={contactFilterErrors.phone?.message}
+            />
           </div>
 
           {/* Outcome */}

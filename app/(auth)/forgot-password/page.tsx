@@ -41,7 +41,7 @@ export default function ForgotPasswordPage() {
         router.push("/login");
       }
     } catch (error: unknown) {
-      let message = "Invalid credentials";
+      let message = "Something went wrong";
 
       if (axios.isAxiosError<ApiErrorResponse>(error)) {
         message =

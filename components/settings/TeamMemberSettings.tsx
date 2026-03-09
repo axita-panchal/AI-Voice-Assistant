@@ -46,12 +46,17 @@ type TeamMember = {
 ------------------------------------------------------- */
 
 const API_ROLE_TO_KEY: Record<string, RoleKey> = {
+  "Agency Owner": "agency-owner",
   "Agency Admin": "agency-admin",
   "Workspace Editor": "workspace-editor",
   "Workspace Viewer": "workspace-viewer",
 };
 
 const ROLE_MAP: Record<RoleKey, { label: string; color: string }> = {
+  "agency-owner": {
+    label: "Agency Owner",
+    color: "bg-orange-100 text-orange-600",
+  },
   "agency-admin": {
     label: "Agency Admin",
     color: "bg-orange-100 text-orange-600",

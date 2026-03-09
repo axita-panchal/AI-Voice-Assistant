@@ -2,68 +2,256 @@
 
 import {
   Checkbox,
+  CircularProgress,
   Drawer,
   IconButton as MuiIconButton,
   Slider,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { useState } from "react";
+import { useEffect } from "react";
 import clsx from "clsx";
 import { formatTime } from "@/utils/helper";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { useAgents } from "@/hooks/agent/useAgentQueries";
+import { useForm, Controller } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  useCreateCampaign,
+  useUpdateCampaign,
+} from "@/hooks/campaign/useCampaignMutations";
+import { toast } from "@/utils/toast";
+import Image from "next/image";
+import { Campaign } from "@/types/campaign.types";
+import { Agent } from "@/types/agent.types";
+
+const campaignSchema = z.object({
+  name: z.string().min(1, "Campaign name is required"),
+  agentId: z.string().min(1, "Agent is required"),
+  dailyCap: z
+    .string()
+    .min(1, "Daily usage cap is required")
+    .refine((val) => !isNaN(Number(val)), "Must be a number")
+    .refine((val) => Number(val) > 0, "Must be greater than 0"),
+  maxFollowUps: z
+    .string()
+    .min(1, "Maximum follow ups is required")
+    .refine((val) => !isNaN(Number(val)), "Must be a number")
+    .refine(
+      (val) => Number(val) >= 0 && Number(val) <= 35,
+      "Must be between 0 and 35",
+    ),
+  selectedDays: z.array(z.string()).min(1, "Select at least one day"),
+  hours: z.tuple([z.number(), z.number()]).refine(([min, max]) => min < max, {
+    message: "Start hour must be less than end hour",
+  }),
+});
+
+type CampaignFormValues = z.infer<typeof campaignSchema>;
+
+const defaultValues: CampaignFormValues = {
+  name: "",
+  agentId: "",
+  dailyCap: "",
+  maxFollowUps: "",
+  selectedDays: [],
+  hours: [9, 20],
+};
+
+export const hourToTimeString = (hour: number) => {
+  const h = hour.toString().padStart(2, "0");
+  return `${h}:00:00`;
+};
+interface CampaignDrawerProps {
+  open: boolean;
+  onClose: () => void;
+  mode: "create" | "edit";
+  campaign?: Campaign | null;
+}
+
+interface optionsTypes {
+  label: string;
+  value: string;
+}
 
 export default function CampaignDrawer({
   open,
   onClose,
-}: {
-  open: boolean;
-  onClose: () => void;
-}) {
+  mode,
+  campaign,
+}: CampaignDrawerProps) {
+  const isEdit = mode === "edit";
+
+  const { mutateAsync: createCampaign, isPending: isCreating } =
+    useCreateCampaign();
+
+  const { mutateAsync: updateCampaign, isPending: isUpdating } =
+    useUpdateCampaign();
+
+  const subaccountId = useSelector(
+    (state: RootState) => state?.workspace?.activeWorkspace?.id,
+  );
+
+  const { data: agentsResponse, isLoading } = useAgents(20, 0, subaccountId);
+
+  const agents = agentsResponse?.data?.data?.agents ?? [];
+
   const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-  const [selectedDays, setSelectedDays] = useState<string[]>([]);
-  const [hours, setHours] = useState<number[]>([9, 20]);
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm<CampaignFormValues>({
+    resolver: zodResolver(campaignSchema),
+    defaultValues,
+  });
+
+  const selectedDays = watch("selectedDays");
+  const hours = watch("hours");
+
+  useEffect(() => {
+    if (!open) {
+      reset(defaultValues);
+    }
+  }, [open, reset]);
+
+  /* ===================== PREFILL WHEN EDIT ===================== */
+
+  useEffect(() => {
+    if (open && isEdit && campaign) {
+      reset({
+        name: campaign.name || "",
+        agentId: campaign.agent_id || "",
+        dailyCap: String(campaign.daily_usage_cap || ""),
+        maxFollowUps: String(campaign.max_dials_per_contact || ""),
+        selectedDays: campaign?.calling_days || [],
+        hours: [
+          campaign.min_calls_per_hour || 9,
+          campaign.max_calls_per_hour || 20,
+        ],
+      });
+    }
+  }, [open, isEdit, campaign, reset]);
+
+  /* ===================== TOGGLE DAYS ===================== */
 
   const toggleDay = (day: string) => {
-    setSelectedDays((prev) =>
-      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
-    );
+    const updated = selectedDays.includes(day)
+      ? selectedDays.filter((d) => d !== day)
+      : [...selectedDays, day];
+
+    setValue("selectedDays", updated, { shouldValidate: true });
   };
+
+  const onSubmit = async (data: CampaignFormValues) => {
+    try {
+      const payload = {
+        name: data.name,
+        agent_id: data.agentId,
+        min_calls_per_hour: data.hours[0],
+        max_calls_per_hour: data.hours[1],
+        daily_usage_cap: Number(data.dailyCap),
+        max_dials_per_contact: Number(data.maxFollowUps),
+        calling_days: data.selectedDays,
+        start_time: hourToTimeString(data.hours[0]),
+        end_time: hourToTimeString(data.hours[1]),
+      };
+
+      if (isEdit && campaign) {
+        const updatedCampaignRes = await updateCampaign({
+          campaignId: campaign.id,
+          payload,
+        });
+
+        toast.success("Campaign updated successfully!");
+      } else {
+        await createCampaign(payload);
+        toast.success("Campaign created successfully!");
+      }
+
+      reset(defaultValues);
+      onClose();
+    } catch (error) {
+      toast.error("Operation failed");
+    }
+  };
+
   return (
     <Drawer
       anchor="right"
       open={open}
       onClose={onClose}
       PaperProps={{
-        className: "w-[420px] rounded-l-2xl",
+        className: "w-full sm:w-[420px] max-w-full ",
       }}
     >
-      <div className="h-full flex flex-col p-6">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="h-full flex flex-col p-4 sm:p-6"
+      >
         {/* HEADER */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2 justify-center  ">
-            <img src={"/assets/svgs/campaign.svg"} alt="campaign" />
-            <span className="text-base text-gray-500">Add Campaign</span>
+        <div className="flex items-center justify-between mb-6 gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-1 border border-gray-300 rounded-md">
+              <Image
+                src="/assets/svgs/campaign.svg"
+                alt="Campaign"
+                width={16}
+                height={16}
+              />
+            </div>
+            <span className="text-base text-[#464646]">
+              {isEdit ? "Edit Campaign" : "Add Campaign"}
+            </span>
           </div>
+
           <MuiIconButton onClick={onClose}>
             <CloseIcon />
           </MuiIconButton>
         </div>
 
-        {/* FORM */}
-        <div className="flex-1 space-y-5 overflow-y-auto text-base font-medium text-gray-700 p-2">
-          <Input label="Name" placeholder="John" />
-          <Select label="Agent" />
-          <Input label="Daily Usage Cap (minutes)" placeholder="20" />
-          <Select label="Contact list" />
-          <Input label="Maximum Follow Ups" placeholder="0 - 15" />
+        {/* BODY */}
+        <div className="flex-1 space-y-5 overflow-y-auto text-sm pr-1 sm:pr-2">
+          <FormInput
+            label="Name"
+            error={errors.name?.message}
+            {...register("name")}
+          />
+
+          <FormSelect
+            label="Agent"
+            error={errors.agentId?.message}
+            disabled={isLoading || agents.length === 0}
+            options={agents.map((agent: Agent) => ({
+              label: agent.name,
+              value: agent.id,
+            }))}
+            {...register("agentId")}
+          />
+
+          <FormInput
+            label="Daily Usage Cap"
+            error={errors.dailyCap?.message}
+            {...register("dailyCap")}
+          />
+
+          <FormInput
+            label="Maximum Follow Ups"
+            error={errors.maxFollowUps?.message}
+            {...register("maxFollowUps")}
+          />
 
           {/* CALLING DAYS */}
           <div>
-            <p className="text-sm font-medium text-gray-700 mb-2">
-              Calling days
-            </p>
+            <p className="text-sm font-medium mb-2">Calling days</p>
 
-            <div className="flex gap-3 flex-wrap">
+            <div className="grid grid-cols-4 sm:flex sm:flex-wrap gap-3">
               {DAYS.map((day) => {
                 const checked = selectedDays.includes(day);
 
@@ -72,86 +260,151 @@ export default function CampaignDrawer({
                     key={day}
                     onClick={() => toggleDay(day)}
                     className={clsx(
-                      "w-12 h-14  flex flex-col items-center justify-center cursor-pointer transition",
+                      "h-14 flex flex-col items-center justify-center cursor-pointer border rounded-lg",
+                      "transition-colors",
                       checked
                         ? "border-blue-600 bg-blue-50"
-                        : "border-gray-300 hover:border-blue-400",
+                        : "border-gray-300",
                     )}
                   >
-                    <Checkbox checked={checked} size="small" className="p-0!" />
-                    <span className="text-sm text-gray-600 mt-0.5">{day}</span>
+                    <Checkbox checked={checked} size="small" />
+                    <span className="text-sm">{day}</span>
                   </div>
                 );
               })}
             </div>
+
+            {errors.selectedDays && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.selectedDays.message}
+              </p>
+            )}
           </div>
 
-          {/* TIME SLIDER */}
+          {/* HOURS */}
           <div>
-            <p className="text-sm font-medium text-gray-700 mb-2">
-              Local calling hours
-            </p>
+            <p className="text-sm font-medium mb-2">Local calling hours</p>
 
-            <Slider
-              value={hours}
-              min={0}
-              max={24}
-              step={1}
-              onChange={(_, value) => setHours(value as number[])}
-              valueLabelDisplay="off"
+            <Controller
+              control={control}
+              name="hours"
+              render={({ field }) => (
+                <Slider
+                  {...field}
+                  value={field.value}
+                  min={0}
+                  max={24}
+                  step={1}
+                  disableSwap
+                  onChange={(_, value) => {
+                    const [min, max] = value as number[];
+                    if (min >= max) return;
+                    field.onChange([min, max]);
+                  }}
+                />
+              )}
             />
 
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <div className="flex justify-between text-xs mt-1">
               <span>{formatTime(hours[0])}</span>
               <span>{formatTime(hours[1])}</span>
             </div>
+
+            {errors.hours && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.hours.message}
+              </p>
+            )}
           </div>
         </div>
 
         {/* FOOTER */}
-        <div className="flex gap-3 pt-4">
-          <button className="flex-1 bg-blue-600 text-white py-2 rounded-lg text-sm">
-            Finish
-          </button>
+        <div className="flex flex-col sm:flex-row gap-3 pt-4">
           <button
+            type="submit"
+            disabled={isCreating || isUpdating}
+            className="w-full sm:flex-1 bg-blue-600 text-white py-2 rounded-lg text-sm cursor-pointer"
+          >
+            {(isUpdating || isCreating) && (
+              <CircularProgress
+                size={18}
+                sx={{ color: "#fff", mr: 1 }}
+                aria-hidden="true"
+              />
+            )}
+            {isEdit
+              ? isUpdating
+                ? "Updating..."
+                : "Update"
+              : isCreating
+                ? "Creating..."
+                : "Finish"}
+          </button>
+
+          <button
+            type="button"
             onClick={onClose}
-            className="flex-1 bg-gray-100 py-2 rounded-lg text-sm"
+            className="w-full sm:flex-1 bg-gray-100 py-2 rounded-lg text-sm cursor-pointer"
           >
             Cancel
           </button>
         </div>
-      </div>
+      </form>
     </Drawer>
   );
 }
 
-/* ---------------- SMALL REUSABLE INPUTS ---------------- */
+/* ===================== REUSABLE INPUT ===================== */
 
-function Input({
+function FormInput({
   label,
-  placeholder,
+  error,
+  ...props
 }: {
   label: string;
-  placeholder?: string;
+  error: string | undefined;
 }) {
   return (
     <div>
       <label className="text-sm text-gray-600">{label}</label>
       <input
-        placeholder={placeholder}
-        className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+        {...props}
+        className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
       />
+      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
     </div>
   );
 }
 
-function Select({ label }: { label: string }) {
+/* ===================== REUSABLE SELECT ===================== */
+
+function FormSelect({
+  label,
+  error,
+  options,
+  ...props
+}: {
+  label: string;
+  error: string | undefined;
+  options: optionsTypes[];
+}) {
   return (
     <div>
       <label className="text-sm text-gray-600">{label}</label>
-      <select className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white">
-        <option>Choose an option...</option>
+
+      <select
+        {...props}
+        className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white"
+      >
+        <option value="">Choose an option...</option>
+        {options.map((option: optionsTypes) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
       </select>
+
+      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
     </div>
   );
 }

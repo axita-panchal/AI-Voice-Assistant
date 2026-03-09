@@ -162,7 +162,7 @@ export default function Header() {
                   </span>
                 </div>
 
-                <nav className="flex gap-1 xl:gap-6">
+                <nav className="flex items-center gap-1 lg:gap-3 xl:gap-6 whitespace-nowrap flex-1">
                   {NAV_ITEMS.map((item) => {
                     const isActive = isNavItemActive(item.href, pathname || "");
                     return (
@@ -170,7 +170,7 @@ export default function Header() {
                         key={item.href}
                         href={item.href}
                         className={clsx(
-                          "flex items-center gap-2 px-3 py-2 rounded-lg text-base font-medium transition",
+                          "flex items-center gap-2 px-2 lg:px-3 py-2 rounded-lg text-sm xl:text-base font-medium transition whitespace-nowrap",
                           isActive
                             ? "text-[#2F6AFF] bg-[#2F6AFF1A]"
                             : "text-gray-500 hover:text-gray-900",
@@ -191,7 +191,7 @@ export default function Header() {
             )}
           </Box>
 
-          <Box className="flex items-center gap-3">
+          <Box className="flex items-center gap-3 sm:gap-2">
             {/* Workspace Selector */}
             {subaccounts?.length > 0 && (
               <Box
@@ -200,9 +200,11 @@ export default function Header() {
                   alignItems: "center",
                   backgroundColor: "#F3F4F6",
                   borderRadius: "12px",
-                  px: 2,
+                  px: 1,
                   py: 1,
-                  minWidth: 220,
+                  minWidth: 180,
+                  maxWidth: 220,
+                  width: "100%",
                 }}
               >
                 {/* Left Icon */}
@@ -243,8 +245,13 @@ export default function Header() {
                     fontWeight: 500,
                     fontSize: 16,
                     color: "#374151",
+                    minWidth: 0,
+                    paddingRight: "10px",
                     "& .MuiSelect-select": {
                       padding: 0,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
                     },
                   }}
                   IconComponent={() => (

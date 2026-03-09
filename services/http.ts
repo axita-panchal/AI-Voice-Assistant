@@ -80,7 +80,12 @@ http.interceptors.response.use(
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         }).then((token) => {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
+          // originalRequest.headers.Authorization = `Bearer ${token}`;
+          // return http(originalRequest);
+          if (originalRequest.headers) {
+            originalRequest.headers.set("Authorization", `Bearer ${token}`);
+          }
+
           return http(originalRequest);
         });
       }
@@ -100,11 +105,21 @@ http.interceptors.response.use(
 
         if (!newToken) throw new Error("No access token from refresh");
 
+        // localStorage.setItem("access_token", newToken);
+
+        // processQueue(null, newToken);
+
+        // originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        // return http(originalRequest);
         localStorage.setItem("access_token", newToken);
 
         processQueue(null, newToken);
 
-        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        // ✅ Ensure headers exist and are clean
+        if (originalRequest.headers) {
+          originalRequest.headers.set("Authorization", `Bearer ${newToken}`);
+        }
+
         return http(originalRequest);
       } catch (err) {
         processQueue(err);

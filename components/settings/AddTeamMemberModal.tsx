@@ -29,7 +29,11 @@ import { useAllWorkspaces } from "@/hooks/workspace/useWorkspaceQueries";
 /* Types */
 /* ---------------------------------- */
 
-export type RoleKey = "agency-admin" | "workspace-editor" | "workspace-viewer";
+export type RoleKey =
+  | "agency-admin"
+  | "agency-owner"
+  | "workspace-editor"
+  | "workspace-viewer";
 
 export interface TeamMember {
   id: string;
@@ -50,12 +54,14 @@ interface Workspace {
 /* ---------------------------------- */
 
 const ROLES: { value: RoleKey; label: string }[] = [
+  { value: "agency-owner", label: "Agency Owner" },
   { value: "agency-admin", label: "Agency Admin" },
   { value: "workspace-editor", label: "Workspace Editor" },
   { value: "workspace-viewer", label: "Workspace Viewer" },
 ];
 
 const ROLE_NAME_MAP: Record<RoleKey, string> = {
+  "agency-owner": "Agency Owner",
   "agency-admin": "Agency Admin",
   "workspace-editor": "Workspace Editor",
   "workspace-viewer": "Workspace Viewer",
@@ -70,7 +76,12 @@ const schema = z
     first_name: z.string().min(1),
     last_name: z.string().min(1),
     email: z.string().email(),
-    role: z.enum(["agency-admin", "workspace-editor", "workspace-viewer"]),
+    role: z.enum([
+      "agency-owner",
+      "agency-admin",
+      "workspace-editor",
+      "workspace-viewer",
+    ]),
     workspace: z.string().optional(),
   })
   .superRefine((data, ctx) => {
@@ -142,7 +153,7 @@ export default function AddTeamMemberModal({
         first_name: "",
         last_name: "",
         email: "",
-        role: "agency-admin",
+        role: "agency-owner",
         workspace: "",
       });
     }

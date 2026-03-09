@@ -1,5 +1,5 @@
 import {
-  Contact,
+  BulkDncUpdate,
   CreateContactListPayload,
   CreateContactPayload,
   GetContactListsParams,
@@ -61,7 +61,7 @@ export const contactListService = {
   deleteBulkContacts: (payload: { ids: string[] }) => {
     return http.post(`/contact/bulk-delete`, payload);
   },
-  updateBulkContacts: (payload: Contact[]) => {
+  updateBulkContacts: (payload: BulkDncUpdate[]) => {
     return http.patch("contact/bulk-update", { items: payload });
   },
 };
