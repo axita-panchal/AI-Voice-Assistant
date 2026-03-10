@@ -186,21 +186,6 @@ export default function ContactListPage() {
     }));
   }, [apiLists]);
 
-  // const mappedContacts: Contact[] = useMemo(() => {
-  //   return apiContacts.map((contact: ApiContact) => ({
-  //     id: contact.id,
-  //     first_name: contact.first_name,
-  //     last_name: contact.last_name,
-  //     phone: contact.phone,
-  //     email: contact.email,
-  //     lastOutcome: contact.most_recent_outcome,
-  //     last_dial_time: contact.last_dial_time,
-  //     listId: contact.contact_list_id,
-  //     status: contact.status,
-  //     dnc: contact.dnc,
-  //   }));
-  // }, [apiContacts]);
-
   const mapApiContactToContact = (contact: ApiContact): Contact => ({
     id: contact.id,
     first_name: contact.first_name,
@@ -227,29 +212,6 @@ export default function ContactListPage() {
     () => apiContacts.map(mapApiContactToContact),
     [apiContacts],
   );
-
-  // const mapContactToApiPayload = (contact: Contact): Partial<ApiContact> => ({
-  //   first_name: contact.first_name,
-  //   last_name: contact.last_name,
-  //   email: contact.email,
-  //   phone: contact.phone,
-  //   status: contact.status,
-  //   dnc: contact.dnc,
-  //   contact_list_id: contact.contact_list_id ?? undefined,
-  //   most_recent_outcome: contact.lastOutcome ?? undefined,
-  //   last_dial_time: contact.last_dial_time ?? undefined,
-
-  //   // If you support these in UI, include them:
-  //   business_name: (contact as any).businessName ?? "",
-  //   job_title: (contact as any).jobTitle ?? "",
-  //   full_address: (contact as any).address ?? "",
-  //   city: (contact as any).city ?? "",
-  //   state: (contact as any).state ?? "",
-  //   postal_code: (contact as any).zip ?? "",
-  //   country: (contact as any).country ?? "",
-  //   timezone: (contact as any).timezone ?? "",
-  //   custom_fields: (contact as any).customFields ?? [],
-  // });
 
   const mapContactToApiPayload = (contact: Contact): Partial<ApiContact> => ({
     first_name: contact.first_name,
@@ -416,32 +378,6 @@ export default function ContactListPage() {
     reset();
   };
 
-  // const handleEditContact = async (id: string, data: Partial<ApiContact>) => {
-  //   try {
-  //     console.log("update contact payload: ", data);
-  //     const updatedcontactRes = await updateContact({
-  //       contactId: id,
-  //       payload: data,
-  //     });
-  //     if (updatedcontactRes?.data?.status_code === 200) {
-  //       toast.success(
-  //         updatedcontactRes?.data?.message || "Contact updated successfully",
-  //       );
-  //     }
-  //     if (
-  //       data?.contact_list_id &&
-  //       updatedcontactRes?.data?.status_code === 200
-  //     ) {
-  //       await queryClient.invalidateQueries({
-  //         queryKey: ["contact-lists"],
-  //       });
-  //       // when ever this condition get true at time call contact-list get api
-  //     }
-  //     setSelectedContact(null);
-  //     setEditOpen(false);
-  //   } catch (error) {}
-  // };
-
   const handleEditContact = async (
     id: string,
     payload: Partial<ApiContact>,
@@ -585,10 +521,6 @@ export default function ContactListPage() {
       }
 
       if (selectedBulkAction === "enableDNC") {
-        // const payload = selectedRows.map((contact) => ({
-        //   ...contact,
-        //   dnc: true,
-        // }));
         const payload = selectedRows.map((contact) => ({
           id: contact.id,
           dnc: true,
@@ -605,10 +537,6 @@ export default function ContactListPage() {
       }
 
       if (selectedBulkAction === "disableDNC") {
-        // const payload = selectedRows.map((contact) => ({
-        //   ...contact,
-        //   dnc: false,
-        // }));
         const payload = selectedRows.map((contact) => ({
           id: contact.id,
           dnc: false,
@@ -974,33 +902,11 @@ export default function ContactListPage() {
           onSubmit={handleCreateContact}
           isCreatingContact={isCreatingContact}
         />
-        {/* <EditContactDrawer
-          open={editOpen}
-          onClose={() => setEditOpen(false)}
-          contact={selectedContact}
-          lists={lists}
-          onSubmit={handleEditContact}
-          isUpdatingContact={isUpdatingContact}
-        /> */}
         <EditContactDrawer
           open={editOpen}
           onClose={() => setEditOpen(false)}
           contact={selectedContact}
           lists={lists}
-          // onSubmit={(id, data: Partial<ApiContact>) => {
-          //   console.log("edit data: ", data);
-          //   handleEditContact(id, {
-          //     first_name: data.first_name,
-          //     last_name: data.last_name,
-          //     email: data.email,
-          //     phone: data.phone,
-          //     status: data.status,
-          //     dnc: data.dnc,
-          //     contact_list_id: data.contact_list_id ?? undefined,
-          //     most_recent_outcome: data.lastOutcome ?? undefined,
-          //     last_dial_time: data.last_dial_time ?? undefined,
-          //   });
-          // }}
           onSubmit={(id, data: Contact) => {
             const payload = mapContactToApiPayload(data);
             handleEditContact(id, payload);

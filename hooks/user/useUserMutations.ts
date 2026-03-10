@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import { userService } from "@/services/user.service";
-import { CreateUserPayload, UpdateUserPayload } from "@/types/user.types";
+import { UpdateUserPayload } from "@/types/user.types";
 
 type ApiErrorResponse = {
   detail?: string;

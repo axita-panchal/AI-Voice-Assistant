@@ -223,7 +223,6 @@ export default function CampaignDrawer({
             error={errors.name?.message}
             {...register("name")}
           />
-
           <FormSelect
             label="Agent"
             error={errors.agentId?.message}
@@ -234,19 +233,16 @@ export default function CampaignDrawer({
             }))}
             {...register("agentId")}
           />
-
           <FormInput
             label="Daily Usage Cap"
             error={errors.dailyCap?.message}
             {...register("dailyCap")}
           />
-
           <FormInput
             label="Maximum Follow Ups"
             error={errors.maxFollowUps?.message}
             {...register("maxFollowUps")}
           />
-
           {/* CALLING DAYS */}
           <div>
             <p className="text-sm font-medium mb-2">Calling days</p>
@@ -254,7 +250,6 @@ export default function CampaignDrawer({
             <div className="grid grid-cols-4 sm:flex sm:flex-wrap gap-3">
               {DAYS.map((day) => {
                 const checked = selectedDays.includes(day);
-
                 return (
                   <div
                     key={day}
@@ -284,7 +279,6 @@ export default function CampaignDrawer({
           {/* HOURS */}
           <div>
             <p className="text-sm font-medium mb-2">Local calling hours</p>
-
             <Controller
               control={control}
               name="hours"
@@ -304,12 +298,10 @@ export default function CampaignDrawer({
                 />
               )}
             />
-
             <div className="flex justify-between text-xs mt-1">
               <span>{formatTime(hours[0])}</span>
               <span>{formatTime(hours[1])}</span>
             </div>
-
             {errors.hours && (
               <p className="text-red-500 text-xs mt-1">
                 {errors.hours.message}

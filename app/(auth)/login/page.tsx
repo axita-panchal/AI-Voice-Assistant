@@ -192,11 +192,6 @@ export default function LoginPage() {
 
         {/* RIGHT IMAGE */}
         <div className="hidden min-[800px]:flex w-1/2 p-10 items-center justify-center ">
-          {/* <img
-            src="/assets/svgs/login_logo.png"
-            alt="Login"
-            className="w-full h-full object-contain"
-          /> */}
           <Image
             src="/assets/svgs/login_logo.png"
             alt="Login"

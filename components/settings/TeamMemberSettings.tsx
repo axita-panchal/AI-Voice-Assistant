@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button, Avatar, Pagination } from "@mui/material";
 import GenericTable, { Column } from "../common/DynamicTable";
 import AddTeamMemberModal, { RoleKey } from "./AddTeamMemberModal";
 import IconButton from "../common/IconButton";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 
 import { useDeleteUser } from "@/hooks/user/useUserMutations";
 import { useTeamMemberUsers } from "@/hooks/user/useUserQueries";

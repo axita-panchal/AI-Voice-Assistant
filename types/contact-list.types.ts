@@ -38,36 +38,6 @@ export type UpdateContactPayload = {
   contact_list_id?: string | null;
 };
 
-// export interface Contact {
-//   id: string;
-//   firstName: string;
-//   lastName: string;
-//   phone: string;
-//   lastOutcome: string | null;
-//   lastDial: string | null;
-//   listId: string;
-//   contact_list_id?: string | null;
-//   status: string;
-//   email: string;
-//   dnc: boolean;
-//   name?: string;
-//   actions?: string;
-// }
-// export interface Contact {
-//   id: string;
-//   first_name: string;
-//   last_name: string;
-//   phone: string;
-//   lastOutcome?: string | null;
-//   last_dial_time?: string | null;
-//   listId: string;
-//   contact_list_id?: string | null;
-//   status: string;
-//   email: string;
-//   dnc: boolean;
-//   name?: string;
-//   actions?: string;
-// }
 export interface Contact {
   id: string;
   first_name: string;

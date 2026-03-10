@@ -13,12 +13,10 @@ export default function Error({
   const router = useRouter();
 
   const handleHome = () => {
-    const loggedIn = Boolean(localStorage.getItem("token"));
+    if (typeof window !== "undefined") {
+      const loggedIn = Boolean(localStorage.getItem("token"));
 
-    if (loggedIn) {
-      router.replace("/dashboard");
-    } else {
-      router.replace("/login");
+      router.replace(loggedIn ? "/dashboard" : "/login");
     }
   };
 

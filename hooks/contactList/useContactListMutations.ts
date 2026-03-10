@@ -46,31 +46,6 @@ export const useCreateContactList = () => {
   });
 };
 
-// export const useUpdateContactList = () => {
-//   const queryClient = useQueryClient();
-
-//   return useMutation<
-//     AxiosResponse<CreateContactListResponse>,
-//     AxiosError<ApiErrorResponse>,
-//     { contactListId: string; payload: UpdateContactListPayload }
-//   >({
-//     mutationFn: ({ contactListId, payload }) =>
-//       contactListService.updateContactList({ contactListId, payload }),
-
-//     onSuccess: (_, variables) => {
-//       queryClient.invalidateQueries({
-//         queryKey: ["contact_lists"],
-//         exact: false,
-//       });
-
-//       // optional: invalidate single contact list cache
-//       queryClient.invalidateQueries({
-//         queryKey: ["contact_lists", variables.contactListId],
-//       });
-//     },
-//   });
-// };
-
 export const useUpdateContactList = () => {
   const queryClient = useQueryClient();
 

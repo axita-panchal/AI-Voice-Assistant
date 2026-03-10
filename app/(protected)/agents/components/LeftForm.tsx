@@ -36,7 +36,6 @@ export default function LeftForm({
   const router = useRouter();
 
   return (
-    // <div className="flex flex-col ">
     <form
       className="flex flex-col"
       onSubmit={(e) => {
@@ -45,13 +44,6 @@ export default function LeftForm({
       }}
       aria-busy={isUpdating}
     >
-      {/* <button
-        onClick={() => router.push("/agents")}
-        className="flex items-center gap-2 text-base text-gray-600 mb-6"
-      >
-        <ArrowBack fontSize="small" />
-        Back
-      </button> */}
       <button
         type="button"
         onClick={() => router.push("/agents")}
@@ -151,9 +143,6 @@ export default function LeftForm({
             },
           }}
         >
-          {/* {isUpdating && (
-            <CircularProgress size={18} sx={{ color: "#fff", mr: 1 }} />
-          )} */}
           {(isUpdating || agentDataByIdLoading) && (
             <CircularProgress
               size={18}
@@ -169,7 +158,6 @@ export default function LeftForm({
               : "Publish"}
         </Button>
       </div>
-      {/* </div> */}
     </form>
   );
 }
