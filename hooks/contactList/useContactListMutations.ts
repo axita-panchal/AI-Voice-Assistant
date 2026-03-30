@@ -25,8 +25,10 @@ export type CreateContactResponse = {
   };
 };
 export interface DeleteContactListResponse {
-  status_code: number;
-  message: string;
+  data: {
+    status_code: number;
+    message: string;
+  };
 }
 export interface DeleteContactResponse {
   status_code: number;
@@ -81,6 +83,9 @@ export const useDeleteContactList = () => {
     mutationFn: (id: string) => contactListService.deleteContactList(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contact_lists"] });
+      queryClient.invalidateQueries({
+        queryKey: ["contacts"],
+      });
     },
   });
 };

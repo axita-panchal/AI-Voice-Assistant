@@ -57,17 +57,17 @@ export default function LoginPage() {
       if (res?.status === 200) {
         dispatch(
           loginSuccess({
-            user: res?.data?.data?.user,
-            access_token: res?.data?.data?.access_token,
-            refresh_token: res?.data?.data?.refresh_token,
+            user: res?.data?.user,
+            access_token: res?.data?.access_token,
+            refresh_token: res?.data?.refresh_token,
           }),
         );
         localStorage.setItem(
           "auth",
           JSON.stringify({
-            user: res?.data?.data?.user,
-            accessToken: res?.data?.data?.access_token,
-            refreshToken: res?.data?.data?.refresh_token,
+            user: res?.data?.user,
+            accessToken: res?.data?.access_token,
+            refreshToken: res?.data?.refresh_token,
             isAuthenticated: true,
           }),
         );

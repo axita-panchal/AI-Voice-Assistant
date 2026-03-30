@@ -1,3 +1,5 @@
+import { Agent } from "./agent.types";
+
 interface BaseCampaignPayload {
   name: string;
   start_time?: string;
@@ -26,6 +28,7 @@ export interface Campaign {
   id: string;
   name: string;
   agent_id: string;
+  agent: Agent;
   start_time: string;
   end_time: string;
   min_calls_per_hour: number;

@@ -16,6 +16,12 @@ import { toast } from "@/utils/toast";
    API TYPES
 ------------------------------------------------------- */
 
+type SubAccountData = {
+  id: string;
+  name: string;
+  description: string;
+};
+
 type ApiUser = {
   id: string;
   email: string;
@@ -24,6 +30,7 @@ type ApiUser = {
   last_name: string;
   full_name: string;
   sub_account_id: string | null;
+  sub_account: SubAccountData;
 };
 
 /* -------------------------------------------------------
@@ -38,6 +45,7 @@ type TeamMember = {
   role: RoleKey;
   organization?: string;
   actions?: string;
+  subaccountDetails?: SubAccountData;
 };
 
 /* -------------------------------------------------------
@@ -91,7 +99,7 @@ export default function TeamMembers() {
      MAP API USERS → TABLE DATA
   --------------------------------------------------- */
 
-  const users = usersResponse?.data?.data?.users ?? [];
+  const users = usersResponse?.data?.users ?? [];
   const meta = usersResponse?.data?.data?.meta;
 
   const totalCount = meta?.totalCount ?? 0;
@@ -105,6 +113,7 @@ export default function TeamMembers() {
       email: user.email,
       role: API_ROLE_TO_KEY[user.role],
       organization: user.sub_account_id ?? "",
+      subaccountDetails: user?.sub_account,
     })) ?? [];
 
   /* ---------------------------------------------------
@@ -160,7 +169,7 @@ export default function TeamMembers() {
     {
       key: "organization",
       label: "Organization",
-      render: (row) => row.organization || "-",
+      render: (row) => row.subaccountDetails?.name || "-",
     },
     {
       key: "actions",

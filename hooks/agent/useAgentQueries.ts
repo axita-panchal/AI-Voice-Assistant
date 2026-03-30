@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { agentService } from "@/services/agent.service";
+import { keepPreviousData } from "@tanstack/react-query";
 
 export const useAgents = (
   limit: number,
@@ -12,10 +13,13 @@ export const useAgents = (
       agentService.getAgents({
         limit,
         skip,
-        subaccountId: subaccountId!,
+        subaccountId: subaccountId as string,
       }),
-    enabled: Boolean(subaccountId),
+    enabled: !!subaccountId,
     staleTime: 0,
+    retry: 1,
+    refetchOnWindowFocus: false,
+    placeholderData: keepPreviousData,
   });
 };
 
@@ -27,6 +31,8 @@ export const useAgentById = (agentId?: string) => {
         agentId: agentId!,
       }),
     enabled: !!agentId,
-    staleTime: 0,
+    // staleTime: 0,
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 };

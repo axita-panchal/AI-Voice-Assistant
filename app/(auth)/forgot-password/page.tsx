@@ -61,11 +61,9 @@ export default function ForgotPasswordPage() {
           <h1 className="text-lg sm:text-3xl font-semibold text-gray-900">
             Forgot your Password?
           </h1>
-
           <p className="text-xs sm:text-sm text-gray-500 mt-1 mb-4">
             Enter your email so we can send you the password reset link
           </p>
-
           <form className="space-y-3" onSubmit={handleSubmit(onSubmit)}>
             <div>
               <label className="text-sm font-medium text-gray-700 mb-1 block">
@@ -81,7 +79,6 @@ export default function ForgotPasswordPage() {
                 helperText={errors.email?.message}
               />
             </div>
-
             <Button
               type="submit"
               fullWidth
@@ -102,7 +99,6 @@ export default function ForgotPasswordPage() {
                 "Send Email"
               )}
             </Button>
-
             <p className="text-xs text-center text-gray-500 mt-2">
               Don’t have an account?{" "}
               <Link href="/signup" className="text-blue-600 hover:underline">
@@ -111,7 +107,6 @@ export default function ForgotPasswordPage() {
             </p>
           </form>
         </div>
-
         <div className="hidden min-[800px]:flex w-1/2 p-10 items-center justify-center ">
           <Image
             src="/assets/svgs/login_logo.png"

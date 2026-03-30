@@ -5,7 +5,7 @@ export const useCampaignById = (id?: string | number) =>
   useQuery({
     queryKey: ["campaigns", id],
     queryFn: () => campaignService.getCampaignById({ campaignId: String(id) }),
-    enabled: Boolean(id),
+    enabled: !!id,
   });
 
 export const useCampaigns = (limit: number, skip: number) =>
@@ -13,5 +13,7 @@ export const useCampaigns = (limit: number, skip: number) =>
     queryKey: ["campaigns", limit, skip],
     queryFn: () => campaignService.getCampaigns({ limit, skip }),
     placeholderData: keepPreviousData,
-    staleTime: 0, // ✅ force refetch on invalidate
+    retry: 1,
+    staleTime: 0, // ✅ force refetch on invalidate retry: 1,
+    refetchOnWindowFocus: false,
   });

@@ -13,15 +13,19 @@ export const workspaceService = {
   },
 
   getWorkspaceById: (id: string) => {
-    return http.get(`/subaccount/${id}`);
+    const res = http.get(`/subaccount/${id}`);
+    return res;
   },
   createWorkspace: (payload: CreateWorkSpacePayload) => {
-    return http.post("/subaccount/", payload);
+    const res = http.post("/subaccount/", payload);
+    return res;
   },
   deleteWorkspace: (id: number) => {
-    return http.delete(`/subaccount/${id}`);
+    const res = http.delete(`/subaccount/${id}`);
+    return res;
   },
   updateWorkspace: (payload: UpdateWorkSpacePayload) => {
-    return http.patch(`/subaccount/${payload?.id}`, payload);
+    const res = http.patch(`/subaccount/${payload?.id}`, payload);
+    return res;
   },
 };

@@ -5,27 +5,32 @@ import {
 import http from "./http";
 
 export const campaignService = {
-  createCampaign: (payload: CreateCampaignPayload) => {
-    return http.post("/campaign", payload);
+  createCampaign: async (payload: CreateCampaignPayload) => {
+    const res = await http.post("/campaign", payload);
+    return res?.data;
   },
-  getCampaigns: ({ limit, skip }: { limit?: number; skip?: number }) => {
-    return http.get(`/campaign/`, {
+  getCampaigns: async ({ limit, skip }: { limit?: number; skip?: number }) => {
+    const res = await http.get(`/campaign/`, {
       params: { limit, skip },
     });
+    return res?.data;
   },
-  getCampaignById: ({ campaignId }: { campaignId: string }) => {
-    return http.get(`/campaign/${campaignId}`);
+  getCampaignById: async ({ campaignId }: { campaignId: string }) => {
+    const res = await http.get(`/campaign/${campaignId}`);
+    return res?.data;
   },
-  updateCampaign: ({
+  updateCampaign: async ({
     campaignId,
     payload,
   }: {
     campaignId: string;
     payload: UpdateCampaignPayload;
   }) => {
-    return http.patch(`/campaign/${campaignId}`, payload);
+    const res = await http.patch(`/campaign/${campaignId}`, payload);
+    return res?.data;
   },
-  deleteCampaign: (campaignId: string) => {
-    return http.delete(`/campaign/${campaignId}`);
+  deleteCampaign: async (campaignId: string) => {
+    const res = await http.delete(`/campaign/${campaignId}`);
+    return res;
   },
 };

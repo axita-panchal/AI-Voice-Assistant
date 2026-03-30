@@ -48,7 +48,7 @@ const AgentList = () => {
   const skip = (page - 1) * limit;
 
   const { data: agentsResponse } = useAgents(limit, skip, subaccountId);
-  const agents = agentsResponse?.data?.data?.agents || [];
+  const agents = agentsResponse?.data?.agents || [];
 
   const { mutateAsync: deleteAgent, isPending } = useDeleteAgent();
 

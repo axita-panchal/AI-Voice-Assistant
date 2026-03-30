@@ -34,7 +34,7 @@ export default function CampaignPage() {
   );
   const [deleteListId, setDeleteListId] = useState<Campaign | null>(null);
 
-  const isEmpty = campaignsData?.data?.data?.campaigns?.length === 0;
+  const isEmpty = campaignsData?.data?.campaigns?.length === 0;
 
   const columns: Column<Campaign>[] = [
     {
@@ -71,8 +71,9 @@ export default function CampaignPage() {
       label: "Daily Cap",
     },
     {
-      key: "agent_id",
+      key: "agent",
       label: "Agent",
+      render: (row) => row.agent?.name || "-",
     },
     {
       key: "dials",
@@ -160,7 +161,7 @@ export default function CampaignPage() {
             <div className="mt-6">
               <GenericTable
                 columns={columns}
-                data={campaignsData?.data?.data?.campaigns || []}
+                data={campaignsData?.data?.campaigns || []}
                 onRowClick={(row) => handleOpenEdit(row)}
               />
             </div>

@@ -7,22 +7,27 @@ type GetUsersParams = {
 };
 
 export const userService = {
-  getUsers: ({ limit, skip }: GetUsersParams) => {
-    return http.get("/users", {
+  getUsers: async ({ limit, skip }: GetUsersParams) => {
+    const res = await http.get("/users", {
       params: { limit, skip },
     });
+    return res?.data;
   },
 
-  getUserById: (id: string) => {
-    return http.get(`/users/${id}`);
+  getUserById: async (id: string) => {
+    const res = await http.get(`/users/${id}`);
+    return res;
   },
-  createUser: (payload: CreateUserPayload) => {
-    return http.post("/users", payload);
+  createUser: async (payload: CreateUserPayload) => {
+    const res = await http.post("/users", payload);
+    return res;
   },
-  deleteUser: (id: string) => {
-    return http.delete(`/users/${id}`);
+  deleteUser: async (id: string) => {
+    const res = await http.delete(`/users/${id}`);
+    return res;
   },
-  updateUser: (payload: UpdateUserPayload) => {
-    return http.patch(`/users/${payload?.id}`, payload);
+  updateUser: async (payload: UpdateUserPayload) => {
+    const res = await http.patch(`/users/${payload?.id}`, payload);
+    return res;
   },
 };

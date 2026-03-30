@@ -95,7 +95,7 @@ export default function CampaignDrawer({
 
   const { data: agentsResponse, isLoading } = useAgents(20, 0, subaccountId);
 
-  const agents = agentsResponse?.data?.data?.agents ?? [];
+  const agents = agentsResponse?.data?.agents ?? [];
 
   const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -168,11 +168,20 @@ export default function CampaignDrawer({
           campaignId: campaign.id,
           payload,
         });
-
-        toast.success("Campaign updated successfully!");
+        if (updatedCampaignRes?.data?.status_code === 200) {
+          toast.success(
+            updatedCampaignRes?.data?.message ||
+              "Campaign updated successfully!",
+          );
+        }
       } else {
-        await createCampaign(payload);
-        toast.success("Campaign created successfully!");
+        const createCampaignRes = await createCampaign(payload);
+        if (createCampaignRes?.data?.status_code === 200) {
+          toast.success(
+            createCampaignRes?.data?.message ||
+              "Campaign created successfully!",
+          );
+        }
       }
 
       reset(defaultValues);

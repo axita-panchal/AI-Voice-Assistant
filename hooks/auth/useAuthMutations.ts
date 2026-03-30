@@ -41,12 +41,12 @@ export type User = {
 export type LoginResponse = {
   status_code: number;
   message: string;
-  data: {
-    token_type: string;
-    access_token: string;
-    refresh_token: string;
-    user: User;
-  };
+  // data: {
+  token_type: string;
+  access_token: string;
+  refresh_token: string;
+  user: User;
+  // };
 };
 
 export type RegisterResponse = {
@@ -78,9 +78,9 @@ export const useLogin = () =>
   >({
     mutationFn: authService.login,
     onSuccess: (res) => {
-      localStorage.setItem("access_token", res.data.data.access_token);
-      localStorage.setItem("refresh_token", res.data.data.refresh_token);
-      localStorage.setItem("user", JSON.stringify(res.data.data.user));
+      localStorage.setItem("access_token", res.data.access_token);
+      localStorage.setItem("refresh_token", res.data.refresh_token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
     },
   });
 

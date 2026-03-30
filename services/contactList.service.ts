@@ -10,58 +10,70 @@ import http from "./http";
 
 export const contactListService = {
   // ================ CONTACT LISTS =================
-  createContactList: (payload: CreateContactListPayload) => {
-    return http.post("/contact-list", payload);
+  createContactList: async (payload: CreateContactListPayload) => {
+    const res = await http.post("/contact-list", payload);
+    return res?.data;
   },
-  getContactLists: ({ limit, skip }: GetContactListsParams) => {
-    return http.get(`/contact-list/`, {
+  getContactLists: async ({ limit, skip }: GetContactListsParams) => {
+    const res = await http.get(`/contact-list/`, {
       params: { limit, skip },
     });
+    return res?.data;
   },
-  getContactListById: ({ contactListId }: { contactListId: string }) => {
-    return http.get(`/contact-list/${contactListId}`);
+  getContactListById: async ({ contactListId }: { contactListId: string }) => {
+    const res = await http.get(`/contact-list/${contactListId}`);
+    return res?.data;
   },
-  updateContactList: ({
+  updateContactList: async ({
     contactListId,
     payload,
   }: {
     contactListId: string;
     payload: UpdateContactListPayload;
   }) => {
-    return http.patch(`/contact-list/${contactListId}`, payload);
+    const res = await http.patch(`/contact-list/${contactListId}`, payload);
+    return res?.data;
   },
-  deleteContactList: (contactListId: string) => {
-    return http.delete(`/contact-list/${contactListId}`);
+  deleteContactList: async (contactListId: string) => {
+    const res = await http.delete(`/contact-list/${contactListId}`);
+    return res;
   },
 
   // ================ CONTACTS =================
-  createContact: (payload: CreateContactPayload) => {
-    return http.post("/contact", payload);
+  createContact: async (payload: CreateContactPayload) => {
+    const res = await http.post("/contact", payload);
+    return res?.data;
   },
-  getContacts: ({ limit, skip }: { limit?: number; skip?: number }) => {
-    return http.get(`/contact/`, {
+  getContacts: async ({ limit, skip }: { limit?: number; skip?: number }) => {
+    const res = await http.get(`/contact/`, {
       params: { limit, skip },
     });
+    return res?.data;
   },
-  getContactById: ({ contactId }: { contactId: string }) => {
-    return http.get(`/contact/${contactId}`);
+  getContactById: async ({ contactId }: { contactId: string }) => {
+    const res = await http.get(`/contact/${contactId}`);
+    return res?.data;
   },
-  updateContact: ({
+  updateContact: async ({
     contactId,
     payload,
   }: {
     contactId: string;
     payload: UpdateContactPayload;
   }) => {
-    return http.patch(`/contact/${contactId}`, payload);
+    const res = await http.patch(`/contact/${contactId}`, payload);
+    return res;
   },
-  deleteContact: (contactId: string) => {
-    return http.delete(`/contact/${contactId}`);
+  deleteContact: async (contactId: string) => {
+    const res = await http.delete(`/contact/${contactId}`);
+    return res;
   },
-  deleteBulkContacts: (payload: { ids: string[] }) => {
-    return http.post(`/contact/bulk-delete`, payload);
+  deleteBulkContacts: async (payload: { ids: string[] }) => {
+    const res = await http.post(`/contact/bulk-delete`, payload);
+    return res;
   },
-  updateBulkContacts: (payload: BulkDncUpdate[]) => {
-    return http.patch("contact/bulk-update", { items: payload });
+  updateBulkContacts: async (payload: BulkDncUpdate[]) => {
+    const res = await http.patch("contact/bulk-update", { items: payload });
+    return res;
   },
 };

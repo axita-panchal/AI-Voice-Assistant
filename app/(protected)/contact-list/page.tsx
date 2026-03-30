@@ -136,8 +136,8 @@ export default function ContactListPage() {
     },
   });
 
-  const apiLists: ContactList[] = data?.data?.data?.contact_lists || [];
-  const apiContacts: ApiContact[] = contactData?.data?.data?.contacts || [];
+  const apiLists: ContactList[] = data?.data?.contact_lists || [];
+  const apiContacts: ApiContact[] = contactData?.data?.contacts || [];
 
   const [activeListId, setActiveListId] = useState<string>("all");
   const [deleteListId, setDeleteListId] = useState<deleteContactList | null>(
@@ -286,7 +286,7 @@ export default function ContactListPage() {
   const handleDeleteList = async () => {
     if (!deleteListId) return;
     try {
-      await deleteContactList(deleteListId?.id);
+      const deleteContactListRes = await deleteContactList(deleteListId?.id);
       toast.success("Contact list deleted successfully");
       if (activeListId === deleteListId.id) {
         setActiveListId("all");
@@ -928,7 +928,7 @@ export default function ContactListPage() {
             setEditContactListOpen(false);
             setSelectedContactList(null);
           }}
-          contactList={contactListDetail?.data?.data?.contact_list}
+          contactList={contactListDetail?.data?.contact_list}
           allContactsData={mappedContacts}
           onSubmit={handleEditContactList}
         />

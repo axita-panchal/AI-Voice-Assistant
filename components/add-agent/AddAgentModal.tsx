@@ -92,7 +92,7 @@ export default function AddAgentModal({ open, onClose }: Props) {
           createAgentRes?.data?.message || "Agent created successfully",
         );
       }
-      queryClient.invalidateQueries({ queryKey: ["allAgents"] });
+      queryClient.invalidateQueries({ queryKey: ["agents"] });
       onClose();
     } catch (error) {
       console.error(error);

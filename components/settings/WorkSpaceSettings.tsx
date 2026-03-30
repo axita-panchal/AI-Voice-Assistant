@@ -211,7 +211,6 @@ export default function WorkSpaceSettings() {
 
   /** ---------------- States ---------------- */
   if (isLoading) return <div>Loading workspaces...</div>;
-  if (isError) return <div>Failed to load workspaces</div>;
 
   return (
     <div className="max-w-5xl mx-auto p-6 bg-white rounded-xl shadow-sm">
