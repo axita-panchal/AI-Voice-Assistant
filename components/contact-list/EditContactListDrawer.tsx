@@ -91,22 +91,20 @@ export default function EditContactListDrawer({
   };
 
   return (
-    <Drawer anchor="right" open={open} onClose={onClose}>
-      <Box
-        width={420}
-        p={3}
-        display="flex"
-        flexDirection="column"
-        height="100%"
-      >
-        {/* HEADER */}
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Stack
-            display="flex"
-            gap={2}
-            flexDirection={"row"}
-            alignItems="center"
-          >
+    <Drawer
+      anchor="right"
+      open={open}
+      onClose={onClose}
+      PaperProps={{
+        sx: {
+          width: { xs: "100%", sm: 420 },
+        },
+      }}
+    >
+      <Box className="h-full flex flex-col">
+        {/* ================= HEADER ================= */}
+        <Box className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4">
+          <Stack direction="row" alignItems="center" gap={2}>
             <Image
               src="/assets/svgs/edit_folder.svg"
               height={30}
@@ -115,89 +113,89 @@ export default function EditContactListDrawer({
             />
             <Typography fontWeight={500}>Edit List</Typography>
           </Stack>
+
           <IconButton onClick={onClose}>
             <Close />
           </IconButton>
         </Box>
 
-        {/* FORM */}
-        <Box mt={3}>
-          <TextField
-            fullWidth
-            label="List name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            margin="normal"
-          />
-          <TextField
-            select
-            fullWidth
-            label="Campaign"
-            value={campaign ?? ""}
-            onChange={(e) => setCampaign(e.target.value)}
-            margin="normal"
-            disabled={isPendingCampaign}
-          >
-            <MenuItem value="">
-              <em>Select Campaign</em>
-            </MenuItem>
-            {campaignsData?.data?.data?.campaigns?.map((item: Campaign) => (
-              <MenuItem key={item.id} value={item.id}>
-                {item.name}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Box>
-
-        {/* CONTACTS */}
-        <Box mt={3} flex={1} overflow="auto">
-          <Typography fontWeight={500} mb={2}>
-            Contact list
-          </Typography>
-
-          {allContactsData.map((contact) => (
-            <Box
-              key={contact.id}
-              display="flex"
-              alignItems="center"
-              justifyContent="space-between"
-              p={1.5}
-              borderRadius={2}
-              bgcolor="#F6F8FB"
-              mb={1}
+        {/* ================= FORM (SCROLLABLE) ================= */}
+        <Box className="flex-1 overflow-y-auto px-4 sm:px-6 py-4">
+          <Box>
+            <TextField
+              fullWidth
+              label="List name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              margin="normal"
+            />
+            <TextField
+              select
+              fullWidth
+              label="Campaign"
+              value={campaign ?? ""}
+              onChange={(e) => setCampaign(e.target.value)}
+              margin="normal"
+              disabled={isPendingCampaign}
             >
-              <Stack direction="row" spacing={2} alignItems="center">
-                <Avatar />
-                <Box>
-                  <Typography fontSize={14}>
-                    {contact.first_name} {contact?.last_name}
-                  </Typography>
-                  <Typography fontSize={12} color="gray">
-                    {contact.phone}
-                  </Typography>
-                </Box>
-              </Stack>
+              <MenuItem value="">
+                <em>Select Campaign</em>
+              </MenuItem>
+              {campaignsData?.data?.data?.campaigns?.map((item: Campaign) => (
+                <MenuItem key={item.id} value={item.id}>
+                  {item.name}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Box>
 
-              <Checkbox
-                checked={selectedContacts.includes(contact.id)}
-                onChange={() => handleToggle(contact.id)}
-              />
-            </Box>
-          ))}
+          {/* ================= CONTACTS ================= */}
+          <Box mt={3}>
+            <Typography fontWeight={500} mb={2}>
+              Contact list
+            </Typography>
+
+            {allContactsData.map((contact) => (
+              <Box
+                key={contact.id}
+                className="flex items-center justify-between p-3 rounded-lg bg-[#F6F8FB] mb-2"
+              >
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Avatar />
+                  <Box>
+                    <Typography fontSize={14}>
+                      {contact.first_name} {contact?.last_name}
+                    </Typography>
+                    <Typography fontSize={12} color="gray">
+                      {contact.phone}
+                    </Typography>
+                  </Box>
+                </Stack>
+
+                <Checkbox
+                  checked={selectedContacts.includes(contact.id)}
+                  onChange={() => handleToggle(contact.id)}
+                />
+              </Box>
+            ))}
+          </Box>
         </Box>
 
-        {/* FOOTER */}
-        <Box mt={2} display="flex" gap={2}>
+        {/* ================= FOOTER (STICKY) ================= */}
+        <Box className="px-4 sm:px-6 py-4 bg-white flex flex-col sm:flex-row gap-2">
           <Button
             variant="contained"
             onClick={handleSubmit}
+            fullWidth
             sx={{ textTransform: "none" }}
           >
             Finish
           </Button>
+
           <Button
             onClick={onClose}
             variant="outlined"
+            fullWidth
             sx={{ textTransform: "none" }}
           >
             Cancel

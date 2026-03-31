@@ -70,7 +70,7 @@ export default function AddAgentShell({
           <div className="border-b border-gray-200 px-4 sm:px-6 py-4">
             <div className="flex flex-col xl:flex-row xl:items-center gap-3">
               {/* Tabs */}
-              <div className="flex-1 overflow-x-auto no-scrollbar">
+              <div className="flex-1 overflow-x-auto custom-scroll">
                 <div className="flex gap-2">
                   {TABS.map((tab) => {
                     const isActive = activeTab === tab.slug;
