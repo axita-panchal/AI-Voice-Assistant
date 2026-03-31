@@ -659,7 +659,8 @@ export default function ContactListPage() {
         </Box>
 
         {/* HEADER */}
-        <Box className="mt-4 flex justify-between items-center">
+        <Box className="mt-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+          {/* LEFT SECTION */}
           <Stack direction="row" alignItems="center" gap={1}>
             <Image
               src="/assets/svgs/contacts.svg"
@@ -667,11 +668,13 @@ export default function ContactListPage() {
               height={24}
               alt="Contact"
             />
-            <Typography fontWeight={600} fontSize={18}>
+            <Typography fontWeight={600} fontSize={{ xs: 16, sm: 18 }}>
               All Contacts
             </Typography>
           </Stack>
-          <Box className="flex flex-wrap items-center gap-2">
+
+          {/* RIGHT SECTION */}
+          <Box className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
             {selectedRows?.length > 0 && (
               <>
                 <Button
@@ -683,8 +686,6 @@ export default function ContactListPage() {
                     textTransform: "none",
                     borderColor: "#E5E7EB",
                     color: "#333",
-                    mr: 1,
-                    mb: { xs: 1, sm: 0 },
                     width: { xs: "100%", sm: "auto" },
                   }}
                 >
@@ -743,7 +744,12 @@ export default function ContactListPage() {
               }
               variant="outlined"
               onClick={handleOpenFilter}
-              sx={{ fontSize: 13, textTransform: "none", color: "#909090" }}
+              sx={{
+                fontSize: 13,
+                textTransform: "none",
+                color: "#909090",
+                width: { xs: "100%", sm: "auto" },
+              }}
             >
               Filter
             </Button>
@@ -757,7 +763,12 @@ export default function ContactListPage() {
                 />
               }
               variant="outlined"
-              sx={{ fontSize: 13, textTransform: "none", color: "#2F6AFF" }}
+              sx={{
+                fontSize: 13,
+                textTransform: "none",
+                color: "#2F6AFF",
+                width: { xs: "100%", sm: "auto" },
+              }}
             >
               Upload
             </Button>
@@ -768,6 +779,7 @@ export default function ContactListPage() {
               sx={{
                 backgroundColor: "#2F6AFF",
                 textTransform: "none",
+                width: { xs: "100%", sm: "auto" },
               }}
             >
               Add Contact
