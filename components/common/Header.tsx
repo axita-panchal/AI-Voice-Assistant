@@ -16,8 +16,10 @@ import {
   Menu,
   Divider,
   ListItemIcon,
+  Button,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import CallIcon from "@mui/icons-material/Call";
 import clsx from "clsx";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
@@ -29,6 +31,7 @@ import {
 import { useAllWorkspaces } from "@/hooks/workspace/useWorkspaceQueries";
 import { subAccountsType } from "@/types/workspace.types";
 import Image from "next/image";
+import MakeCallDrawer from "@/components/common/MakeCallDrawer";
 
 const NAV_ITEMS = [
   {
@@ -50,6 +53,8 @@ const NAV_ITEMS = [
   },
 ];
 
+const EMPTY_SUBACCOUNTS: subAccountsType[] = [];
+
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
@@ -66,7 +71,8 @@ export default function Header() {
 
   const { data: allWorkspaces, isLoading } = useAllWorkspaces(skip, limit);
 
-  const subaccounts = allWorkspaces?.data?.subaccounts || [];
+  const subaccounts =
+    allWorkspaces?.data?.subaccounts ?? EMPTY_SUBACCOUNTS;
 
   useEffect(() => {
     if (!subaccounts || subaccounts.length === 0) {
@@ -96,6 +102,7 @@ export default function Header() {
 
   const isSmallScreen = useMediaQuery("(max-width:1000px)");
   const [open, setOpen] = useState(false);
+  const [makeCallOpen, setMakeCallOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const openMenu = Boolean(anchorEl);
 
@@ -191,7 +198,30 @@ export default function Header() {
             )}
           </Box>
 
-          <Box className="flex items-center gap-3 sm:gap-2">
+          <Box className="flex items-center gap-2 sm:gap-3">
+            <Button
+              variant="contained"
+              size="small"
+              startIcon={<CallIcon sx={{ fontSize: 18 }} />}
+              onClick={() => setMakeCallOpen(true)}
+              sx={{
+                textTransform: "none",
+                borderRadius: "10px",
+                bgcolor: "#2563eb",
+                "&:hover": { bgcolor: "#1d4ed8" },
+                px: { xs: 1, sm: 2 },
+                whiteSpace: "nowrap",
+              }}
+              aria-label="Make a call"
+            >
+              <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>
+                Make a call
+              </Box>
+              <Box component="span" sx={{ display: { xs: "inline", sm: "none" } }}>
+                Call
+              </Box>
+            </Button>
+
             {/* Workspace Selector */}
             {subaccounts?.length > 0 && (
               <Box
@@ -305,6 +335,26 @@ export default function Header() {
               <p className="font-semibold">Assistant</p>
             </div>
           </Box>
+
+          <Button
+            fullWidth
+            variant="contained"
+            startIcon={<CallIcon />}
+            onClick={() => {
+              setOpen(false);
+              setMakeCallOpen(true);
+            }}
+            sx={{
+              textTransform: "none",
+              borderRadius: "10px",
+              bgcolor: "#2563eb",
+              mb: 2,
+              py: 1.25,
+              "&:hover": { bgcolor: "#1d4ed8" },
+            }}
+          >
+            Make a call
+          </Button>
 
           <nav className="flex flex-col gap-2">
             {NAV_ITEMS.map((item) => {
@@ -454,6 +504,11 @@ export default function Header() {
           Log out
         </MenuItem>
       </Menu>
+
+      <MakeCallDrawer
+        open={makeCallOpen}
+        onClose={() => setMakeCallOpen(false)}
+      />
     </>
   );
 }
