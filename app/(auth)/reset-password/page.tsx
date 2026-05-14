@@ -135,7 +135,7 @@ export default function ResetPasswordPage() {
                         onClick={() => setShowPassword(!showPassword)}
                         onMouseDown={(e) => e.preventDefault()}
                       >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                        {showPassword ? <Visibility /> : <VisibilityOff />}
                       </IconButton>
                     </InputAdornment>
                   ),
@@ -163,7 +163,7 @@ export default function ResetPasswordPage() {
                       }
                       onMouseDown={(e) => e.preventDefault()}
                     >
-                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                      {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
                     </IconButton>
                   </InputAdornment>
                 ),

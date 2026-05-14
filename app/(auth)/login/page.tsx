@@ -141,7 +141,7 @@ export default function LoginPage() {
                         onClick={() => setShowPassword(!showPassword)}
                         onMouseDown={(e) => e.preventDefault()}
                       >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                        {showPassword ? <Visibility /> : <VisibilityOff />}
                       </IconButton>
                     </InputAdornment>
                   ),
