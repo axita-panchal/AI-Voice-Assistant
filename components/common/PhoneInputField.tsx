@@ -60,7 +60,7 @@ export default function PhoneInputField<T extends FieldValues>({
         )}
       />
 
-      {error && <p className="text-xs text-[#d32f2f] mt-1">{error}</p>}
+      {error && <p className="text-xs text-[#d32f2f] mt-1 ml-3">{error}</p>}
     </div>
   );
 }

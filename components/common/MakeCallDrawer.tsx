@@ -4,23 +4,25 @@ import { useEffect } from "react";
 import {
   Drawer,
   IconButton as MuiIconButton,
-  Button,
   TextField,
+  CircularProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import AddIcon from "@mui/icons-material/Add";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import CallIcon from "@mui/icons-material/Call";
 import { useForm, useFieldArray, type Path } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isValidPhoneNumber } from "react-phone-number-input";
+import { isAxiosError } from "axios";
 import { toast } from "@/utils/toast";
 import PhoneInputField from "@/components/common/PhoneInputField";
+import { useOutboundCall } from "@/hooks/calls/useOutboundCallMutation";
+import type { ApiErrorResponse } from "@/hooks/auth/useAuthMutations";
 
 const personSchema = z.object({
   name: z.string().trim().min(1, "Name is required"),
-  phone: z
+  phone_number: z
     .string()
     .optional()
     .refine((val) => !!val, {
@@ -34,12 +36,12 @@ const personSchema = z.object({
 const schema = z.object({
   persons: z
     .array(personSchema)
-    .min(2, "Add at least two people before placing a call"),
+    .min(1, "Add at least one people before placing a call"),
 });
 
 type FormValues = z.infer<typeof schema>;
 
-const emptyPerson = () => ({ name: "", phone: "" });
+const emptyPerson = () => ({ name: "", phone_number: "" });
 
 const defaultValues: FormValues = {
   persons: [emptyPerson()],
@@ -51,6 +53,8 @@ interface MakeCallDrawerProps {
 }
 
 export default function MakeCallDrawer({ open, onClose }: MakeCallDrawerProps) {
+  const { mutateAsync, isPending } = useOutboundCall();
+
   const {
     register,
     control,
@@ -62,7 +66,7 @@ export default function MakeCallDrawer({ open, onClose }: MakeCallDrawerProps) {
     defaultValues,
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, remove } = useFieldArray({
     control,
     name: "persons",
   });
@@ -73,12 +77,29 @@ export default function MakeCallDrawer({ open, onClose }: MakeCallDrawerProps) {
     }
   }, [open, reset]);
 
-  const onSubmit = (data: FormValues) => {
-    // Wire to dial / outbound API when available
-    toast.success(
-      `Call request prepared for ${data.persons.length} contact(s).`,
-    );
-    onClose();
+  const onSubmit = async (data: FormValues) => {
+    const payload = data.persons[0];
+
+    try {
+      const res = await mutateAsync(payload);
+      toast.success(
+        res.data?.message ??
+          `Call request sent for ${1} contact(s).`,
+      );
+      onClose();
+    } catch (error: unknown) {
+      let message = "Could not start calls. Try again.";
+
+      if (isAxiosError<ApiErrorResponse>(error)) {
+        const data = error.response?.data;
+        message =
+          (typeof data?.detail === "string" ? data.detail : undefined) ||
+          data?.message ||
+          message;
+      }
+
+      toast.error(message);
+    }
   };
 
   return (
@@ -138,9 +159,9 @@ export default function MakeCallDrawer({ open, onClose }: MakeCallDrawerProps) {
                   sx={{ "& .MuiOutlinedInput-root": { bgcolor: "#fff" } }}
                 />
                 <PhoneInputField<FormValues>
-                  name={`persons.${index}.phone` as Path<FormValues>}
+                  name={`persons.${index}.phone_number` as Path<FormValues>}
                   control={control}
-                  error={errors.persons?.[index]?.phone?.message}
+                  error={errors.persons?.[index]?.phone_number?.message}
                 />
               </div>
             </div>
@@ -166,9 +187,13 @@ export default function MakeCallDrawer({ open, onClose }: MakeCallDrawerProps) {
         <div className="flex flex-col gap-3 pt-4 sm:flex-row">
           <button
             type="submit"
-            className="w-full cursor-pointer rounded-lg bg-blue-600 py-2 text-sm text-white sm:flex-1"
+            disabled={isPending}
+            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-blue-600 py-2 text-sm text-white disabled:cursor-not-allowed disabled:opacity-60 sm:flex-1"
           >
-            Start calls
+            {isPending && (
+              <CircularProgress size={18} color="inherit" aria-hidden />
+            )}
+            {isPending ? "Calling.." : "Start call"}
           </button>
           <button
             type="button"
