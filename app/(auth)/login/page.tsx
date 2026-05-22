@@ -133,16 +133,17 @@ export default function LoginPage() {
         onSubmit={handleSubmit(onSubmit)}
       >
         <div>
-          <label className="text-sm font-medium text-gray-700 mb-2 block">
+          <label className="text-sm min-[1750]:text-[18px] font-medium text-gray-700 mb-2 block">
             Email
           </label>
           <TextField
             placeholder="Enter your email"
             fullWidth
             size="small"
+            autoComplete="new-password"
             sx={{
-              backgroundColor: "#F7F9FF",
               "& .MuiOutlinedInput-root": {
+                backgroundColor: "#F6F8FB",
                 borderRadius: "10px",
                 height: "48px",
               },
@@ -154,7 +155,7 @@ export default function LoginPage() {
         </div>
 
         <div>
-          <label className="text-sm font-medium text-gray-700 mb-2 block">
+          <label className="text-sm min-[1750]:text-[18px] font-medium text-gray-700 mb-2 block">
             Password
           </label>
           <TextField
@@ -162,9 +163,10 @@ export default function LoginPage() {
             type={showPassword ? "text" : "password"}
             fullWidth
             size="small"
+            autoComplete="new-password"
             sx={{
-              backgroundColor: "#F7F9FF",
               "& .MuiOutlinedInput-root": {
+                backgroundColor: "#F6F8FB",
                 borderRadius: "10px",
                 height: "48px",
               },

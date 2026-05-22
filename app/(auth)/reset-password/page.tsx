@@ -158,8 +158,8 @@ export default function ResetPasswordPage() {
             fullWidth
             size="small"
             sx={{
-              backgroundColor: "#F7F9FF",
               "& .MuiOutlinedInput-root": {
+                backgroundColor: "#F6F8FB",
                 borderRadius: "10px",
                 height: "48px",
               },
@@ -193,8 +193,8 @@ export default function ResetPasswordPage() {
             fullWidth
             size="small"
             sx={{
-              backgroundColor: "#F7F9FF",
               "& .MuiOutlinedInput-root": {
+                backgroundColor: "#F6F8FB",
                 borderRadius: "10px",
                 height: "48px",
               },

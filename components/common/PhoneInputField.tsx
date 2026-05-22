@@ -21,7 +21,7 @@ export default function PhoneInputField<T extends FieldValues>({
 
   return (
     <div>
-      <label className="text-sm font-medium text-gray-700 mb-1 block">
+      <label className="text-sm min-[1750]:text-[18px] font-medium text-gray-700 mb-1 block">
         Phone
       </label>
 

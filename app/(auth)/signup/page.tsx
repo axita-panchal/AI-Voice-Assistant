@@ -154,7 +154,7 @@ export default function SignupPage() {
         {/* First + Last Name */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
+            <label className="text-sm min-[1750]:text-[18px] font-medium text-gray-700 mb-2 block">
               First Name
             </label>
 
@@ -163,9 +163,8 @@ export default function SignupPage() {
               fullWidth
               size="small"
               sx={{
-                backgroundColor: "#F7F9FF",
-
                 "& .MuiOutlinedInput-root": {
+                  backgroundColor: "#F6F8FB",
                   borderRadius: "10px",
                   height: "48px",
                 },
@@ -177,7 +176,7 @@ export default function SignupPage() {
           </div>
 
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
+            <label className="text-sm min-[1750]:text-[18px] font-medium text-gray-700 mb-2 block">
               Last Name
             </label>
 
@@ -186,9 +185,8 @@ export default function SignupPage() {
               fullWidth
               size="small"
               sx={{
-                backgroundColor: "#F7F9FF",
-
                 "& .MuiOutlinedInput-root": {
+                  backgroundColor: "#F6F8FB",
                   borderRadius: "10px",
                   height: "48px",
                 },
@@ -202,18 +200,18 @@ export default function SignupPage() {
 
         {/* Account Name */}
         <div>
-          <label className="text-sm font-medium text-gray-700 mb-2 block">
+          <label className="text-sm min-[1750]:text-[18px] font-medium text-gray-700 mb-2 block">
             Account Name
           </label>
 
           <TextField
             placeholder="Name"
             fullWidth
+            autoComplete="new-password"
             size="small"
             sx={{
-              backgroundColor: "#F7F9FF",
-
               "& .MuiOutlinedInput-root": {
+                backgroundColor: "#F6F8FB",
                 borderRadius: "10px",
                 height: "48px",
               },
@@ -235,7 +233,7 @@ export default function SignupPage() {
 
         {/* Email */}
         <div>
-          <label className="text-sm font-medium text-gray-700 mb-2 block">
+          <label className="text-sm min-[1750]:text-[18px] font-medium text-gray-700 mb-2 block">
             Email
           </label>
 
@@ -244,9 +242,8 @@ export default function SignupPage() {
             fullWidth
             size="small"
             sx={{
-              backgroundColor: "#F7F9FF",
-
               "& .MuiOutlinedInput-root": {
+                backgroundColor: "#F6F8FB",
                 borderRadius: "10px",
                 height: "48px",
               },
@@ -259,19 +256,19 @@ export default function SignupPage() {
 
         {/* Password */}
         <div>
-          <label className="text-sm font-medium text-gray-700 mb-2 block">
+          <label className="text-sm min-[1750]:text-[18px] font-medium text-gray-700 mb-2 block">
             Password
           </label>
 
           <TextField
             placeholder="********"
             type={showPassword ? "text" : "password"}
+            autoComplete="new-password"
             fullWidth
             size="small"
             sx={{
-              backgroundColor: "#F7F9FF",
-
               "& .MuiOutlinedInput-root": {
+                backgroundColor: "#F6F8FB",
                 borderRadius: "10px",
                 height: "48px",
               },

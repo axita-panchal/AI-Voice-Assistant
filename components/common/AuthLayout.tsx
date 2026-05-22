@@ -24,11 +24,11 @@ export default function AuthLayout({
              {/* HEADER */}
              <div className="shrink-0 pt-8 pb-5">
                <div className="mx-auto w-full">
-                 <h1 className="text-lg sm:text-xl leading-[40px] font-semibold text-gray-900">
+                 <h1 className="text-xl min-[1750]:text-3xl leading-[40px] font-bold text-gray-900">
                    {title}
                  </h1>
    
-                 <p className="text-sm text-gray-500 mt-2 leading-6">
+                 <p className="text-[18px] min-[1750]:text-[20px] font-medium text-gray-500 mt-2 leading-6">
                      {subtitle}
                  </p>
                </div>
