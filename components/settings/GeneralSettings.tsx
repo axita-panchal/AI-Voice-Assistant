@@ -7,6 +7,7 @@ import CustomTextField, { CustomTextFieldProps } from "@/components/common/Custo
 const SmallTextField = (props: CustomTextFieldProps) => (
   <CustomTextField
     size="small"
+    fullWidth
     {...props}
   />
 );
@@ -24,7 +25,7 @@ export default function GeneralSettings() {
         </label>
         <div className="flex items-center gap-4 mb-4">
           <Avatar src="/assets/svgs/user_profile.svg" />
-          <SmallTextField defaultValue={user?.full_name} />
+          <SmallTextField defaultValue={user?.full_name} placeholder="John Doe " />
         </div>
 
         <div className="mb-4">
@@ -38,7 +39,7 @@ export default function GeneralSettings() {
           <label className="block text-gray-700 font-medium mb-1">
             Company timezone
           </label>
-          <SmallTextField defaultValue="America/New-york" />
+          <SmallTextField defaultValue="America/New-york" placeholder="Select timezone..." />
         </div>
 
         <h3 className="text-md font-semibold mb-4">Business Information</h3>
@@ -48,7 +49,7 @@ export default function GeneralSettings() {
             <label className="block text-gray-700 font-medium mb-1">
               Contact Name
             </label>
-            <SmallTextField />
+            <SmallTextField placeholder="Enter contact name..." />
           </div>
 
           {[
@@ -66,7 +67,7 @@ export default function GeneralSettings() {
               <label className="block text-gray-700 font-medium mb-1">
                 {label}
               </label>
-              <SmallTextField />
+              <SmallTextField placeholder={`Enter ${label.toLowerCase()}`} />
             </div>
           ))}
         </div>

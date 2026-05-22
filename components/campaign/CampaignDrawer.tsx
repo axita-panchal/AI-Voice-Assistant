@@ -6,9 +6,11 @@ import {
   Drawer,
   IconButton as MuiIconButton,
   Slider,
+  MenuItem,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { useEffect } from "react";
+import React, { useEffect, forwardRef } from "react";
+import CustomTextField from "@/components/common/CustomTextField";
 import clsx from "clsx";
 import { formatTime } from "@/utils/helper";
 import { useSelector } from "react-redux";
@@ -229,11 +231,13 @@ export default function CampaignDrawer({
         <div className="flex-1 space-y-5 overflow-y-auto text-sm pr-1 sm:pr-2">
           <FormInput
             label="Name"
+            placeholder="John"
             error={errors.name?.message}
             {...register("name")}
           />
           <FormSelect
             label="Agent"
+            placeholder="Choose an option.."
             error={errors.agentId?.message}
             disabled={isLoading || agents.length === 0}
             options={agents.map((agent: Agent) => ({
@@ -244,11 +248,13 @@ export default function CampaignDrawer({
           />
           <FormInput
             label="Daily Usage Cap"
+            placeholder="20"
             error={errors.dailyCap?.message}
             {...register("dailyCap")}
           />
           <FormInput
             label="Maximum Follow Ups"
+            placeholder="0 - 15"
             error={errors.maxFollowUps?.message}
             {...register("maxFollowUps")}
           />
@@ -264,15 +270,22 @@ export default function CampaignDrawer({
                     key={day}
                     onClick={() => toggleDay(day)}
                     className={clsx(
-                      "h-14 flex flex-col items-center justify-center cursor-pointer border rounded-lg",
+                      "h-14 flex flex-col items-center justify-center cursor-pointer rounded-lg",
                       "transition-colors",
-                      checked
-                        ? "border-blue-600 bg-blue-50"
-                        : "border-gray-300",
                     )}
                   >
-                    <Checkbox checked={checked} size="small" />
-                    <span className="text-sm">{day}</span>
+                    <Checkbox
+                      checked={checked}
+                      size="small"
+                      sx={{
+                        // borderRadius: "6px",
+                        color: "#C3C3C3",
+                        "&.Mui-checked": {
+                          color: "bg-blue-600", 
+                        },
+                      }}
+                    />
+                    <span className="text-sm text-[#808080]">{day}</span>
                   </div>
                 );
               })}
@@ -357,55 +370,67 @@ export default function CampaignDrawer({
 
 /* ===================== REUSABLE INPUT ===================== */
 
-function FormInput({
-  label,
-  error,
-  ...props
-}: {
-  label: string;
-  error: string | undefined;
-}) {
+const FormInput = forwardRef<
+  HTMLDivElement,
+  Omit<React.ComponentPropsWithoutRef<typeof CustomTextField>, "error"> & {
+    label: string;
+    error?: string;
+  }
+>(({ label, error, ...props }, ref) => {
   return (
     <div>
-      <label className="text-sm text-gray-600">{label}</label>
-      <input
+      <label className="text-sm font-medium text-gray-700 mb-1 block">
+        {label}
+      </label>
+      <CustomTextField
+        ref={ref}
+        fullWidth
+        size="small"
+        error={!!error}
+        helperText={error}
         {...props}
-        className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
       />
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
     </div>
   );
-}
+});
+
+FormInput.displayName = "FormInput";
 
 /* ===================== REUSABLE SELECT ===================== */
 
-function FormSelect({
-  label,
-  error,
-  options,
-  ...props
-}: {
-  label: string;
-  error: string | undefined;
-  options: optionsTypes[];
-}) {
+const FormSelect = forwardRef<
+  HTMLDivElement,
+  Omit<React.ComponentPropsWithoutRef<typeof CustomTextField>, "error"> & {
+    label: string;
+    error?: string;
+    options: optionsTypes[];
+  }
+>(({ label, error, options, ...props }, ref) => {
   return (
     <div>
-      <label className="text-sm text-gray-600">{label}</label>
-
-      <select
+      <label className="text-sm font-medium text-gray-700 mb-1 block">
+        {label}
+      </label>
+      <CustomTextField
+        ref={ref}
+        select
+        fullWidth
+        size="small"
+        error={!!error}
+        helperText={error}
         {...props}
-        className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white"
       >
-        <option value="">Choose an option...</option>
-        {options.map((option: optionsTypes) => (
-          <option key={option.value} value={option.value}>
+        <MenuItem value="" disabled>
+          Choose an option...
+        </MenuItem>
+        {options.map((option) => (
+          <MenuItem key={option.value} value={option.value}>
             {option.label}
-          </option>
+          </MenuItem>
         ))}
-      </select>
-
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+      </CustomTextField>
     </div>
   );
-}
+});
+
+FormSelect.displayName = "FormSelect";

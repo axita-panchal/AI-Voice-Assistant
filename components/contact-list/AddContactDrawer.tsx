@@ -140,6 +140,7 @@ export default function AddContactDrawer({
               </label>
               <CustomTextField
                 fullWidth
+                placeholder="John"
                 size="small"
                 {...register("first_name")}
                 error={!!errors.first_name}
@@ -154,6 +155,7 @@ export default function AddContactDrawer({
               </label>
               <CustomTextField
                 fullWidth
+                placeholder="Peter"
                 size="small"
                 {...register("last_name")}
                 error={!!errors.last_name}
@@ -176,6 +178,7 @@ export default function AddContactDrawer({
               <CustomTextField
                 fullWidth
                 size="small"
+                placeholder="Type here..."
                 {...register("email")}
                 error={!!errors.email}
                 helperText={errors.email?.message}
