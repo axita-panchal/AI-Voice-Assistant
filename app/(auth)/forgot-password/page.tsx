@@ -13,6 +13,7 @@ import {
 } from "@/hooks/auth/useAuthMutations";
 import axios from "axios";
 import Image from "next/image";
+import AuthLayout from "@/components/common/AuthLayout";
 
 const schema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email address"),
@@ -55,68 +56,67 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="h-screen bg-linear-to-br from-indigo-500 via-blue-500 to-purple-600 p-6 flex items-center">
-      <div className="bg-white w-full flex rounded-3xl shadow-xl overflow-hidden max-w-6xl mx-auto">
-        <div className="w-full min-[800px]:w-1/2 px-10 py-8 flex flex-col justify-center">
-          <h1 className="text-lg sm:text-3xl font-semibold text-gray-900">
-            Forgot your Password?
-          </h1>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1 mb-4">
-            Enter your email so we can send you the password reset link
+    <AuthLayout
+      title="Forgot your Password?"
+      subtitle="Enter your email so we can send you the password reset link"
+      footer={
+        <>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            disabled={isPending}
+            onClick={handleSubmit(onSubmit)}
+            sx={{
+              borderRadius: "10px",
+              textTransform: "none",
+              height: "50px",
+              fontSize: "15px",
+              fontWeight: 500,
+              backgroundColor: "#2563eb",
+              "&:hover": { backgroundColor: "#1d4ed8" },
+            }}
+          >
+            {isPending ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              "Send Email"
+            )}
+          </Button>
+          <p className="text-xs text-center text-gray-500 mt-4">
+            Don’t have an account?{" "}
+            <Link href="/signup" className="text-blue-600 hover:underline">
+              Sign up
+            </Link>
           </p>
-          <form className="space-y-3" onSubmit={handleSubmit(onSubmit)}>
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">
-                Email
-              </label>
-              <TextField
-                placeholder="Enter your email"
-                fullWidth
-                size="small"
-                sx={{ backgroundColor: "#F7F9FF" }}
-                {...register("email")}
-                error={!!errors.email}
-                helperText={errors.email?.message}
-              />
-            </div>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              disabled={isPending}
-              sx={{
+        </>
+      }
+    >
+      <form
+        className="space-y-4 mx-auto w-full pb-6"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <div>
+          <label className="text-sm font-medium text-gray-700 mb-2 block">
+            Email
+          </label>
+          <TextField
+            placeholder="Enter your email"
+            fullWidth
+            size="small"
+            sx={{
+              backgroundColor: "#F7F9FF",
+              "& .MuiOutlinedInput-root": {
                 borderRadius: "10px",
-                textTransform: "none",
-                py: 1.2,
-                mt: 1,
-                backgroundColor: "#2563eb",
-                "&:hover": { backgroundColor: "#1d4ed8" },
-              }}
-            >
-              {isPending ? (
-                <CircularProgress size={20} color="inherit" />
-              ) : (
-                "Send Email"
-              )}
-            </Button>
-            <p className="text-xs text-center text-gray-500 mt-2">
-              Don’t have an account?{" "}
-              <Link href="/signup" className="text-blue-600 hover:underline">
-                Sign up
-              </Link>
-            </p>
-          </form>
-        </div>
-        <div className="hidden min-[800px]:flex w-1/2 p-10 items-center justify-center ">
-          <Image
-            src="/assets/svgs/login_logo.png"
-            alt="Login"
-            className="object-contain"
-            width={600}
-            height={600}
+                height: "48px",
+              },
+            }}
+            {...register("email")}
+            error={!!errors.email}
+            helperText={errors.email?.message}
           />
         </div>
-      </div>
-    </div>
+      </form>
+    </AuthLayout>
   );
 }
