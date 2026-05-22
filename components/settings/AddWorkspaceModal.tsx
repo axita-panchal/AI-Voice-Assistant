@@ -4,11 +4,11 @@ import {
   Dialog,
   DialogContent,
   IconButton,
-  TextField,
   Button,
   Avatar,
   CircularProgress,
 } from "@mui/material";
+import CustomTextField from "@/components/common/CustomTextField";
 import { z } from "zod";
 
 import CloseIcon from "@mui/icons-material/Close";
@@ -106,7 +106,7 @@ export default function AddWorkspaceModal({
               {nameValue ? nameValue.charAt(0).toUpperCase() : "N"}
             </Avatar>
 
-            <TextField
+            <CustomTextField
               fullWidth
               size="small"
               placeholder="Name of the workspace"
@@ -123,7 +123,7 @@ export default function AddWorkspaceModal({
             Description{" "}
             <span className="text-gray-400 text-xs">(optional)</span>
           </label>
-          <TextField
+          <CustomTextField
             fullWidth
             size="small"
             multiline

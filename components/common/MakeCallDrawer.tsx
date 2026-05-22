@@ -4,9 +4,9 @@ import { useEffect } from "react";
 import {
   Drawer,
   IconButton as MuiIconButton,
-  TextField,
   CircularProgress,
 } from "@mui/material";
+import CustomTextField from "@/components/common/CustomTextField";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import CallIcon from "@mui/icons-material/Call";
@@ -149,14 +149,13 @@ export default function MakeCallDrawer({ open, onClose }: MakeCallDrawerProps) {
                 )}
               </div>
               <div className="space-y-3 flex flex-col gap-[20px]">
-                <TextField
+                <CustomTextField
                   placeholder="Full name"
                   fullWidth
                   size="small"
                   {...register(`persons.${index}.name`)}
                   error={!!errors.persons?.[index]?.name}
                   helperText={errors.persons?.[index]?.name?.message}
-                  sx={{ "& .MuiOutlinedInput-root": { bgcolor: "#fff" } }}
                 />
                 <PhoneInputField<FormValues>
                   name={`persons.${index}.phone_number` as Path<FormValues>}

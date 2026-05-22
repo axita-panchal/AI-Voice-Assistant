@@ -6,12 +6,12 @@ import {
   Checkbox,
   Drawer,
   IconButton,
-  TextField,
   Typography,
   Avatar,
   Stack,
   MenuItem,
 } from "@mui/material";
+import CustomTextField from "@/components/common/CustomTextField";
 import { Close } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import {
@@ -122,16 +122,18 @@ export default function EditContactListDrawer({
         {/* ================= FORM (SCROLLABLE) ================= */}
         <Box className="flex-1 overflow-y-auto px-4 sm:px-6 py-4">
           <Box>
-            <TextField
+            <CustomTextField
               fullWidth
+              size="small"
               label="List name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               margin="normal"
             />
-            <TextField
+            <CustomTextField
               select
               fullWidth
+              size="small"
               label="Campaign"
               value={campaign ?? ""}
               onChange={(e) => setCampaign(e.target.value)}
@@ -146,7 +148,7 @@ export default function EditContactListDrawer({
                   {item.name}
                 </MenuItem>
               ))}
-            </TextField>
+            </CustomTextField>
           </Box>
 
           {/* ================= CONTACTS ================= */}

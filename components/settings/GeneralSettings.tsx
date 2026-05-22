@@ -1,24 +1,13 @@
 import { RootState } from "@/store";
-import { Avatar, TextField, Button, TextFieldProps } from "@mui/material";
+import { Avatar, Button } from "@mui/material";
 import { useSelector } from "react-redux";
+import CustomTextField, { CustomTextFieldProps } from "@/components/common/CustomTextField";
 
 // Custom TextField with consistent styling
-const SmallTextField = (props: TextFieldProps) => (
-  <TextField
-    fullWidth
+const SmallTextField = (props: CustomTextFieldProps) => (
+  <CustomTextField
     size="small"
-    variant="outlined"
     {...props}
-    sx={{
-      "& .MuiInputBase-input": {
-        fontSize: "15px",
-        padding: "8px 12px",
-      },
-      "& .MuiInputLabel-root": {
-        fontSize: "14px",
-      },
-      ...props.sx,
-    }}
   />
 );
 

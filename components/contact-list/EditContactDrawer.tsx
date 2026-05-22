@@ -4,7 +4,6 @@ import {
   Drawer,
   Box,
   Typography,
-  TextField,
   Button,
   IconButton,
   MenuItem,
@@ -12,6 +11,7 @@ import {
   Collapse,
   CircularProgress,
 } from "@mui/material";
+import CustomTextField from "@/components/common/CustomTextField";
 import CloseIcon from "@mui/icons-material/Close";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
@@ -206,13 +206,15 @@ export default function EditContactDrawer({
           >
             {/* Name */}
             <Box className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <TextField
+              <CustomTextField
                 label="First name"
+                size="small"
                 {...register("first_name")}
                 fullWidth
               />
-              <TextField
+              <CustomTextField
                 label="Last name"
+                size="small"
                 {...register("last_name")}
                 fullWidth
               />
@@ -220,8 +222,8 @@ export default function EditContactDrawer({
 
             {/* Phone + Email */}
             <Box className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <TextField label="Phone" {...register("phone")} fullWidth />
-              <TextField label="Email" {...register("email")} fullWidth />
+              <CustomTextField label="Phone" size="small" {...register("phone")} fullWidth />
+              <CustomTextField label="Email" size="small" {...register("email")} fullWidth />
             </Box>
 
             <Box className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -229,25 +231,27 @@ export default function EditContactDrawer({
                 name="contact_list_id"
                 control={control}
                 render={({ field }) => (
-                  <TextField {...field} select label="Contact list" fullWidth>
+                  <CustomTextField {...field} select label="Contact list" size="small" fullWidth>
                     {lists.map((l) => (
                       <MenuItem key={l.id} value={l.id}>
                         {l.name}
                       </MenuItem>
                     ))}
-                  </TextField>
+                  </CustomTextField>
                 )}
               />
 
-              <TextField
+              <CustomTextField
                 label="Enable 'Do not call'"
+                size="small"
                 {...register("dnc")}
                 fullWidth
               />
             </Box>
 
-            <TextField
+            <CustomTextField
               label="Contact Timezone"
+              size="small"
               {...register("timezone")}
               fullWidth
             />
@@ -258,21 +262,21 @@ export default function EditContactDrawer({
             </Typography>
 
             <Box className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
-              <TextField label="Business name" {...register("business_name")} />
-              <TextField label="Job title" {...register("job_title")} />
+              <CustomTextField label="Business name" size="small" {...register("business_name")} />
+              <CustomTextField label="Job title" size="small" {...register("job_title")} />
             </Box>
 
             <Box className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <TextField label="Address" {...register("full_address")} />
-              <TextField label="City" {...register("city")} />
+              <CustomTextField label="Address" size="small" {...register("full_address")} />
+              <CustomTextField label="City" size="small" {...register("city")} />
             </Box>
 
             <Box className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <TextField label="ZIP code" {...register("postal_code")} />
-              <TextField label="State" {...register("state")} />
+              <CustomTextField label="ZIP code" size="small" {...register("postal_code")} />
+              <CustomTextField label="State" size="small" {...register("state")} />
             </Box>
 
-            <TextField label="Country" {...register("country")} fullWidth />
+            <CustomTextField label="Country" size="small" {...register("country")} fullWidth />
 
             {/* Custom Fields */}
             <Box
@@ -292,9 +296,10 @@ export default function EditContactDrawer({
             <Collapse in={customFieldsOpen}>
               <Box className="space-y-3 pt-3">
                 {customFieldKeys.map((key, index) => (
-                  <TextField
+                  <CustomTextField
                     key={key}
                     label={`Custom Field ${index + 1}`}
+                    size="small"
                     {...register(`customFields.${key}`)}
                     fullWidth
                     sx={{ marginBottom: 2 }}

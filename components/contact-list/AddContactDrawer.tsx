@@ -4,7 +4,6 @@ import {
   Drawer,
   Box,
   Typography,
-  TextField,
   Button,
   MenuItem,
   FormControl,
@@ -12,6 +11,7 @@ import {
   CircularProgress,
   IconButton as MuiIconButton,
 } from "@mui/material";
+import CustomTextField from "@/components/common/CustomTextField";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -138,7 +138,7 @@ export default function AddContactDrawer({
               <label className="text-sm font-medium text-gray-700 mb-1 block">
                 First Name
               </label>
-              <TextField
+              <CustomTextField
                 fullWidth
                 size="small"
                 {...register("first_name")}
@@ -152,7 +152,7 @@ export default function AddContactDrawer({
               <label className="text-sm font-medium text-gray-700 mb-1 block">
                 Last Name
               </label>
-              <TextField
+              <CustomTextField
                 fullWidth
                 size="small"
                 {...register("last_name")}
@@ -173,7 +173,7 @@ export default function AddContactDrawer({
               <label className="text-sm font-medium text-gray-700 mb-1 block">
                 Email
               </label>
-              <TextField
+              <CustomTextField
                 fullWidth
                 size="small"
                 {...register("email")}

@@ -4,9 +4,9 @@ import {
   Button,
   MenuItem,
   Select,
-  TextField,
   FormControl,
 } from "@mui/material";
+import CustomTextField from "@/components/common/CustomTextField";
 import { ArrowBack } from "@mui/icons-material";
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
@@ -213,7 +213,7 @@ function LeftForm({ form, setForm }: LeftFormProps) {
 
       <div className="space-y-4">
         <Field label="Name">
-          <TextField
+          <CustomTextField
             fullWidth
             size="small"
             value={form.name}
@@ -222,7 +222,7 @@ function LeftForm({ form, setForm }: LeftFormProps) {
         </Field>
 
         <Field label="Description">
-          <TextField
+          <CustomTextField
             fullWidth
             size="small"
             value={form.description}
@@ -231,7 +231,7 @@ function LeftForm({ form, setForm }: LeftFormProps) {
         </Field>
 
         <Field label="Opening Line">
-          <TextField
+          <CustomTextField
             fullWidth
             size="small"
             value={form.openingLine}

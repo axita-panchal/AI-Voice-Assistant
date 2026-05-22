@@ -5,10 +5,10 @@ import {
   Button,
   MenuItem,
   Select,
-  TextField,
   FormControl,
   CircularProgress,
 } from "@mui/material";
+import CustomTextField from "@/components/common/CustomTextField";
 import { useRouter } from "next/navigation";
 
 type AgentForm = {
@@ -56,7 +56,7 @@ export default function LeftForm({
 
       <div className="flex-1 overflow-y-auto pb-6 space-y-4 pr-2 ">
         <Field label="Name" htmlFor="agent-name">
-          <TextField
+          <CustomTextField
             id="agent-name"
             fullWidth
             size="small"
@@ -66,7 +66,7 @@ export default function LeftForm({
         </Field>
 
         <Field label="Description" htmlFor="agent-description">
-          <TextField
+          <CustomTextField
             id="agent-description"
             fullWidth
             size="small"
@@ -78,7 +78,7 @@ export default function LeftForm({
         </Field>
 
         <Field label="Opening Line" htmlFor="agent-first_message">
-          <TextField
+          <CustomTextField
             id="agent-first_message"
             fullWidth
             size="small"

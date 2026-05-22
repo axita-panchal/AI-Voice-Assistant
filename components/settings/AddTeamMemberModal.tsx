@@ -5,7 +5,6 @@ import {
   Modal,
   Box,
   Typography,
-  TextField,
   Button,
   MenuItem,
   Select,
@@ -14,6 +13,7 @@ import {
   InputLabel,
   CircularProgress,
 } from "@mui/material";
+import CustomTextField from "@/components/common/CustomTextField";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -219,13 +219,13 @@ export default function AddTeamMemberModal({
 
         {/* Responsive grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <TextField
+          <CustomTextField
             label="First Name"
             size="small"
             {...register("first_name")}
             error={!!errors.first_name}
           />
-          <TextField
+          <CustomTextField
             label="Last Name"
             size="small"
             {...register("last_name")}
@@ -233,7 +233,7 @@ export default function AddTeamMemberModal({
           />
         </div>
 
-        <TextField
+        <CustomTextField
           label="Email"
           size="small"
           {...register("email")}

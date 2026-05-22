@@ -18,9 +18,9 @@ import {
   MenuItem,
   Stack,
   Switch,
-  TextField,
   Typography,
 } from "@mui/material";
+import CustomTextField from "@/components/common/CustomTextField";
 import { Add, DeleteOutline, EditOutlined } from "@mui/icons-material";
 import {
   useBulkDeleteContacts,
@@ -813,7 +813,7 @@ export default function ContactListPage() {
             onSubmit={createContactListHandleSubmit(handleCreateContactList)}
           >
             <DialogContent sx={{ padding: "10px 24px" }}>
-              <TextField
+              <CustomTextField
                 fullWidth
                 label="List name"
                 margin="normal"
