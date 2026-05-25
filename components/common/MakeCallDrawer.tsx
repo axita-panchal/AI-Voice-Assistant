@@ -83,8 +83,7 @@ export default function MakeCallDrawer({ open, onClose }: MakeCallDrawerProps) {
     try {
       const res = await mutateAsync(payload);
       toast.success(
-        res.data?.message ??
-          `Call request sent for ${1} contact(s).`,
+        res.data?.message ?? `Call request sent for ${1} contact(s).`,
       );
       onClose();
     } catch (error: unknown) {
@@ -185,6 +184,13 @@ export default function MakeCallDrawer({ open, onClose }: MakeCallDrawerProps) {
 
         <div className="flex flex-col gap-3 pt-4 sm:flex-row">
           <button
+            type="button"
+            onClick={onClose}
+            className="w-full cursor-pointer rounded-lg bg-gray-100 py-2 text-sm sm:flex-1"
+          >
+            Cancel
+          </button>
+          <button
             type="submit"
             disabled={isPending}
             className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-[#2F6AFF] py-2 text-sm text-white disabled:cursor-not-allowed disabled:opacity-60 sm:flex-1"
@@ -193,13 +199,6 @@ export default function MakeCallDrawer({ open, onClose }: MakeCallDrawerProps) {
               <CircularProgress size={18} color="inherit" aria-hidden />
             )}
             {isPending ? "Calling.." : "Start call"}
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-full cursor-pointer rounded-lg bg-gray-100 py-2 text-sm sm:flex-1"
-          >
-            Cancel
           </button>
         </div>
       </form>

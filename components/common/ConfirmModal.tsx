@@ -62,11 +62,17 @@ export default function ConfirmModal({
             color="inherit"
             onClick={onCancel}
             sx={{
+              width: "120px",
+              height: "48px",
+              borderRadius: "12px",
+              backgroundColor: "#F3F3F3",
+              color: "#6D6D6D",
+              fontSize: "15px",
+              fontWeight: 500,
               textTransform: "none",
-              borderColor: "grey.300",
+
               "&:hover": {
-                borderColor: "grey.400",
-                backgroundColor: "grey.100",
+                backgroundColor: "#F3F3F3",
               },
             }}
           >
@@ -76,11 +82,17 @@ export default function ConfirmModal({
             variant="contained"
             disabled={loading}
             sx={{
+              height: "48px",
+              width: "120px",
+              borderRadius: "12px",
+              fontSize: "15px",
+              fontWeight: 500,
               textTransform: "none",
+
               "&.Mui-disabled": {
-                backgroundColor: "lab(48.4493% 77.4328 61.5452)",
+                backgroundColor: "#3366FF",
                 color: "#fff",
-                opacity: 1, // prevent faded look
+                opacity: 0.7,
               },
             }}
             className={VARIANT_STYLES[variant]}

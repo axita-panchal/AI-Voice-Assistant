@@ -75,7 +75,25 @@ export default function AddWorkspaceModal({
       onClose={onClose}
       maxWidth="sm"
       fullWidth
-      PaperProps={{ className: "rounded-2xl" }}
+      slotProps={{
+        paper: {
+          sx: {
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: {
+              xs: "92%",
+              sm: "540px",
+            },
+            borderRadius: "20px",
+            overflow: "hidden",
+            boxShadow: "0px 16px 40px rgba(0,0,0,0.10)",
+            margin: 0,
+            backgroundColor: "#fff",
+          },
+        },
+      }}
     >
       <DialogContent className="p-6">
         {/* HEADER */}
@@ -137,7 +155,6 @@ export default function AddWorkspaceModal({
 
         {/* ACTIONS */}
         <div className="flex gap-3 mt-6 justify-end">
-         
           <Button
             variant="outlined"
             className="capitalize!"
@@ -146,7 +163,7 @@ export default function AddWorkspaceModal({
           >
             Cancel
           </Button>
-           <Button
+          <Button
             variant="contained"
             className="capitalize!"
             sx={{
@@ -175,7 +192,6 @@ export default function AddWorkspaceModal({
           >
             {initialData ? "Save Changes" : "Add Workspace"}
           </Button>
-
         </div>
       </DialogContent>
     </Dialog>
