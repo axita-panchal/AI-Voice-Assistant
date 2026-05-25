@@ -11,6 +11,7 @@ import { useDeleteUser } from "@/hooks/user/useUserMutations";
 import { useTeamMemberUsers } from "@/hooks/user/useUserQueries";
 import ConfirmModal from "../common/ConfirmModal";
 import { toast } from "@/utils/toast";
+import TableActionButton from "../common/TableActionButton";
 
 /* -------------------------------------------------------
    API TYPES
@@ -173,21 +174,20 @@ export default function TeamMembers() {
     },
     {
       key: "actions",
-      label: "",
+      label: "Actions",
       render: (row) => (
-        <div className="flex justify-end ">
-          <IconButton
-            danger
-            disabled={isPending}
+        <>
+          <TableActionButton
+            icon="/remove.png"
+            tooltip="Delete"
+            size={30}
             onClick={(e) => {
               e.stopPropagation();
               setMemberToDelete(row);
               setDeleteOpen(true);
             }}
-          >
-            <DeleteOutlineIcon sx={{ fontSize: 16, cursor: "pointer" }} />
-          </IconButton>
-        </div>
+          />
+        </>
       ),
     },
   ];

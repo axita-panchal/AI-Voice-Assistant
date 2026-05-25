@@ -18,6 +18,7 @@ import axios from "axios";
 import { ApiErrorResponse } from "@/hooks/auth/useAuthMutations";
 import { Campaign } from "@/types/campaign.types";
 import ConfirmModal from "@/components/common/ConfirmModal";
+import TableActionButton from "@/components/common/TableActionButton";
 
 export default function CampaignPage() {
   const [page] = useState(1);
@@ -100,15 +101,14 @@ export default function CampaignPage() {
       label: "Action",
       className: "text-right min-w-[80px]",
       render: (row) => (
-        <IconButton
-          danger
+        <TableActionButton
+          icon="/remove.png"
+          tooltip="Delete"
           onClick={(e) => {
             e.stopPropagation();
             setDeleteListId(row);
           }}
-        >
-          <DeleteOutlineIcon sx={{ fontSize: 16, cursor: "pointer" }} />
-        </IconButton>
+        />
       ),
     },
   ];

@@ -68,6 +68,7 @@ import IconButtonComp from "@/components/common/IconButton";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isValidPhoneNumber } from "react-phone-number-input";
+import TableActionButton from "@/components/common/TableActionButton";
 
 const listSchema = z.object({
   listName: z
@@ -451,20 +452,16 @@ export default function ContactListPage() {
       className: "text-right min-w-[80px]",
       render: (row) => (
         <>
-          <IconButtonComp
+          <TableActionButton
+            icon="/remove.png"
+            tooltip="Delete"
             onClick={(e) => {
               e.stopPropagation();
               // handleDeleteContactList(row);
               setShowContactDeleteConfirmModal(true);
               setContactToDelete(row);
             }}
-            danger
-          >
-            <DeleteOutline
-              fontSize="small"
-              sx={{ fontSize: 16, cursor: "pointer" }}
-            />
-          </IconButtonComp>
+          />
         </>
       ),
     },
@@ -656,31 +653,24 @@ export default function ContactListPage() {
                       transition: "all 0.2s ease",
                     }}
                   >
-                    <IconButton
-                      sx={{
-                        p: 0,
-                        "&:hover": {
-                          backgroundColor: "#fee2e2",
-                          color: "#dc2626",
-                        },
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setDeleteListId(list);
-                      }}
-                    >
-                      <DeleteOutline fontSize="small" />
-                    </IconButton>
-
-                    <IconButton
-                      sx={{ p: 0 }}
+                    <TableActionButton
+                      icon="/edit.png"
+                      tooltip="Edit"
+                      size={30}
                       onClick={(e) => {
                         e.stopPropagation();
                         handleOpenEditContactList(list.id);
                       }}
-                    >
-                      <EditOutlined fontSize="small" />
-                    </IconButton>
+                    />
+                    <TableActionButton
+                      icon="/remove.png"
+                      tooltip="Delete"
+                      size={30}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteListId(list);
+                      }}
+                    />
                   </Box>
                 )}
               </Box>

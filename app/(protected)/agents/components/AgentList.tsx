@@ -27,6 +27,7 @@ import { toast } from "@/utils/toast";
 import axios from "axios";
 import { ApiErrorResponse } from "@/hooks/auth/useAuthMutations";
 import Image from "next/image";
+import TableActionButton from "@/components/common/TableActionButton";
 
 type Agent = {
   id: number;
@@ -105,24 +106,22 @@ const AgentList = () => {
       label: "Actions",
       render: (row) => (
         <div className="flex gap-2">
-          <IconButton
+          <TableActionButton
+            icon="/copy.png"
+            tooltip="Copy"
             onClick={(e) => {
               e.stopPropagation();
             }}
-          >
-            <ContentCopyIcon sx={{ fontSize: 16, cursor: "pointer" }} />
-          </IconButton>
-
-          <IconButton
-            danger
+          />
+          <TableActionButton
+            icon="/remove.png"
+            tooltip="Delete"
             onClick={(e) => {
               e.stopPropagation();
               setAgentToDelete(row);
               setDeleteOpen(true);
             }}
-          >
-            <DeleteOutlineIcon sx={{ fontSize: 16, cursor: "pointer" }} />
-          </IconButton>
+          />
         </div>
       ),
     },

@@ -20,6 +20,7 @@ import ConfirmModal from "../common/ConfirmModal";
 import NoTableData from "../common/NoTableData";
 import { useDispatch } from "react-redux";
 import { clearWorkspace } from "@/store/slices/workspaceSlice";
+import TableActionButton from "../common/TableActionButton";
 
 type WorkspaceProps = {
   id: number;
@@ -186,19 +187,18 @@ export default function WorkSpaceSettings() {
       key: "actions",
       label: "Actions",
       render: (row) => (
-        <div className="flex gap-2">
-          <IconButton
-            danger
+        <>
+          <TableActionButton
+            icon="/remove.png"
+            tooltip="Delete"
+            size={30}
             onClick={(e) => {
               e.stopPropagation();
               setWorkspaceToDelete(row);
               setDeleteOpen(true);
             }}
-            disabled={deletePending}
-          >
-            <DeleteOutlineIcon sx={{ fontSize: 16, cursor: "pointer" }} />
-          </IconButton>
-        </div>
+          />
+        </>
       ),
     },
   ];
@@ -229,11 +229,11 @@ export default function WorkSpaceSettings() {
       </div>
 
       {tableData?.length > 0 ? (
-          <GenericTable
-            columns={columns}
-            data={tableData}
-            onRowClick={(row) => handleEdit(row)}
-          />
+        <GenericTable
+          columns={columns}
+          data={tableData}
+          onRowClick={(row) => handleEdit(row)}
+        />
       ) : (
         <NoTableData message="No workspaces found. Please add a workspace." />
       )}
