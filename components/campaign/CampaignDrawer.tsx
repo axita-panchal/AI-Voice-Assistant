@@ -277,7 +277,7 @@ export default function CampaignDrawer({
                         // borderRadius: "6px",
                         color: "#C3C3C3",
                         "&.Mui-checked": {
-                          color: "bg-blue-600",
+                          color: "bg-[#2F6AFF]",
                         },
                       }}
                     />
@@ -340,7 +340,7 @@ export default function CampaignDrawer({
           <button
             type="submit"
             disabled={isCreating || isUpdating}
-            className="w-full sm:flex-1 bg-blue-600 text-white py-2 rounded-lg text-sm cursor-pointer"
+            className="w-full sm:flex-1 bg-[#2F6AFF] text-white py-2 rounded-lg text-sm cursor-pointer"
           >
             {(isUpdating || isCreating) && (
               <CircularProgress

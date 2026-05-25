@@ -197,13 +197,13 @@ export default function TeamMembers() {
   --------------------------------------------------- */
 
   return (
-    <div className="max-w-5xl mx-auto p-6 bg-white rounded-xl shadow-sm">
+    <div className="max-w-5xl mx-auto p-6">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">Team members</h2>
 
         <Button
           variant="contained"
-          className="bg-blue-600! capitalize!"
+          className="bg-[#2F6AFF]! capitalize! rounded-xl!"
           onClick={() => {
             setSelectedMember(null);
             setOpen(true);
@@ -213,7 +213,7 @@ export default function TeamMembers() {
         </Button>
       </div>
 
-      <div className="bg-white shadow-sm rounded-lg p-4">
+      <>
         {isLoading ? (
           <div className="text-center py-6">Loading team members…</div>
         ) : (
@@ -226,7 +226,7 @@ export default function TeamMembers() {
             }}
           />
         )}
-      </div>
+      </>
       {totalPages > 1 && (
         <div className="flex justify-end mt-4">
           <Pagination

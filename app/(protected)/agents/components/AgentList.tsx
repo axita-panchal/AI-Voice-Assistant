@@ -157,7 +157,7 @@ const AgentList = () => {
 
             <button
               onClick={() => setOpenModal(true)}
-              className="flex items-center gap-2 bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
+              className="flex items-center gap-2 bg-[#2F6AFF] text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
             >
               <AddIcon sx={{ fontSize: 16 }} />
               New Agent

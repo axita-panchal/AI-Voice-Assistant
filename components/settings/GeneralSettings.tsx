@@ -16,8 +16,8 @@ export default function GeneralSettings() {
   const user = useSelector((state: RootState) => state?.auth?.user);
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="bg-white rounded-xl p-6 shadow-sm">
+    <div className="max-w-4xl mx-auto h-full ">
+      <div className=" rounded-xl p-6 shadow-sm">
         <h2 className="text-lg font-semibold mb-6">General Settings</h2>
 
         <label className="block text-[#565656] font-medium mb-1 ">
@@ -75,7 +75,7 @@ export default function GeneralSettings() {
         <div className="mt-6">
           <Button
             variant="contained"
-            className="bg-blue-600! rounded-lg! px-6! capitalize!"
+            className="bg-[#2F6AFF]! rounded-lg! px-6! capitalize!"
           >
             Save
           </Button>

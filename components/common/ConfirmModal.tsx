@@ -26,7 +26,7 @@ type Props = {
 
 const VARIANT_STYLES: Record<ConfirmVariant, string> = {
   danger: "!bg-red-600 hover:!bg-red-700",
-  primary: "!bg-blue-600 hover:!bg-blue-700",
+  primary: "!bg-[#2F6AFF] hover:!bg-blue-700",
 };
 
 export default function ConfirmModal({

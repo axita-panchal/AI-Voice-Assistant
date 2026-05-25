@@ -143,7 +143,7 @@ export default function EditCampaignDrawer({ open, onClose, campaign }: Props) {
           <button
             type="submit"
             disabled={isPending}
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            className="w-full bg-[#2F6AFF] text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
           >
             {isPending ? "Updating..." : "Update Campaign"}
           </button>

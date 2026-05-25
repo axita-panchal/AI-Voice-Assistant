@@ -213,7 +213,7 @@ export default function Header() {
               sx={{
                 textTransform: "none",
                 borderRadius: "10px",
-                bgcolor: "#2563eb",
+                bgcolor: "#2F6AFF",
                 "&:hover": { bgcolor: "#1d4ed8" },
                 px: { xs: 1, sm: 2 },
                 whiteSpace: "nowrap",
@@ -358,10 +358,10 @@ export default function Header() {
             sx={{
               textTransform: "none",
               borderRadius: "10px",
-              bgcolor: "#2563eb",
+              bgcolor: "#2F6AFF",
               mb: 2,
               py: 1.25,
-              "&:hover": { bgcolor: "#1d4ed8" },
+              "&:hover": { bgcolor: "#2F6AFF" },
             }}
           >
             Make a call

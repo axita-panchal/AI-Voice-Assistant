@@ -187,7 +187,7 @@ export default function MakeCallDrawer({ open, onClose }: MakeCallDrawerProps) {
           <button
             type="submit"
             disabled={isPending}
-            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-blue-600 py-2 text-sm text-white disabled:cursor-not-allowed disabled:opacity-60 sm:flex-1"
+            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-[#2F6AFF] py-2 text-sm text-white disabled:cursor-not-allowed disabled:opacity-60 sm:flex-1"
           >
             {isPending && (
               <CircularProgress size={18} color="inherit" aria-hidden />
