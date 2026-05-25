@@ -572,8 +572,8 @@ export default function ContactListPage() {
   };
 
   return (
-    <div className="p-4 sm:p-6 bg-[#F6F8FB]">
-      <Box className="p-6 rounded-2xl bg-white border border-gray-200">
+    <div className="py-6 px-15 bg-[#F6F8FB] h-full">
+      <Box className="bg-white h-full rounded-[20px] border border-[#DDDDDD] p-6">
         <Box
           className="custom-scroll"
           sx={{
@@ -603,7 +603,7 @@ export default function ContactListPage() {
                   gap: 1,
                   px: 2,
                   py: 1,
-                  borderRadius: 2,
+                  borderRadius: "10px",
                   cursor: "pointer",
                   border: "1px solid",
                   borderColor: isActive ? "#2F6AFF99" : "#E5E7EB",
@@ -659,7 +659,7 @@ export default function ContactListPage() {
         </Box>
 
         {/* HEADER */}
-        <Box className="mt-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+        <Box className="mt-4 pt-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 border-t border-[#DDDDDD]">
           {/* LEFT SECTION */}
           <Stack direction="row" alignItems="center" gap={1}>
             <Image
@@ -676,7 +676,7 @@ export default function ContactListPage() {
           {/* RIGHT SECTION */}
           <Box className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
             {selectedRows?.length > 0 && (
-              <>
+              <Box className="flex items-center gap-2 w-full sm:w-auto px-6">
                 <Button
                   variant="outlined"
                   onClick={handleOpenSelectMenu}
@@ -719,18 +719,18 @@ export default function ContactListPage() {
                 </Menu>
                 {/* ✅ CONFIRM BUTTON RESTORED */}
                 <Button
-                  variant="contained"
+                  variant="outlined"
                   onClick={handleConfirmBulkAction}
                   disabled={!selectedBulkAction}
                   sx={{
-                    backgroundColor: "#2F6AFF",
                     textTransform: "none",
+                    borderRadius: "12px",
                     width: { xs: "100%", sm: "auto" },
                   }}
                 >
                   Confirm
                 </Button>
-              </>
+              </Box>
             )}
 
             <Button
@@ -748,6 +748,7 @@ export default function ContactListPage() {
                 fontSize: 13,
                 textTransform: "none",
                 color: "#909090",
+                borderRadius: "12px",
                 width: { xs: "100%", sm: "auto" },
               }}
             >
@@ -767,6 +768,7 @@ export default function ContactListPage() {
                 fontSize: 13,
                 textTransform: "none",
                 color: "#2F6AFF",
+                borderRadius: "12px",
                 width: { xs: "100%", sm: "auto" },
               }}
             >
@@ -779,6 +781,7 @@ export default function ContactListPage() {
               sx={{
                 backgroundColor: "#2F6AFF",
                 textTransform: "none",
+                borderRadius: "12px",
                 width: { xs: "100%", sm: "auto" },
               }}
             >

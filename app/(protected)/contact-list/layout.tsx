@@ -6,10 +6,10 @@ export default function ContactListLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="h-screen flex flex-col">
       <Header />
 
-      <main className="bg-[#F6F8FB] flex-1  overflow-auto">{children}</main>
+      <main className="flex-1 overflow-auto lg:overflow-hidden bg-[#F6F8FB]">{children}</main>
     </div>
   );
 }

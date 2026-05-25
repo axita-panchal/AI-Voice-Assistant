@@ -144,15 +144,15 @@ export default function CampaignPage() {
   return (
     <>
       {!isEmpty ? (
-        <div className="p-6 bg-[#F6F8FB]">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="py-6 px-15 bg-[#F6F8FB] h-full">
+          <div className="bg-white h-full rounded-[20px] border border-[#DDDDDD] p-6">
+            <div className="flex items-center justify-between gap-4">
               <h2 className="text-lg font-medium text-gray-700">
                 List of Campaigns
               </h2>
               <button
                 onClick={() => setOpen(true)}
-                className="flex items-center justify-center gap-2 bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 w-full sm:w-auto cursor-pointer"
+                className="flex items-center justify-center gap-2 bg-[#2F6AFF] text-white text-sm px-4 py-2 rounded-xl hover:bg-blue-700 w-full sm:w-auto cursor-pointer"
               >
                 <AddIcon sx={{ fontSize: 16 }} />
                 New Campaign

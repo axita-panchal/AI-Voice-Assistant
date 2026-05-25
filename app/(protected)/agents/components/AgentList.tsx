@@ -140,9 +140,9 @@ const AgentList = () => {
   };
 
   return (
-    <div className="p-6 bg-[#F6F8FB]">
+    <div className="py-6 px-15 bg-[#F6F8FB] h-full">
       {!isEmpty ? (
-        <Box className="p-6 rounded-2xl bg-white shadow-sm border border-gray-200">
+        <Box className="p-6 h-full rounded-[20px] bg-white border border-[#DDDDDD]">
           {/* Header */}
           <div className="flex items-center justify-between">
             <h2 className="text-base sm:text-lg font-semibold text-gray-800 flex items-center gap-2">

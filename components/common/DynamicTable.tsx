@@ -229,7 +229,7 @@ export default function GenericTable<T extends { id: string | number }>({
   return (
     <TableContainer
       sx={{ maxHeight, overflowY: "auto" }}
-      className="rounded-lg bg-white shadow-sm border border-gray-200"
+      className="rounded-[20px] bg-white border border-[#DDDDDD]"
     >
       <Table stickyHeader className="min-w-150 w-full">
         {/* ---------- HEADER ---------- */}
@@ -300,6 +300,7 @@ export default function GenericTable<T extends { id: string | number }>({
                       px: { xs: 1.5, sm: 2 },
                       py: { xs: 1, sm: 1.25 },
                       color: "#606060",
+                      opacity: col.render ? 1 : 0.7,
                     }}
                   >
                     {col.render ? col.render(row) : renderValue(row[col.key])}
