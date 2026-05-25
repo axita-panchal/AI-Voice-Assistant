@@ -228,6 +228,7 @@ export default function SignupPage() {
             name="phone"
             control={control}
             error={errors.phone?.message}
+            filled
           />
         </div>
 

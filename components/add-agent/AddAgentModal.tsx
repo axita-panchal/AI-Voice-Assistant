@@ -116,19 +116,19 @@ export default function AddAgentModal({ open, onClose }: Props) {
           absolute top-1/2 left-1/2
           -translate-x-1/2 -translate-y-1/2
           bg-white
-          w-[95%] sm:w-[680px]
-          rounded-[32px]
+          w-[92%] sm:w-[540px]
+          rounded-[20px]
           overflow-hidden
         "
         sx={{
-          boxShadow: "0px 20px 60px rgba(0,0,0,0.12)",
+          boxShadow: "0px 16px 40px rgba(0,0,0,0.10)",
         }}
       >
         {/* HEADER */}
-        <Box className="flex items-center justify-between px-7 pt-7 pb-4 border-b border-[#ECECEC]">
+        <Box className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-[#ECECEC]">
           <Typography
             sx={{
-              fontSize: "22px",
+              fontSize: "18px",
               fontWeight: 500,
               color: "#4A4A4A",
             }}
@@ -143,20 +143,20 @@ export default function AddAgentModal({ open, onClose }: Props) {
             }}
             className="text-[#5B5B5B] hover:opacity-70 transition"
           >
-            <CloseIcon sx={{ fontSize: 34 }} />
+            <CloseIcon sx={{ fontSize: 24 }} />
           </button>
         </Box>
 
         {/* BODY */}
-        <Box className="px-7 pt-6 pb-8 flex flex-col gap-7">
+        <Box className="px-5 pt-5 pb-6 flex flex-col gap-5">
           {/* FIRST NAME */}
           <Box>
             <Typography
               sx={{
-                fontSize: "18px",
+                fontSize: "14px",
                 fontWeight: 500,
                 color: "#474747",
-                mb: 1.5,
+                mb: 1,
               }}
             >
               First name
@@ -168,6 +168,13 @@ export default function AddAgentModal({ open, onClose }: Props) {
               {...register("first_name")}
               error={!!errors.first_name}
               helperText={errors.first_name?.message}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  height: "46px",
+                  borderRadius: "12px",
+                  fontSize: "14px",
+                },
+              }}
             />
           </Box>
 
@@ -175,10 +182,10 @@ export default function AddAgentModal({ open, onClose }: Props) {
           <Box>
             <Typography
               sx={{
-                fontSize: "18px",
+                fontSize: "14px",
                 fontWeight: 500,
                 color: "#474747",
-                mb: 1.5,
+                mb: 1,
               }}
             >
               Phone number
@@ -194,9 +201,9 @@ export default function AddAgentModal({ open, onClose }: Props) {
                     displayEmpty
                     IconComponent={KeyboardArrowDownIcon}
                     sx={{
-                      height: 64,
-                      borderRadius: "20px",
-                      fontSize: "16px",
+                      height: 46,
+                      borderRadius: "12px",
+                      fontSize: "14px",
                       color: "#7B7B7B",
 
                       "& .MuiOutlinedInput-notchedOutline": {
@@ -213,18 +220,24 @@ export default function AddAgentModal({ open, onClose }: Props) {
                       },
 
                       "& .MuiSelect-select": {
-                        padding: "18px 20px",
+                        padding: "12px 14px",
                       },
 
                       "& .MuiSvgIcon-root": {
                         color: "#A0A0A0",
-                        fontSize: 32,
-                        right: 16,
+                        fontSize: 24,
+                        right: 10,
                       },
                     }}
                   >
                     {PHONE_COLLECTIONS.map((item) => (
-                      <MenuItem key={item.value} value={item.value}>
+                      <MenuItem
+                        key={item.value}
+                        value={item.value}
+                        sx={{
+                          fontSize: "14px",
+                        }}
+                      >
                         {item.label}
                       </MenuItem>
                     ))}
@@ -238,10 +251,10 @@ export default function AddAgentModal({ open, onClose }: Props) {
           <Box>
             <Typography
               sx={{
-                fontSize: "18px",
+                fontSize: "14px",
                 fontWeight: 500,
                 color: "#474747",
-                mb: 1.5,
+                mb: 1,
               }}
             >
               Description
@@ -250,24 +263,31 @@ export default function AddAgentModal({ open, onClose }: Props) {
             <CustomTextField
               fullWidth
               multiline
-              rows={5}
+              rows={4}
+              placeholder="Write description..."
               {...register("description")}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: "12px",
+                  fontSize: "14px",
+                },
+              }}
             />
           </Box>
 
           {/* ACTION BUTTONS */}
-          <Box className="flex items-center gap-4 pt-2">
+          <Box className="flex items-center gap-3 pt-1">
             <Button
               onClick={handleSubmit(onSubmit)}
               disabled={isSubmitting}
               variant="contained"
               disableElevation
               sx={{
-                width: "220px",
-                height: "62px",
-                borderRadius: "18px",
+                flex: 1,
+                height: "48px",
+                borderRadius: "12px",
                 backgroundColor: "#3366FF",
-                fontSize: "18px",
+                fontSize: "15px",
                 fontWeight: 500,
                 textTransform: "none",
 
@@ -284,7 +304,7 @@ export default function AddAgentModal({ open, onClose }: Props) {
               endIcon={
                 isSubmitting ? (
                   <CircularProgress
-                    size={18}
+                    size={16}
                     sx={{
                       color: "#fff",
                     }}
@@ -302,12 +322,12 @@ export default function AddAgentModal({ open, onClose }: Props) {
               }}
               disableElevation
               sx={{
-                width: "165px",
-                height: "62px",
-                borderRadius: "18px",
+                width: "120px",
+                height: "48px",
+                borderRadius: "12px",
                 backgroundColor: "#F3F3F3",
                 color: "#6D6D6D",
-                fontSize: "18px",
+                fontSize: "15px",
                 fontWeight: 500,
                 textTransform: "none",
 

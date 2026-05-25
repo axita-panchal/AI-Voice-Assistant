@@ -30,6 +30,8 @@ body {
 .PhoneInput * {
   outline: none !important;
   box-shadow: none !important;
+  border-radius: 10px !important;
+  /* height: 48px !important; */
 }
 
 .custom-scroll {
