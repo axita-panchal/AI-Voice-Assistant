@@ -20,6 +20,7 @@ import PhoneInputField from "@/components/common/PhoneInputField";
 import CloseIcon from "@mui/icons-material/Close";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { CreateContactPayload } from "@/types/contact-list.types";
+import { CustomFormSelect } from "../common/CustomFormSelect";
 
 /* ================= TYPES ================= */
 
@@ -190,31 +191,35 @@ export default function AddContactDrawer({
               <label className="text-sm font-medium text-gray-700 mb-1 block">
                 Contact List
               </label>
-              <FormControl fullWidth size="small">
-                <Select
-                  defaultValue=""
-                  {...register("contact_list_id")}
-                  // error={!!errors.contact_list_id}
-                >
-                  <MenuItem value="" disabled>
-                    Choose contact list
-                  </MenuItem>
-                  {lists
-                    .filter((l) => l.id !== "all")
-                    .map((l) => (
-                      <MenuItem key={l.id} value={l.id}>
-                        {l.name}
-                      </MenuItem>
-                    ))}
-                </Select>
-              </FormControl>
+              <CustomFormSelect
+                label=""
+                placeholder="Choose contact list"
+                defaultValue={defaultListId || ""}
+                options={lists
+                  .filter((l) => l.id !== "all")
+                  .map((l) => ({ label: l.name, value: l.id }))}
+                {...register("contact_list_id")}
+                error={errors.contact_list_id?.message}
+              />
             </div>
           </form>
         </Box>
 
         {/* ================= Footer (Sticky) ================= */}
         <Box className="px-4 sm:px-6 py-4 bg-white  flex flex-col sm:flex-row gap-2">
+
           <Button
+            fullWidth
+            variant="outlined"
+            onClick={() => {
+              onClose();
+              reset();
+            }}
+            sx={{ textTransform: "none", borderRadius: "10px" }}
+          >
+            Cancel
+          </Button>
+           <Button
             type="submit"
             form="add-contact-form"
             fullWidth
@@ -236,18 +241,6 @@ export default function AddContactDrawer({
             {isCreatingContact && (
               <CircularProgress size={18} sx={{ color: "#fff", ml: 1 }} />
             )}
-          </Button>
-
-          <Button
-            fullWidth
-            variant="outlined"
-            onClick={() => {
-              onClose();
-              reset();
-            }}
-            sx={{ textTransform: "none", borderRadius: "10px" }}
-          >
-            Cancel
           </Button>
         </Box>
       </Box>

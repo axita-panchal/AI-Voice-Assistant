@@ -46,11 +46,11 @@ const NAV_ITEMS = [
     href: "/contact-list",
     icon: "/assets/svgs/contacts.svg",
   },
-  {
-    label: "Recordings",
-    href: "/recordings",
-    icon: "/assets/svgs/recordings.svg",
-  },
+  // {
+  //   label: "Recordings",
+  //   href: "/recordings",
+  //   icon: "/assets/svgs/recordings.svg",
+  // },
 ];
 
 const EMPTY_SUBACCOUNTS: subAccountsType[] = [];

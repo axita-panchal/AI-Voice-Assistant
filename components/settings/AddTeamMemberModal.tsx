@@ -24,6 +24,7 @@ import { toast } from "@/utils/toast";
 import { AxiosError } from "axios";
 import { ApiErrorResponse } from "@/hooks/auth/useAuthMutations";
 import { useAllWorkspaces } from "@/hooks/workspace/useWorkspaceQueries";
+import { CustomFormSelect } from "../common/CustomFormSelect";
 
 /* ---------------------------------- */
 /* Types */
@@ -219,44 +220,76 @@ export default function AddTeamMemberModal({
 
         {/* Responsive grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <CustomTextField
-            label="First Name"
-            size="small"
-            {...register("first_name")}
-            error={!!errors.first_name}
-          />
-          <CustomTextField
-            label="Last Name"
-            size="small"
-            {...register("last_name")}
-            error={!!errors.last_name}
-          />
+          <Box>
+            <Typography
+              sx={{
+                fontSize: "14px",
+                fontWeight: 500,
+                color: "#474747",
+                mb: 1,
+              }}
+            >
+              First name
+            </Typography>
+
+            <CustomTextField
+              placeholder="First Name"
+              size="small"
+              {...register("first_name")}
+              error={!!errors.first_name}
+            />
+          </Box>
+          <Box>
+            <Typography
+              sx={{
+                fontSize: "14px",
+                fontWeight: 500,
+                color: "#474747",
+                mb: 1,
+              }}
+            >
+              Last name
+            </Typography>
+            <CustomTextField
+              placeholder="Last Name"
+              size="small"
+              {...register("last_name")}
+              error={!!errors.last_name}
+            />
+          </Box>
         </div>
-
-        <CustomTextField
-          label="Email"
-          size="small"
-          {...register("email")}
-          error={!!errors.email}
-        />
-
-        <Controller
-          name="role"
-          control={control}
-          render={({ field }) => (
-            <FormControl size="small" error={!!errors.role}>
-              <InputLabel id="role-label">Role</InputLabel>
-              <Select {...field} label="Role">
-                {ROLES.map((r) => (
-                  <MenuItem key={r.value} value={r.value}>
-                    {r.label}
-                  </MenuItem>
-                ))}
-              </Select>
-              <FormHelperText>{errors.role?.message}</FormHelperText>
-            </FormControl>
-          )}
-        />
+        <Box>
+          <Typography
+            sx={{
+              fontSize: "14px",
+              fontWeight: 500,
+              color: "#474747",
+              mb: 1,
+            }}
+          >
+            Email
+          </Typography>
+          <CustomTextField
+            fullWidth
+            placeholder="Email"
+            size="small"
+            {...register("email")}
+            error={!!errors.email}
+          />
+        </Box>
+        <Box>
+          <CustomFormSelect
+            label="Role"
+            placeholder="role"
+            error={errors.role?.message}
+            disabled={ROLES.length === 0}
+            options={ROLES.map((role) => ({
+              label: role.label,
+              value: role.value,
+            }))}
+            {...register("role")}
+          />
+        </Box>
 
         {(selectedRole === "workspace-editor" ||
           selectedRole === "workspace-viewer") && (
@@ -282,7 +315,18 @@ export default function AddTeamMemberModal({
         )}
 
         {/* Buttons responsive */}
-        <div className="flex flex-col sm:flex-row gap-3 mt-4">
+        <div className="flex gap-3 mt-4">
+          <Button
+            fullWidth
+            variant="outlined"
+            onClick={() => {
+              onClose();
+              reset();
+            }}
+            sx={{ textTransform: "capitalize", borderRadius: "10px" }}
+          >
+            Cancel
+          </Button>
           <Button
             fullWidth
             variant="contained"
@@ -290,6 +334,7 @@ export default function AddTeamMemberModal({
             onClick={handleSubmit(onSubmit)}
             sx={{
               textTransform: "capitalize",
+              borderRadius: "10px",
               backgroundColor: "#1976d2",
               color: "#fff",
               "&:hover": {
@@ -309,18 +354,6 @@ export default function AddTeamMemberModal({
             }
           >
             {member ? "Save Changes" : "Add Team Member"}
-          </Button>
-
-          <Button
-            fullWidth
-            variant="outlined"
-            onClick={() => {
-              onClose();
-              reset();
-            }}
-            sx={{ textTransform: "capitalize" }}
-          >
-            Cancel
           </Button>
         </div>
       </Box>

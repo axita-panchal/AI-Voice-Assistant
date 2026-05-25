@@ -136,12 +136,22 @@ export default function AddWorkspaceModal({
         </div>
 
         {/* ACTIONS */}
-        <div className="flex gap-3 mt-6">
+        <div className="flex gap-3 mt-6 justify-end">
+         
           <Button
+            variant="outlined"
+            className="capitalize!"
+            sx={{ fontSize: "14px", borderRadius: "10px" }}
+            onClick={onClose}
+          >
+            Cancel
+          </Button>
+           <Button
             variant="contained"
             className="capitalize!"
             sx={{
               fontSize: "14px",
+              borderRadius: "10px",
               backgroundColor: "#2563eb", // blue-600
               "&:hover": {
                 backgroundColor: "#2563eb",
@@ -166,14 +176,6 @@ export default function AddWorkspaceModal({
             {initialData ? "Save Changes" : "Add Workspace"}
           </Button>
 
-          <Button
-            variant="outlined"
-            className="capitalize!"
-            sx={{ fontSize: "14px" }}
-            onClick={onClose}
-          >
-            Cancel
-          </Button>
         </div>
       </DialogContent>
     </Dialog>

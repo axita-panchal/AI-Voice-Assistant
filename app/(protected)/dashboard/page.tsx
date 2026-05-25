@@ -12,7 +12,7 @@ const Dashboard = () => {
 
         <StatCommonCard title="Appointments booked" value="20" subText="70%" />
 
-        <StatCommonCard title="Appointments booked" value="05" subText="30%" />
+        <StatCommonCard title="Appointments cancelled" value="05" subText="30%" />
 
         <StatCommonCard title="Successful transfers" value="20" />
         <StatCommonCard title="Average Call Time" value="50m 15s" />

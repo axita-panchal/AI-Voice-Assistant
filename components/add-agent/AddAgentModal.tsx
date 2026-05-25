@@ -276,14 +276,36 @@ export default function AddAgentModal({ open, onClose }: Props) {
           </Box>
 
           {/* ACTION BUTTONS */}
-          <Box className="flex items-center gap-3 pt-1">
+          <Box className="flex items-center gap-3 pt-1 justify-end">
             <Button
+              onClick={() => {
+                onClose();
+                reset();
+              }}
+              disableElevation
+              sx={{
+                width: "120px",
+                height: "48px",
+                borderRadius: "12px",
+                backgroundColor: "#F3F3F3",
+                color: "#6D6D6D",
+                fontSize: "15px",
+                fontWeight: 500,
+                textTransform: "none",
+
+                "&:hover": {
+                  backgroundColor: "#F3F3F3",
+                },
+              }}
+            >
+              Cancel
+            </Button>
+             <Button
               onClick={handleSubmit(onSubmit)}
               disabled={isSubmitting}
               variant="contained"
               disableElevation
               sx={{
-                flex: 1,
                 height: "48px",
                 borderRadius: "12px",
                 backgroundColor: "#3366FF",
@@ -313,30 +335,6 @@ export default function AddAgentModal({ open, onClose }: Props) {
               }
             >
               Create Agent
-            </Button>
-
-            <Button
-              onClick={() => {
-                onClose();
-                reset();
-              }}
-              disableElevation
-              sx={{
-                width: "120px",
-                height: "48px",
-                borderRadius: "12px",
-                backgroundColor: "#F3F3F3",
-                color: "#6D6D6D",
-                fontSize: "15px",
-                fontWeight: 500,
-                textTransform: "none",
-
-                "&:hover": {
-                  backgroundColor: "#F3F3F3",
-                },
-              }}
-            >
-              Cancel
             </Button>
           </Box>
         </Box>

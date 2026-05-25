@@ -27,6 +27,7 @@ import { toast } from "@/utils/toast";
 import Image from "next/image";
 import { Campaign } from "@/types/campaign.types";
 import { Agent } from "@/types/agent.types";
+import { CustomFormSelect } from "../common/CustomFormSelect";
 
 const campaignSchema = z.object({
   name: z.string().min(1, "Campaign name is required"),
@@ -70,11 +71,6 @@ interface CampaignDrawerProps {
   onClose: () => void;
   mode: "create" | "edit";
   campaign?: Campaign | null;
-}
-
-interface optionsTypes {
-  label: string;
-  value: string;
 }
 
 export default function CampaignDrawer({
@@ -235,7 +231,7 @@ export default function CampaignDrawer({
             error={errors.name?.message}
             {...register("name")}
           />
-          <FormSelect
+          <CustomFormSelect
             label="Agent"
             placeholder="Choose an option.."
             error={errors.agentId?.message}
@@ -281,7 +277,7 @@ export default function CampaignDrawer({
                         // borderRadius: "6px",
                         color: "#C3C3C3",
                         "&.Mui-checked": {
-                          color: "bg-blue-600", 
+                          color: "bg-blue-600",
                         },
                       }}
                     />
@@ -335,6 +331,13 @@ export default function CampaignDrawer({
         {/* FOOTER */}
         <div className="flex flex-col sm:flex-row gap-3 pt-4">
           <button
+            type="button"
+            onClick={onClose}
+            className="w-full sm:flex-1 bg-gray-100 py-2 rounded-lg text-sm cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
             type="submit"
             disabled={isCreating || isUpdating}
             className="w-full sm:flex-1 bg-blue-600 text-white py-2 rounded-lg text-sm cursor-pointer"
@@ -353,14 +356,6 @@ export default function CampaignDrawer({
               : isCreating
                 ? "Creating..."
                 : "Finish"}
-          </button>
-
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-full sm:flex-1 bg-gray-100 py-2 rounded-lg text-sm cursor-pointer"
-          >
-            Cancel
           </button>
         </div>
       </form>
@@ -395,42 +390,3 @@ const FormInput = forwardRef<
 });
 
 FormInput.displayName = "FormInput";
-
-/* ===================== REUSABLE SELECT ===================== */
-
-const FormSelect = forwardRef<
-  HTMLDivElement,
-  Omit<React.ComponentPropsWithoutRef<typeof CustomTextField>, "error"> & {
-    label: string;
-    error?: string;
-    options: optionsTypes[];
-  }
->(({ label, error, options, ...props }, ref) => {
-  return (
-    <div>
-      <label className="text-sm font-medium text-gray-700 mb-1 block">
-        {label}
-      </label>
-      <CustomTextField
-        ref={ref}
-        select
-        fullWidth
-        size="small"
-        error={!!error}
-        helperText={error}
-        {...props}
-      >
-        <MenuItem value="" disabled>
-          Choose an option...
-        </MenuItem>
-        {options.map((option) => (
-          <MenuItem key={option.value} value={option.value}>
-            {option.label}
-          </MenuItem>
-        ))}
-      </CustomTextField>
-    </div>
-  );
-});
-
-FormSelect.displayName = "FormSelect";
