@@ -103,6 +103,7 @@ export default function CampaignDrawer({
     setValue,
     watch,
     control,
+    getValues,
     reset,
     formState: { errors },
   } = useForm<CampaignFormValues>({
@@ -190,176 +191,180 @@ export default function CampaignDrawer({
   };
 
   return (
-    <Drawer
-      anchor="right"
-      open={open}
-      onClose={onClose}
-      PaperProps={{
-        className: "w-full sm:w-[420px] max-w-full ",
-      }}
-    >
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="h-full flex flex-col p-4 sm:p-6"
+    console.log("Agents in drawer:", agents),
+    (
+      <Drawer
+        anchor="right"
+        open={open}
+        onClose={onClose}
+        PaperProps={{
+          className: "w-full sm:w-[420px] max-w-full ",
+        }}
       >
-        {/* HEADER */}
-        <div className="flex items-center justify-between mb-6 gap-4">
-          <div className="flex items-center gap-3">
-            <div className="p-1 border border-gray-300 rounded-md">
-              <Image
-                src="/assets/svgs/campaign.svg"
-                alt="Campaign"
-                width={16}
-                height={16}
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="h-full flex flex-col p-4 sm:p-6"
+        >
+          {/* HEADER */}
+          <div className="flex items-center justify-between mb-6 gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-1 border border-gray-300 rounded-md">
+                <Image
+                  src="/assets/svgs/campaign.svg"
+                  alt="Campaign"
+                  width={16}
+                  height={16}
+                />
+              </div>
+              <span className="text-base text-[#464646]">
+                {isEdit ? "Edit Campaign1" : "Add Campaign"}
+              </span>
+            </div>
+
+            <MuiIconButton onClick={onClose}>
+              <CloseIcon />
+            </MuiIconButton>
+          </div>
+
+          {/* BODY */}
+          <div className="flex-1 space-y-5 overflow-y-auto text-sm pr-1 sm:pr-2">
+            <FormInput
+              label="Name"
+              placeholder="John"
+              error={errors.name?.message}
+              {...register("name")}
+            />
+            <CustomFormSelect
+              label="Agent"
+              placeholder="Choose an option.."
+              error={errors.agentId?.message}
+              disabled={isLoading || agents.length === 0}
+              defaultValue={getValues("agentId")}
+              options={agents.map((agent: Agent) => ({
+                label: agent.name,
+                value: agent.id,
+              }))}
+              {...register("agentId")}
+            />
+            <FormInput
+              label="Daily Usage Cap"
+              placeholder="20"
+              error={errors.dailyCap?.message}
+              {...register("dailyCap")}
+            />
+            <FormInput
+              label="Maximum Follow Ups"
+              placeholder="0 - 15"
+              error={errors.maxFollowUps?.message}
+              {...register("maxFollowUps")}
+            />
+            {/* CALLING DAYS */}
+            <div>
+              <p className="text-sm font-medium mb-2">Calling days</p>
+
+              <div className="grid grid-cols-4 sm:flex sm:flex-wrap gap-3">
+                {DAYS.map((day) => {
+                  const checked = selectedDays.includes(day);
+                  return (
+                    <div
+                      key={day}
+                      onClick={() => toggleDay(day)}
+                      className={clsx(
+                        "h-14 flex flex-col items-center justify-center cursor-pointer rounded-lg",
+                        "transition-colors",
+                      )}
+                    >
+                      <Checkbox
+                        checked={checked}
+                        size="small"
+                        sx={{
+                          // borderRadius: "6px",
+                          color: "#C3C3C3",
+                          "&.Mui-checked": {
+                            color: "bg-[#2F6AFF]",
+                          },
+                        }}
+                      />
+                      <span className="text-sm text-[#808080]">{day}</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {errors.selectedDays && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.selectedDays.message}
+                </p>
+              )}
+            </div>
+
+            {/* HOURS */}
+            <div>
+              <p className="text-sm font-medium mb-2">Local calling hours</p>
+              <Controller
+                control={control}
+                name="hours"
+                render={({ field }) => (
+                  <Slider
+                    {...field}
+                    value={field.value}
+                    min={0}
+                    max={24}
+                    step={1}
+                    disableSwap
+                    onChange={(_, value) => {
+                      const [min, max] = value as number[];
+                      if (min >= max) return;
+                      field.onChange([min, max]);
+                    }}
+                  />
+                )}
               />
+              <div className="flex justify-between text-xs mt-1">
+                <span>{formatTime(hours[0])}</span>
+                <span>{formatTime(hours[1])}</span>
+              </div>
+              {errors.hours && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.hours.message}
+                </p>
+              )}
             </div>
-            <span className="text-base text-[#464646]">
-              {isEdit ? "Edit Campaign" : "Add Campaign"}
-            </span>
           </div>
 
-          <MuiIconButton onClick={onClose}>
-            <CloseIcon />
-          </MuiIconButton>
-        </div>
-
-        {/* BODY */}
-        <div className="flex-1 space-y-5 overflow-y-auto text-sm pr-1 sm:pr-2">
-          <FormInput
-            label="Name"
-            placeholder="John"
-            error={errors.name?.message}
-            {...register("name")}
-          />
-          <CustomFormSelect
-            label="Agent"
-            placeholder="Choose an option.."
-            error={errors.agentId?.message}
-            disabled={isLoading || agents.length === 0}
-            options={agents.map((agent: Agent) => ({
-              label: agent.name,
-              value: agent.id,
-            }))}
-            {...register("agentId")}
-          />
-          <FormInput
-            label="Daily Usage Cap"
-            placeholder="20"
-            error={errors.dailyCap?.message}
-            {...register("dailyCap")}
-          />
-          <FormInput
-            label="Maximum Follow Ups"
-            placeholder="0 - 15"
-            error={errors.maxFollowUps?.message}
-            {...register("maxFollowUps")}
-          />
-          {/* CALLING DAYS */}
-          <div>
-            <p className="text-sm font-medium mb-2">Calling days</p>
-
-            <div className="grid grid-cols-4 sm:flex sm:flex-wrap gap-3">
-              {DAYS.map((day) => {
-                const checked = selectedDays.includes(day);
-                return (
-                  <div
-                    key={day}
-                    onClick={() => toggleDay(day)}
-                    className={clsx(
-                      "h-14 flex flex-col items-center justify-center cursor-pointer rounded-lg",
-                      "transition-colors",
-                    )}
-                  >
-                    <Checkbox
-                      checked={checked}
-                      size="small"
-                      sx={{
-                        // borderRadius: "6px",
-                        color: "#C3C3C3",
-                        "&.Mui-checked": {
-                          color: "bg-[#2F6AFF]",
-                        },
-                      }}
-                    />
-                    <span className="text-sm text-[#808080]">{day}</span>
-                  </div>
-                );
-              })}
-            </div>
-
-            {errors.selectedDays && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.selectedDays.message}
-              </p>
-            )}
-          </div>
-
-          {/* HOURS */}
-          <div>
-            <p className="text-sm font-medium mb-2">Local calling hours</p>
-            <Controller
-              control={control}
-              name="hours"
-              render={({ field }) => (
-                <Slider
-                  {...field}
-                  value={field.value}
-                  min={0}
-                  max={24}
-                  step={1}
-                  disableSwap
-                  onChange={(_, value) => {
-                    const [min, max] = value as number[];
-                    if (min >= max) return;
-                    field.onChange([min, max]);
-                  }}
+          {/* FOOTER */}
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-full sm:flex-1 bg-gray-100 py-2 rounded-lg text-sm cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isCreating || isUpdating}
+              className="w-full sm:flex-1 bg-[#2F6AFF] text-white py-2 rounded-lg text-sm cursor-pointer"
+            >
+              {(isUpdating || isCreating) && (
+                <CircularProgress
+                  size={18}
+                  sx={{ color: "#fff", mr: 1 }}
+                  aria-hidden="true"
                 />
               )}
-            />
-            <div className="flex justify-between text-xs mt-1">
-              <span>{formatTime(hours[0])}</span>
-              <span>{formatTime(hours[1])}</span>
-            </div>
-            {errors.hours && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.hours.message}
-              </p>
-            )}
+              {isEdit
+                ? isUpdating
+                  ? "Updating..."
+                  : "Update"
+                : isCreating
+                  ? "Creating..."
+                  : "Finish"}
+            </button>
           </div>
-        </div>
-
-        {/* FOOTER */}
-        <div className="flex flex-col sm:flex-row gap-3 pt-4">
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-full sm:flex-1 bg-gray-100 py-2 rounded-lg text-sm cursor-pointer"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isCreating || isUpdating}
-            className="w-full sm:flex-1 bg-[#2F6AFF] text-white py-2 rounded-lg text-sm cursor-pointer"
-          >
-            {(isUpdating || isCreating) && (
-              <CircularProgress
-                size={18}
-                sx={{ color: "#fff", mr: 1 }}
-                aria-hidden="true"
-              />
-            )}
-            {isEdit
-              ? isUpdating
-                ? "Updating..."
-                : "Update"
-              : isCreating
-                ? "Creating..."
-                : "Finish"}
-          </button>
-        </div>
-      </form>
-    </Drawer>
+        </form>
+      </Drawer>
+    )
   );
 }
 

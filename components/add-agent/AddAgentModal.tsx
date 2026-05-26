@@ -29,8 +29,8 @@ const PHONE_COLLECTIONS = [
     label: "Shared US Phone Collection",
   },
   {
-    value: "Shared UK phone collection",
-    label: "Shared UK Phone Collection",
+    value: "My own phone number",
+    label: "My own phone number",
   },
 ];
 
@@ -300,7 +300,7 @@ export default function AddAgentModal({ open, onClose }: Props) {
             >
               Cancel
             </Button>
-             <Button
+            <Button
               onClick={handleSubmit(onSubmit)}
               disabled={isSubmitting}
               variant="contained"

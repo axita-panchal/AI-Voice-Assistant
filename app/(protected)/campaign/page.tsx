@@ -40,31 +40,6 @@ export default function CampaignPage() {
 
   const columns: Column<Campaign>[] = [
     {
-      key: "is_active",
-      label: "Status",
-      render: (row) => (
-        <Switch
-          checked={row.is_active}
-          disabled={isUpdating}
-          onClick={(e) => e.stopPropagation()}
-          onChange={async (e) => {
-            const newStatus = e.target.checked;
-            try {
-              await updateCampaign({
-                campaignId: row.id?.toString() || "",
-                payload: { ...row, is_active: newStatus },
-              });
-              toast.success(
-                `Campaign ${newStatus ? "activated" : "deactivated"}`,
-              );
-            } catch (error) {
-              toast.error("Failed to update status");
-            }
-          }}
-        />
-      ),
-    },
-    {
       key: "name",
       label: "Name",
     },
@@ -96,6 +71,31 @@ export default function CampaignPage() {
     {
       key: "total_min_used",
       label: "Total Usage",
+    },
+    {
+      key: "is_active",
+      label: "Status",
+      render: (row) => (
+        <Switch
+          checked={row.is_active}
+          disabled={isUpdating}
+          onClick={(e) => e.stopPropagation()}
+          onChange={async (e) => {
+            const newStatus = e.target.checked;
+            try {
+              await updateCampaign({
+                campaignId: row.id?.toString() || "",
+                payload: { ...row, is_active: newStatus },
+              });
+              toast.success(
+                `Campaign ${newStatus ? "activated" : "deactivated"}`,
+              );
+            } catch (error) {
+              toast.error("Failed to update status");
+            }
+          }}
+        />
+      ),
     },
     {
       key: "actions",

@@ -129,6 +129,7 @@ export default function AddTeamMemberModal({
     handleSubmit,
     control,
     register,
+    getValues,
     reset,
     watch,
     formState: { errors },
@@ -154,7 +155,7 @@ export default function AddTeamMemberModal({
         first_name: "",
         last_name: "",
         email: "",
-        role: "agency-owner",
+        role: "agency-admin",
         workspace: "",
       });
     }
@@ -209,7 +210,7 @@ export default function AddTeamMemberModal({
       -translate-x-1/2 -translate-y-1/2
       bg-white rounded-xl shadow-lg
       flex flex-col gap-4
-      w-[92%] sm:w-full max-w-md
+      w-[92%] sm:w-full max-w-xl
       p-4 sm:p-6
       max-h-[90vh] overflow-y-auto
     "
@@ -233,6 +234,7 @@ export default function AddTeamMemberModal({
             </Typography>
 
             <CustomTextField
+              fullWidth
               placeholder="First Name"
               size="small"
               {...register("first_name")}
@@ -251,6 +253,7 @@ export default function AddTeamMemberModal({
               Last name
             </Typography>
             <CustomTextField
+              fullWidth
               placeholder="Last Name"
               size="small"
               {...register("last_name")}
@@ -280,12 +283,19 @@ export default function AddTeamMemberModal({
         <Box>
           <CustomFormSelect
             label="Role"
-            placeholder="role"
+            placeholder="Role"
+            defaultValue={getValues("role")}
             error={errors.role?.message}
             disabled={ROLES.length === 0}
             options={ROLES.map((role) => ({
               label: role.label,
               value: role.value,
+              disabled:
+                (getValues("role") === "agency-owner" &&
+                  role.value !== "agency-owner") ||
+                role.value === "agency-owner",
+              // member?.role === "agency-owner" &&
+              // role.value !== "agency-owner", // only allow editing role if current role is agency-owner
             }))}
             {...register("role")}
           />
@@ -293,25 +303,20 @@ export default function AddTeamMemberModal({
 
         {(selectedRole === "workspace-editor" ||
           selectedRole === "workspace-viewer") && (
-          <Controller
-            name="workspace"
-            control={control}
-            render={({ field }) => (
-              <FormControl size="small" error={!!errors.workspace}>
-                <InputLabel id="workspace-label">Workspace</InputLabel>
-                <Select {...field} label="Workspace">
-                  <MenuItem value="">
-                    <em>Select workspace</em>
-                  </MenuItem>
-                  {workspaceOptions.map((ws) => (
-                    <MenuItem key={ws.id} value={ws.id}>
-                      {ws.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            )}
-          />
+          <Box>
+            <CustomFormSelect
+              label="Workspace"
+              placeholder="Workspace"
+              defaultValue={getValues("workspace")}
+              error={errors.workspace?.message}
+              disabled={workspaceOptions.length === 0}
+              options={workspaceOptions.map((workspace) => ({
+                label: workspace.name,
+                value: workspace.id,
+              }))}
+              {...register("workspace")}
+            />
+          </Box>
         )}
 
         {/* Buttons responsive */}

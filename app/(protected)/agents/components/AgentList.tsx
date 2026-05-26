@@ -110,13 +110,13 @@ const AgentList = () => {
       label: "Actions",
       render: (row) => (
         <div className="flex gap-2">
-          <TableActionButton
+          {/* <TableActionButton
             icon="/copy.png"
             tooltip="Copy"
             onClick={(e) => {
               e.stopPropagation();
             }}
-          />
+          /> */}
           <TableActionButton
             icon="/remove.png"
             tooltip="Delete"
