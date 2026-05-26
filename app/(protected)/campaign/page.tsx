@@ -35,7 +35,8 @@ export default function CampaignPage() {
   );
   const [deleteListId, setDeleteListId] = useState<Campaign | null>(null);
 
-  const isEmpty = campaignsData?.data?.campaigns?.length === 0;
+  const campaigns = campaignsData?.data?.campaigns || [];
+  const isEmpty = !isLoading && campaigns.length === 0;
 
   const columns: Column<Campaign>[] = [
     {
@@ -142,38 +143,37 @@ export default function CampaignPage() {
   };
 
   return (
-    <>
-      {!isEmpty ? (
-        <div className="py-6 px-15 bg-[#F6F8FB] h-full">
-          <div className="bg-white h-full rounded-[20px] border border-[#DDDDDD] p-6">
-            <div className="flex items-center justify-between gap-4">
-              <h2 className="text-lg font-medium text-gray-700">
-                List of Campaigns
-              </h2>
-              <button
-                onClick={() => setOpen(true)}
-                className="flex items-center justify-center gap-2 bg-[#2F6AFF] text-white text-sm px-4 py-2 rounded-xl hover:bg-blue-700 w-full sm:w-auto cursor-pointer"
-              >
-                <AddIcon sx={{ fontSize: 16 }} />
-                New Campaign
-              </button>
-            </div>
-            <div className="mt-6">
-              <GenericTable
-                columns={columns}
-                data={campaignsData?.data?.campaigns || []}
-                onRowClick={(row) => handleOpenEdit(row)}
-              />
-            </div>
+    <div className="py-6 px-15 bg-[#F6F8FB] h-full">
+      {isLoading || !isEmpty ? (
+        <div className="bg-white h-full rounded-[20px] border border-[#DDDDDD] p-6">
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-lg font-medium text-gray-700">
+              List of Campaigns
+            </h2>
+            <button
+              onClick={() => setOpen(true)}
+              className="flex items-center justify-center gap-2 bg-[#2F6AFF] text-white text-sm px-4 py-2 rounded-xl hover:bg-blue-700 w-full sm:w-auto cursor-pointer"
+            >
+              <AddIcon sx={{ fontSize: 16 }} />
+              New Campaign
+            </button>
+          </div>
+          <div className="mt-6">
+            <GenericTable
+              columns={columns}
+              data={campaigns}
+              onRowClick={(row) => handleOpenEdit(row)}
+              isLoading={isLoading && campaigns.length === 0}
+            />
           </div>
         </div>
       ) : (
         <Box className="flex items-center justify-center min-h-[70vh] bg-gray-100 rounded-xl">
           <Box className="text-center max-w-2xl px-6">
-            <Typography variant="h4" sx={{ fontWeight: 700, mb: 2 }}>
+            <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
               Create And Launch Your First Campaign
             </Typography>
-            <Typography sx={{ fontSize: 18, mb: 4, lineHeight: 1.6 }}>
+            <Typography sx={{ fontSize: 14, mb: 4, lineHeight: 1.6 }}>
               Launch your AI agent and have it get on live calls by clicking the
               button below and creating your first campaign. Creating a campaign
               is easy and can be done in about 60 seconds.
@@ -222,6 +222,6 @@ export default function CampaignPage() {
           </div>
         )}
       </ConfirmModal>
-    </>
+    </div>
   );
 }

@@ -13,5 +13,5 @@ export const useTeamMemberUsers = (limit: number, skip: number) =>
     queryKey: ["users", limit, skip],
     queryFn: () => userService.getUsers({ limit, skip }),
     placeholderData: keepPreviousData,
-    staleTime: 0, // ✅ force refetch on invalidate
   });
+

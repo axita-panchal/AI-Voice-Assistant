@@ -19,6 +19,7 @@ import {
   Stack,
   Switch,
   Typography,
+  Skeleton,
 } from "@mui/material";
 import CustomTextField from "@/components/common/CustomTextField";
 import { Add, DeleteOutline, EditOutlined } from "@mui/icons-material";
@@ -585,97 +586,109 @@ export default function ContactListPage() {
             pb: 1,
           }}
         >
-          {listsWithCounts.map((list) => {
-            const isActive = activeListId === list.id;
-            const isAll = list.id === "all";
+          {isLoading && apiLists.length === 0 ? (
+            Array.from({ length: 4 }).map((_, index) => (
+              <Skeleton
+                key={`list-skeleton-${index}`}
+                variant="rectangular"
+                width={140}
+                height={40}
+                sx={{ borderRadius: "10px", flexShrink: 0 }}
+              />
+            ))
+          ) : (
+            listsWithCounts.map((list) => {
+              const isActive = activeListId === list.id;
+              const isAll = list.id === "all";
 
-            return (
-              <Box
-                key={list.id}
-                onClick={() => setActiveListId(list.id)}
-                sx={{
-                  position: "relative",
-                  flexShrink: 0,
-                  minWidth: "140px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  px: 2,
-                  py: 1,
-                  borderRadius: "10px",
-                  cursor: "pointer",
-                  border: "1px solid",
-                  borderColor: isActive ? "#2F6AFF99" : "#E5E7EB",
-                  backgroundColor: isActive ? "#2f6aff1a" : "#00000008",
-                  color: isActive ? "#2F6AFF" : "#808080",
-
-                  "&:hover .list-content": {
-                    opacity: !isAll && 0.25,
-                  },
-
-                  "&:hover .action-buttons": {
-                    opacity: 1,
-                    visibility: "visible",
-                  },
-                }}
-              >
-                {/* Main Content */}
+              return (
                 <Box
-                  className="list-content"
+                  key={list.id}
+                  onClick={() => setActiveListId(list.id)}
                   sx={{
+                    position: "relative",
+                    flexShrink: 0,
+                    minWidth: "140px",
                     display: "flex",
                     alignItems: "center",
-                    gap: 1,
-                    transition: "opacity 0.2s ease",
+                    justifyContent: "center",
+                    px: 2,
+                    py: 1,
+                    borderRadius: "10px",
+                    cursor: "pointer",
+                    border: "1px solid",
+                    borderColor: isActive ? "#2F6AFF99" : "#E5E7EB",
+                    backgroundColor: isActive ? "#2f6aff1a" : "#00000008",
+                    color: isActive ? "#2F6AFF" : "#808080",
+
+                    "&:hover .list-content": {
+                      opacity: !isAll ? 0.25 : 1,
+                    },
+
+                    "&:hover .action-buttons": {
+                      opacity: 1,
+                      visibility: "visible",
+                    },
                   }}
                 >
-                  {list.name}
-
-                  <Chip
-                    size="small"
-                    label={list.count}
-                    sx={{ flexShrink: 0 }}
-                  />
-                </Box>
-
-                {/* Hover Actions */}
-                {!isAll && (
+                  {/* Main Content */}
                   <Box
-                    className="action-buttons"
+                    className="list-content"
                     sx={{
-                      position: "absolute",
-                      right: 8,
                       display: "flex",
                       alignItems: "center",
-                      gap: 0.5,
-                      opacity: 0,
-                      visibility: "hidden",
-                      transition: "all 0.2s ease",
+                      gap: 1,
+                      transition: "opacity 0.2s ease",
                     }}
                   >
-                    <TableActionButton
-                      icon="/edit.png"
-                      tooltip="Edit"
-                      size={30}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleOpenEditContactList(list.id);
-                      }}
-                    />
-                    <TableActionButton
-                      icon="/remove.png"
-                      tooltip="Delete"
-                      size={30}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setDeleteListId(list);
-                      }}
+                    {list.name}
+
+                    <Chip
+                      size="small"
+                      label={list.count}
+                      sx={{ flexShrink: 0 }}
                     />
                   </Box>
-                )}
-              </Box>
-            );
-          })}
+
+                  {/* Hover Actions */}
+                  {!isAll && (
+                    <Box
+                      className="action-buttons"
+                      sx={{
+                        position: "absolute",
+                        right: 8,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 0.5,
+                        opacity: 0,
+                        visibility: "hidden",
+                        transition: "all 0.2s ease",
+                      }}
+                    >
+                      <TableActionButton
+                        icon="/edit.png"
+                        tooltip="Edit"
+                        size={30}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenEditContactList(list.id);
+                        }}
+                      />
+                      <TableActionButton
+                        icon="/remove.png"
+                        tooltip="Delete"
+                        size={30}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeleteListId(list);
+                        }}
+                      />
+                    </Box>
+                  )}
+                </Box>
+              );
+            })
+          )}
 
           <IconButton
             onClick={() => setIsListModalOpen(true)}
@@ -825,6 +838,7 @@ export default function ContactListPage() {
             selectedRows={selectedRows}
             onSelectionChange={setSelectedRows}
             onRowClick={(row) => handleOpenEdit(row)}
+            isLoading={isContactLoading && mappedContacts.length === 0}
           />
         </Box>
         {/* CREATE LIST MODAL */}

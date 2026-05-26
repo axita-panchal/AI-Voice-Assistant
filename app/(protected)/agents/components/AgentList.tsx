@@ -48,7 +48,11 @@ const AgentList = () => {
   const limit = 20;
   const skip = (page - 1) * limit;
 
-  const { data: agentsResponse } = useAgents(limit, skip, subaccountId);
+  const { data: agentsResponse, isLoading } = useAgents(
+    limit,
+    skip,
+    subaccountId,
+  );
   const agents = agentsResponse?.data?.agents || [];
 
   const { mutateAsync: deleteAgent, isPending } = useDeleteAgent();
@@ -127,7 +131,7 @@ const AgentList = () => {
     },
   ];
 
-  const isEmpty = agents.length === 0;
+  const isEmpty = !isLoading && agents.length === 0;
 
   const handleCreateAgent = () => {
     if (!subaccountId) {
@@ -140,7 +144,7 @@ const AgentList = () => {
 
   return (
     <div className="py-6 px-15 bg-[#F6F8FB] h-full">
-      {!isEmpty ? (
+      {!subaccountId || isLoading || !isEmpty ? (
         <Box className="p-6 h-full rounded-[20px] bg-white border border-[#DDDDDD]">
           {/* Header */}
           <div className="flex items-center justify-between">
@@ -169,6 +173,7 @@ const AgentList = () => {
               columns={columns}
               data={agents}
               onRowClick={handleRowClick}
+              isLoading={!subaccountId || (isLoading && agents.length === 0)}
             />
           </div>
         </Box>
@@ -176,11 +181,11 @@ const AgentList = () => {
         // ✅ Empty State
         <Box className="flex items-center justify-center min-h-[70vh] bg-gray-100 rounded-xl">
           <Box className="text-center max-w-2xl px-6">
-            <Typography variant="h4" sx={{ fontWeight: 700, mb: 2 }}>
+            <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
               Welcome {user?.first_name || "User"}!
             </Typography>
 
-            <Typography sx={{ fontSize: 18, mb: 4, lineHeight: 1.6 }}>
+            <Typography sx={{ fontSize: 14, mb: 4, lineHeight: 1.6 }}>
               To get started, create your first AI agent by clicking the button
               below.
             </Typography>

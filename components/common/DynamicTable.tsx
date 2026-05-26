@@ -8,6 +8,7 @@ import {
   TableBody,
   TableContainer,
   Checkbox,
+  Skeleton,
 } from "@mui/material";
 import clsx from "clsx";
 import React from "react";
@@ -33,6 +34,7 @@ type Props<T extends { id: string | number }> = {
   // onSelectionChange?: (ids: any[]) => void;
   selectedRows?: T[];
   onSelectionChange?: (rows: T[]) => void;
+  isLoading?: boolean;
 };
 
 function renderValue(value: unknown): React.ReactNode {
@@ -171,6 +173,7 @@ export default function GenericTable<T extends { id: string | number }>({
   onSelectAll,
   selectedRows = [],
   onSelectionChange,
+  isLoading = false,
 }: Props<T>) {
   /* -------------------------------------------------- */
   /* ✅ Normalize + Optimize Selection Using Set       */
@@ -267,50 +270,66 @@ export default function GenericTable<T extends { id: string | number }>({
 
         {/* ---------- BODY ---------- */}
         <TableBody>
-          {data.map((row) => {
-            const isSelected = selectedSet.has(String(row.id));
-
-            return (
-              <TableRow
-                key={row.id}
-                className="group"
-                hover
-                onClick={onRowClick ? () => onRowClick(row) : undefined}
-                sx={{
-                  cursor: onRowClick ? "pointer" : "default",
-                  backgroundColor: isSelected ? "#F0F6FF" : "inherit",
-                }}
-              >
+          {isLoading ? (
+            Array.from({ length: 5 }).map((_, index) => (
+              <TableRow key={`skeleton-${index}`}>
                 {showCheckBoxes && (
                   <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={isSelected}
-                      onClick={(e) => e.stopPropagation()}
-                      // onChange={() => handleSelectRow(row.id)}
-                      onChange={() => handleSelectRow(row)}
-                    />
+                    <Skeleton variant="rectangular" width={20} height={20} />
                   </TableCell>
                 )}
-
                 {columns.map((col) => (
-                  <TableCell
-                    key={String(col.key)}
-                    sx={{
-                      fontSize: { xs: 12, sm: 13, md: 14 },
-                      px: { xs: 1.5, sm: 2 },
-                      py: { xs: 1, sm: 1.25 },
-                      color: "#606060",
-                      opacity: col.render ? 1 : 0.7,
-                    }}
-                  >
-                    {col.render ? col.render(row) : renderValue(row[col.key])}
+                  <TableCell key={String(col.key)} sx={{ py: 1.5 }}>
+                    <Skeleton variant="text" width="80%" height={24} />
                   </TableCell>
                 ))}
               </TableRow>
-            );
-          })}
+            ))
+          ) : (
+            data.map((row) => {
+              const isSelected = selectedSet.has(String(row.id));
 
-          {data.length === 0 && (
+              return (
+                <TableRow
+                  key={row.id}
+                  className="group"
+                  hover
+                  onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  sx={{
+                    cursor: onRowClick ? "pointer" : "default",
+                    backgroundColor: isSelected ? "#F0F6FF" : "inherit",
+                  }}
+                >
+                  {showCheckBoxes && (
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        checked={isSelected}
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={() => handleSelectRow(row)}
+                      />
+                    </TableCell>
+                  )}
+
+                  {columns.map((col) => (
+                    <TableCell
+                      key={String(col.key)}
+                      sx={{
+                        fontSize: { xs: 12, sm: 13, md: 14 },
+                        px: { xs: 1.5, sm: 2 },
+                        py: { xs: 1, sm: 1.25 },
+                        color: "#606060",
+                        opacity: col.render ? 1 : 0.7,
+                      }}
+                    >
+                      {col.render ? col.render(row) : renderValue(row[col.key])}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              );
+            })
+          )}
+
+          {!isLoading && data.length === 0 && (
             <TableRow>
               <TableCell
                 colSpan={columns.length + (showCheckBoxes ? 1 : 0)}
