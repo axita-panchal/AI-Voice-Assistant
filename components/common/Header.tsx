@@ -71,8 +71,7 @@ export default function Header() {
 
   const { data: allWorkspaces, isLoading } = useAllWorkspaces(skip, limit);
 
-  const subaccounts =
-    allWorkspaces?.data?.subaccounts ?? EMPTY_SUBACCOUNTS;
+  const subaccounts = allWorkspaces?.data?.subaccounts ?? EMPTY_SUBACCOUNTS;
 
   useEffect(() => {
     if (!subaccounts || subaccounts.length === 0) {
@@ -81,7 +80,7 @@ export default function Header() {
       return;
     }
 
-     // If no active workspace OR active workspace was deleted
+    // If no active workspace OR active workspace was deleted
     const exists = subaccounts.some(
       (workspace: subAccountsType) => workspace.id === activeWorkspace?.id,
     );
@@ -171,10 +170,7 @@ export default function Header() {
                 {/* NAVIGATION */}
                 <nav className="flex items-center gap-2 whitespace-nowrap">
                   {NAV_ITEMS.map((item) => {
-                    const isActive = isNavItemActive(
-                      item.href,
-                      pathname || "",
-                    );
+                    const isActive = isNavItemActive(item.href, pathname || "");
 
                     return (
                       <Link
@@ -204,7 +200,7 @@ export default function Header() {
 
           {/* RIGHT SECTION */}
           <Box className="flex items-center gap-3">
-           <Button
+            <Button
               fullWidth
               variant="contained"
               size="small"
@@ -220,10 +216,16 @@ export default function Header() {
               }}
               aria-label="Make a call"
             >
-              <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", sm: "inline" } }}
+              >
                 Make a call
               </Box>
-              <Box component="span" sx={{ display: { xs: "inline", sm: "none" } }}>
+              <Box
+                component="span"
+                sx={{ display: { xs: "inline", sm: "none" } }}
+              >
                 Call
               </Box>
             </Button>
@@ -311,7 +313,7 @@ export default function Header() {
               onClick={handleUserClick}
             >
               <Avatar
-                src="/assets/svgs/user_profile.svg"
+                src="/avatar.png"
                 sx={{
                   width: 34,
                   height: 34,
@@ -437,7 +439,7 @@ export default function Header() {
         <Divider className="my-2!" />
 
         {/* Menu Items */}
-        <MenuItem
+        {/* <MenuItem
           onClick={handleClose}
           sx={{ fontSize: "15px", color: "#565656", borderRadius: "10px" }}
         >
@@ -450,7 +452,7 @@ export default function Header() {
             />
           </ListItemIcon>
           Profile
-        </MenuItem>
+        </MenuItem> */}
 
         <MenuItem
           onClick={() => handleNavigate("/settings")}
@@ -467,7 +469,7 @@ export default function Header() {
           Settings
         </MenuItem>
 
-        <MenuItem
+        {/* <MenuItem
           onClick={handleClose}
           sx={{ fontSize: "15px", color: "#565656", borderRadius: "10px" }}
         >
@@ -480,9 +482,9 @@ export default function Header() {
             />
           </ListItemIcon>
           Integrations
-        </MenuItem>
+        </MenuItem> */}
 
-        <MenuItem
+        {/* <MenuItem
           onClick={handleClose}
           sx={{ fontSize: "15px", color: "#565656", borderRadius: "10px" }}
         >
@@ -495,7 +497,7 @@ export default function Header() {
             />
           </ListItemIcon>
           Billing
-        </MenuItem>
+        </MenuItem> */}
 
         <Divider className="my-2!" />
 

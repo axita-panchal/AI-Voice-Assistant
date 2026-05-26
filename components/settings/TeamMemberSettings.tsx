@@ -12,6 +12,7 @@ import { useTeamMemberUsers } from "@/hooks/user/useUserQueries";
 import ConfirmModal from "../common/ConfirmModal";
 import { toast } from "@/utils/toast";
 import TableActionButton from "../common/TableActionButton";
+import { API_ROLE_TO_KEY } from "@/utils/enums";
 
 /* -------------------------------------------------------
    API TYPES
@@ -52,13 +53,6 @@ type TeamMember = {
 /* -------------------------------------------------------
    ROLE MAPS
 ------------------------------------------------------- */
-
-const API_ROLE_TO_KEY: Record<string, RoleKey> = {
-  "Agency Owner": "agency-owner",
-  "Agency Admin": "agency-admin",
-  "Workspace Editor": "workspace-editor",
-  "Workspace Viewer": "workspace-viewer",
-};
 
 const ROLE_MAP: Record<RoleKey, { label: string; color: string }> = {
   "agency-owner": {

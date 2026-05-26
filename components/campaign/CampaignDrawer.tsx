@@ -45,7 +45,7 @@ const campaignSchema = z.object({
       (val) => Number(val) >= 0 && Number(val) <= 35,
       "Must be between 0 and 35",
     ),
-  selectedDays: z.array(z.string()).min(1, "Select at least one day"),
+  campaign_days: z.array(z.string()).min(1, "Select at least one day"),
   hours: z.tuple([z.number(), z.number()]).refine(([min, max]) => min < max, {
     message: "Start hour must be less than end hour",
   }),
@@ -58,7 +58,7 @@ const defaultValues: CampaignFormValues = {
   agentId: "",
   dailyCap: "",
   maxFollowUps: "",
-  selectedDays: [],
+  campaign_days: [],
   hours: [9, 20],
 };
 
@@ -95,7 +95,15 @@ export default function CampaignDrawer({
 
   const agents = agentsResponse?.data?.agents ?? [];
 
-  const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const DAYS = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
 
   const {
     register,
@@ -111,7 +119,7 @@ export default function CampaignDrawer({
     defaultValues,
   });
 
-  const selectedDays = watch("selectedDays");
+  const campaign_days = watch("campaign_days");
   const hours = watch("hours");
 
   useEffect(() => {
@@ -124,12 +132,13 @@ export default function CampaignDrawer({
 
   useEffect(() => {
     if (open && isEdit && campaign) {
+      console.log("Prefilling form with campaign data:", campaign);
       reset({
         name: campaign.name || "",
         agentId: campaign.agent_id || "",
         dailyCap: String(campaign.daily_usage_cap || ""),
         maxFollowUps: String(campaign.max_dials_per_contact || ""),
-        selectedDays: campaign?.calling_days || [],
+        campaign_days: campaign?.calling_days || [],
         hours: [
           campaign.min_calls_per_hour || 9,
           campaign.max_calls_per_hour || 20,
@@ -141,11 +150,11 @@ export default function CampaignDrawer({
   /* ===================== TOGGLE DAYS ===================== */
 
   const toggleDay = (day: string) => {
-    const updated = selectedDays.includes(day)
-      ? selectedDays.filter((d) => d !== day)
-      : [...selectedDays, day];
+    const updated = campaign_days.includes(day)
+      ? campaign_days.filter((d) => d !== day)
+      : [...campaign_days, day];
 
-    setValue("selectedDays", updated, { shouldValidate: true });
+    setValue("campaign_days", updated, { shouldValidate: true });
   };
 
   const onSubmit = async (data: CampaignFormValues) => {
@@ -157,7 +166,7 @@ export default function CampaignDrawer({
         max_calls_per_hour: data.hours[1],
         daily_usage_cap: Number(data.dailyCap),
         max_dials_per_contact: Number(data.maxFollowUps),
-        calling_days: data.selectedDays,
+        campaign_days: data.campaign_days,
         start_time: hourToTimeString(data.hours[0]),
         end_time: hourToTimeString(data.hours[1]),
       };
@@ -217,7 +226,7 @@ export default function CampaignDrawer({
                 />
               </div>
               <span className="text-base text-[#464646]">
-                {isEdit ? "Edit Campaign1" : "Add Campaign"}
+                {isEdit ? "Edit Campaign" : "Add Campaign"}
               </span>
             </div>
 
@@ -264,7 +273,10 @@ export default function CampaignDrawer({
 
               <div className="grid grid-cols-4 sm:flex sm:flex-wrap gap-3">
                 {DAYS.map((day) => {
-                  const checked = selectedDays.includes(day);
+                  console.log("Selected days:", getValues("campaign_days"));
+                  const checked =
+                    campaign_days.includes(day) ||
+                    getValues("campaign_days").includes(day);
                   return (
                     <div
                       key={day}
@@ -285,15 +297,17 @@ export default function CampaignDrawer({
                           },
                         }}
                       />
-                      <span className="text-sm text-[#808080]">{day}</span>
+                      <span className="text-sm text-[#808080]">
+                        {day.slice(0, 3)}
+                      </span>
                     </div>
                   );
                 })}
               </div>
 
-              {errors.selectedDays && (
+              {errors.campaign_days && (
                 <p className="text-red-500 text-xs mt-1">
-                  {errors.selectedDays.message}
+                  {errors.campaign_days.message}
                 </p>
               )}
             </div>

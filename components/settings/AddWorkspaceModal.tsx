@@ -113,17 +113,11 @@ export default function AddWorkspaceModal({
           </IconButton>
         </div>
 
-        {/* ICON & NAME */}
+        {/* NAME */}
         <div className="mt-6">
-          <label className="text-base text-gray-600 mb-1 block">
-            Icon & Name
-          </label>
+          <label className="text-base text-gray-600 mb-1 block">Name</label>
 
           <div className="flex items-start gap-3">
-            <Avatar className="bg-gray-200 text-gray-600 mt-1">
-              {nameValue ? nameValue.charAt(0).toUpperCase() : "N"}
-            </Avatar>
-
             <CustomTextField
               fullWidth
               size="small"

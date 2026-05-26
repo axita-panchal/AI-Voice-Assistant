@@ -1,15 +1,13 @@
 import { RootState } from "@/store";
 import { Avatar, Button } from "@mui/material";
 import { useSelector } from "react-redux";
-import CustomTextField, { CustomTextFieldProps } from "@/components/common/CustomTextField";
+import CustomTextField, {
+  CustomTextFieldProps,
+} from "@/components/common/CustomTextField";
 
 // Custom TextField with consistent styling
 const SmallTextField = (props: CustomTextFieldProps) => (
-  <CustomTextField
-    size="small"
-    fullWidth
-    {...props}
-  />
+  <CustomTextField size="small" fullWidth {...props} />
 );
 
 export default function GeneralSettings() {
@@ -24,8 +22,11 @@ export default function GeneralSettings() {
           Icon & Name
         </label>
         <div className="flex items-center gap-4 mb-4">
-          <Avatar src="/assets/svgs/user_profile.svg" />
-          <SmallTextField defaultValue={user?.full_name} placeholder="John Doe " />
+          <Avatar src="/avatar.png" />
+          <SmallTextField
+            defaultValue={user?.full_name}
+            placeholder="John Doe "
+          />
         </div>
 
         <div className="mb-4">
@@ -39,7 +40,10 @@ export default function GeneralSettings() {
           <label className="block text-gray-700 font-medium mb-1">
             Company timezone
           </label>
-          <SmallTextField defaultValue="America/New-york" placeholder="Select timezone..." />
+          <SmallTextField
+            defaultValue="America/New-york"
+            placeholder="Select timezone..."
+          />
         </div>
 
         <h3 className="text-md font-semibold mb-4">Business Information</h3>

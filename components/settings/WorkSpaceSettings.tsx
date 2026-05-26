@@ -159,7 +159,6 @@ export default function WorkSpaceSettings() {
       label: "Name",
       render: (row) => (
         <div className="flex items-center gap-2">
-          <Avatar>{row.name.charAt(0).toUpperCase()}</Avatar>
           <span className="font-medium">{row.name}</span>
         </div>
       ),

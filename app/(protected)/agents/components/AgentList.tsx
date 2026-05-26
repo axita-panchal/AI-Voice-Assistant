@@ -28,6 +28,7 @@ import axios from "axios";
 import { ApiErrorResponse } from "@/hooks/auth/useAuthMutations";
 import Image from "next/image";
 import TableActionButton from "@/components/common/TableActionButton";
+import { API_ROLE_TO_KEY } from "@/utils/enums";
 
 type Agent = {
   id: number;
@@ -158,13 +159,17 @@ const AgentList = () => {
               List of agents
             </h2>
 
-            <button
-              onClick={() => setOpenModal(true)}
-              className="flex items-center gap-2 bg-[#2F6AFF] text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
-            >
-              <AddIcon sx={{ fontSize: 16 }} />
-              New Agent
-            </button>
+            {user &&
+              (API_ROLE_TO_KEY[user.role] === "agency-owner" ||
+                API_ROLE_TO_KEY[user.role] === "agency-admin") && (
+                <button
+                  onClick={() => setOpenModal(true)}
+                  className="flex items-center gap-2 bg-[#2F6AFF] text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
+                >
+                  <AddIcon sx={{ fontSize: 16 }} />
+                  New Agent
+                </button>
+              )}
           </div>
 
           {/* Table */}

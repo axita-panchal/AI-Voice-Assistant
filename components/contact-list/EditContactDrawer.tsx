@@ -222,8 +222,18 @@ export default function EditContactDrawer({
 
             {/* Phone + Email */}
             <Box className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <CustomTextField label="Phone" size="small" {...register("phone")} fullWidth />
-              <CustomTextField label="Email" size="small" {...register("email")} fullWidth />
+              <CustomTextField
+                label="Phone"
+                size="small"
+                {...register("phone")}
+                fullWidth
+              />
+              <CustomTextField
+                label="Email"
+                size="small"
+                {...register("email")}
+                fullWidth
+              />
             </Box>
 
             <Box className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -231,7 +241,13 @@ export default function EditContactDrawer({
                 name="contact_list_id"
                 control={control}
                 render={({ field }) => (
-                  <CustomTextField {...field} select label="Contact list" size="small" fullWidth>
+                  <CustomTextField
+                    {...field}
+                    select
+                    label="Contact list"
+                    size="small"
+                    fullWidth
+                  >
                     {lists.map((l) => (
                       <MenuItem key={l.id} value={l.id}>
                         {l.name}
@@ -262,21 +278,50 @@ export default function EditContactDrawer({
             </Typography>
 
             <Box className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
-              <CustomTextField label="Business name" size="small" {...register("business_name")} />
-              <CustomTextField label="Job title" size="small" {...register("job_title")} />
+              <CustomTextField
+                label="Business name"
+                size="small"
+                {...register("business_name")}
+              />
+              <CustomTextField
+                label="Job title"
+                size="small"
+                {...register("job_title")}
+              />
             </Box>
 
             <Box className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <CustomTextField label="Address" size="small" {...register("full_address")} />
-              <CustomTextField label="City" size="small" {...register("city")} />
+              <CustomTextField
+                label="Address"
+                size="small"
+                {...register("full_address")}
+              />
+              <CustomTextField
+                label="City"
+                size="small"
+                {...register("city")}
+              />
             </Box>
 
             <Box className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <CustomTextField label="ZIP code" size="small" {...register("postal_code")} />
-              <CustomTextField label="State" size="small" {...register("state")} />
+              <CustomTextField
+                label="ZIP code"
+                size="small"
+                {...register("postal_code")}
+              />
+              <CustomTextField
+                label="State"
+                size="small"
+                {...register("state")}
+              />
             </Box>
 
-            <CustomTextField label="Country" size="small" {...register("country")} fullWidth />
+            <CustomTextField
+              label="Country"
+              size="small"
+              {...register("country")}
+              fullWidth
+            />
 
             {/* Custom Fields */}
             <Box
@@ -311,6 +356,15 @@ export default function EditContactDrawer({
             {/* Footer Buttons */}
             <Box className="flex flex-col sm:flex-row gap-3 pt-4">
               <Button
+                variant="outlined"
+                fullWidth
+                onClick={onClose}
+                disabled={isUpdatingContact}
+                sx={{ textTransform: "none", borderRadius: "10px" }}
+              >
+                Cancel
+              </Button>
+              <Button
                 type="submit"
                 form="edit-contact-form"
                 fullWidth
@@ -340,16 +394,6 @@ export default function EditContactDrawer({
                 ) : (
                   "Finish"
                 )}
-              </Button>
-
-              <Button
-                variant="outlined"
-                fullWidth
-                onClick={onClose}
-                disabled={isUpdatingContact}
-                sx={{ textTransform: "none", borderRadius: "10px" }}
-              >
-                Cancel
               </Button>
             </Box>
           </form>
