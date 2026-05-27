@@ -50,6 +50,6 @@ export interface Campaign {
   total_min_used: number;
   total_pickups: number;
   total_positive_outcomes: number;
-  calling_days?: string[];
+  campaign_days?: string[];
   actions?: string;
 }

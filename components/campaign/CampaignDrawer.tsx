@@ -138,7 +138,7 @@ export default function CampaignDrawer({
         agentId: campaign.agent_id || "",
         dailyCap: String(campaign.daily_usage_cap || ""),
         maxFollowUps: String(campaign.max_dials_per_contact || ""),
-        campaign_days: campaign?.calling_days || [],
+        campaign_days: campaign?.campaign_days || [],
         hours: [
           campaign.min_calls_per_hour || 9,
           campaign.max_calls_per_hour || 20,
