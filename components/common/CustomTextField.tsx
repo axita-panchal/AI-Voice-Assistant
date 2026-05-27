@@ -37,7 +37,7 @@ const CustomTextField = forwardRef<HTMLDivElement, CustomTextFieldProps>(
           },
 
           "& .MuiInputBase-input": {
-            px: isSmall ? "14px" : "20px",
+            px: multiline ? undefined : isSmall ? "14px" : "20px",
             py: multiline ? undefined : isSmall ? "10px" : "18px",
             color: "#4A4A4A",
 
@@ -48,13 +48,17 @@ const CustomTextField = forwardRef<HTMLDivElement, CustomTextFieldProps>(
           },
           // styling for standard MUI select when using select prop
           "& .MuiSelect-select": {
-            padding: multiline ? undefined : isSmall ? "10px 14px" : "18px 20px",
+            padding: multiline
+              ? undefined
+              : isSmall
+                ? "10px 14px"
+                : "18px 20px",
           },
           ...sx,
         }}
       />
     );
-  }
+  },
 );
 
 CustomTextField.displayName = "CustomTextField";

@@ -19,7 +19,7 @@ export default function AgentPrompt() {
     <div className=" py-4 space-y-4 min-h-0">
       <PromptCard
         title="Identity"
-        text="You are  Emma, a human-like AI Voice Agent representing Suzie Davis. You place outbound sales calls to prospective customers. You address the contact by {{contactFirstName}} and keep
+        text="You are Emma, a human-like AI Voice Agent representing Suzie Davis. You place outbound sales calls to prospective customers. You address the contact by {{contactFirstName}} and keep
 interactions compliant and respectful. You operate within call best practices, honoring do-not-call requests. You never misrepresent yourself or the company."
       />
       <PromptCard

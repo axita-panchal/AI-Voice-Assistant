@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Contact } from "@/types/contact-list.types";
 import { z } from "zod";
+import { formatDateTime } from "@/utils/helper";
 interface Props {
   open: boolean;
   onClose: () => void;
@@ -171,7 +172,7 @@ export default function EditContactDrawer({
               {contact?.first_name} {contact?.last_name}
             </Typography>
             <Typography className="text-xs text-gray-500">
-              Last updated: Dec 4th, 2025, 1:13 am
+              Last updated: {formatDateTime(contact?.updated_at || "")}
             </Typography>
           </Box>
           <IconButton onClick={onClose}>

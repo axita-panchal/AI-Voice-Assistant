@@ -208,6 +208,7 @@ export default function ContactListPage() {
     state: contact?.state ?? "",
     country: contact?.country ?? "",
     postal_code: contact?.postal_code ?? "",
+    updated_at: contact?.updated_at ?? "",
   });
 
   const mappedContacts = useMemo(

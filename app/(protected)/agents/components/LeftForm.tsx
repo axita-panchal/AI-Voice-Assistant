@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import CustomTextField from "@/components/common/CustomTextField";
 import { useRouter } from "next/navigation";
+import { CustomFormSelect } from "@/components/common/CustomFormSelect";
 
 type AgentForm = {
   name: string;
@@ -92,30 +93,30 @@ export default function LeftForm({
         </Field>
 
         <Field label="Language" htmlFor="agent-language">
-          <FormControl fullWidth size="small">
-            <Select
-              id="agent-language"
-              value={form.language}
-              onChange={(e) =>
-                setForm({ ...form, language: e.target.value as string })
-              }
-            >
-              <MenuItem value="English">English</MenuItem>
-            </Select>
-          </FormControl>
+          <CustomFormSelect
+            id="agent-language"
+            label=""
+            fullWidth
+            size="small"
+            value={form.language}
+            onChange={(e) =>
+              setForm({ ...form, language: e.target.value as string })
+            }
+            options={[{ label: "English", value: "English" }]}
+          />
         </Field>
         <Field label="Voice" htmlFor="agent-voice">
-          <FormControl fullWidth size="small">
-            <Select
-              id="agent-voice"
-              value={form.voice}
-              onChange={(e) =>
-                setForm({ ...form, voice: e.target.value as string })
-              }
-            >
-              <MenuItem value="Joseph (English)">Joseph (English)</MenuItem>
-            </Select>
-          </FormControl>
+          <CustomFormSelect
+            id="agent-voice"
+            label=""
+            fullWidth
+            size="small"
+            value={form.voice}
+            onChange={(e) =>
+              setForm({ ...form, voice: e.target.value as string })
+            }
+            options={[{ label: "Joseph (English)", value: "Joseph (English)" }]}
+          />
         </Field>
       </div>
 

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import { analyticsService } from "@/services/analytics.service";
+import { toast } from "@/utils/toast";
 
 import AnalyticsChart from "@/components/charts/AnalyticsChart";
 import ChartCard from "@/components/common/ChartCard";
@@ -38,6 +40,7 @@ export default function Dashboard() {
   const [period, setPeriod] = useState<
     "this_week" | "this_month" | "monthly" | "yearly"
   >("this_month");
+  const [isExporting, setIsExporting] = useState(false);
 
   const activeWorkspace = useSelector(
     (state: RootState) => state.workspace.activeWorkspace,
@@ -50,6 +53,24 @@ export default function Dashboard() {
 
   const summary = analyticsRes?.summary;
   const chart_data = analyticsRes?.chart_data;
+
+  const handleExport = async () => {
+    if (!activeWorkspace?.id) return;
+    try {
+      setIsExporting(true);
+      const blob = await analyticsService.exportAnalytics(activeWorkspace.id);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `analytics-${activeWorkspace.id}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error("Failed to export analytics");
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   return (
     <div className="bg-[#F6F8FB]">
@@ -68,6 +89,8 @@ export default function Dashboard() {
           <Button
             size="small"
             variant="outlined"
+            onClick={handleExport}
+            disabled={isExporting || !activeWorkspace?.id}
             sx={{
               fontSize: "15px",
               textTransform: "none",
@@ -78,7 +101,7 @@ export default function Dashboard() {
               borderRadius: "12px",
             }}
           >
-            Export CSV
+            {isExporting ? "Exporting..." : "Export CSV"}
             <Image
               src="/assets/svgs/export.svg"
               alt="Export"
