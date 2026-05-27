@@ -11,7 +11,7 @@ export const userService = {
     const res = await http.get("/users", {
       params: { limit, skip },
     });
-    return res?.data;
+    return res?.data || [];
   },
 
   getUserById: async (id: string) => {

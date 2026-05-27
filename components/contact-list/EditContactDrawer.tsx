@@ -324,7 +324,7 @@ export default function EditContactDrawer({
             />
 
             {/* Custom Fields */}
-            <Box
+            {/* <Box
               className="flex justify-between items-center p-3 mt-4 cursor-pointer"
               onClick={() => setCustomFieldsOpen((prev) => !prev)}
             >
@@ -336,9 +336,9 @@ export default function EditContactDrawer({
               ) : (
                 <KeyboardArrowRightIcon />
               )}
-            </Box>
+            </Box> */}
 
-            <Collapse in={customFieldsOpen}>
+            {/* <Collapse in={customFieldsOpen}>
               <Box className="space-y-3 pt-3">
                 {customFieldKeys.map((key, index) => (
                   <CustomTextField
@@ -351,7 +351,7 @@ export default function EditContactDrawer({
                   />
                 ))}
               </Box>
-            </Collapse>
+            </Collapse> */}
 
             {/* Footer Buttons */}
             <Box className="flex flex-col sm:flex-row gap-3 pt-4">
