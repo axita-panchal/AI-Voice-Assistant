@@ -10,6 +10,7 @@ type User = {
   is_admin: boolean;
   is_agency_owner: boolean;
   account_id: string;
+  profile_pic?: string | null;
 };
 
 type AuthState = {

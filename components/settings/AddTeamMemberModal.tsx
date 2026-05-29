@@ -19,7 +19,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { useCreateUser, useUpdateUser } from "@/hooks/user/useUserMutations";
+import { useCreateUser, useUpdateUserProfile } from "@/hooks/user/useUserMutations";
 import { toast } from "@/utils/toast";
 import { AxiosError } from "axios";
 import { ApiErrorResponse } from "@/hooks/auth/useAuthMutations";
@@ -118,7 +118,7 @@ export default function AddTeamMemberModal({
   onSuccess,
 }: Props) {
   const { mutateAsync: createUser, isPending: isCreating } = useCreateUser();
-  const { mutateAsync: updateUser, isPending: isUpdating } = useUpdateUser();
+  const { mutateAsync: updateUserProfile, isPending: isUpdating } = useUpdateUserProfile();
 
   const user = useSelector((state: RootState) => state.auth.user);
   const { data: allWorkspaces } = useAllWorkspaces();
@@ -175,15 +175,23 @@ export default function AddTeamMemberModal({
 
     try {
       if (member?.id) {
-        // update user
-        const updatedUserRes = await updateUser({
-          id: member.id,
-          ...payload,
-        });
+        // update user via FormData
+        const formData = new FormData();
+        formData.append("first_name", payload.first_name);
+        formData.append("last_name", payload.last_name);
+        formData.append("email", payload.email);
+        formData.append("role", payload.role);
+        formData.append("full_name", payload.full_name);
+        formData.append("is_admin", String(payload.is_admin));
+        formData.append("is_agency_owner", String(payload.is_agency_owner));
+        if (payload.sub_account_id) {
+          formData.append("sub_account_id", payload.sub_account_id);
+        }
+        await updateUserProfile({ id: member.id, formData });
         toast.success("User updated successfully");
       } else {
         // create user
-        const createdUserRes = await createUser(payload);
+        await createUser(payload);
         toast.success("User created successfully");
       }
 
