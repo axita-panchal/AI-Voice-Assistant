@@ -99,6 +99,11 @@ export default function Header() {
     }
   }, [subaccounts, activeWorkspace, dispatch]);
 
+  const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL ?? "";
+  const avatarSrc = user?.profile_pic
+    ? `${frontendUrl}${user.profile_pic}`
+    : "/avatar.png";
+
   const isSmallScreen = useMediaQuery("(max-width:1000px)");
   const [open, setOpen] = useState(false);
   const [makeCallOpen, setMakeCallOpen] = useState(false);
@@ -313,7 +318,7 @@ export default function Header() {
               onClick={handleUserClick}
             >
               <Avatar
-                src="/avatar.png"
+                src={avatarSrc}
                 sx={{
                   width: 34,
                   height: 34,
@@ -425,11 +430,11 @@ export default function Header() {
       >
         {/* PROFILE HEADER */}
         <div className="flex items-center gap-3 px-3 py-2">
-          <Avatar src="/avatar.png" className="w-10! h-10!" />
+          <Avatar src={avatarSrc} className="w-10! h-10!" />
 
           <div>
             <p className="text-base font-semibold leading-tight text-neutral-700">
-              {user?.full_name}
+              {user?.first_name} {user?.last_name}
             </p>
 
             <p className="text-sm text-[#909090]">{user?.email}</p>
