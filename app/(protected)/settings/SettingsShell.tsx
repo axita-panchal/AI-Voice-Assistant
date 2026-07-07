@@ -18,7 +18,7 @@ export default function SettingsShell({
       {/* Centered container */}
       <div className="max-w-4xl mx-auto w-full px-4 sm:px-6 flex flex-col flex-1 pt-4 sm:pt-6">
         {/* Tabs wrapper */}
-        <Box className="bg-white rounded-xl p-2 mb-4 sm:mb-6">
+        <Box className="bg-white border border-[#DDDDDD] px-7.5 py-5 rounded-xl mb-4 sm:mb-6">
           <Tabs
             value={currentTab}
             onChange={(_, value) => router.push(`/settings/${value}`)}
@@ -29,7 +29,7 @@ export default function SettingsShell({
             sx={{
               minHeight: 40,
               "& .MuiTabs-flexContainer": {
-                gap: "4px",
+                gap: "24px",
               },
             }}
           >
@@ -57,7 +57,7 @@ export default function SettingsShell({
         </Box>
 
         {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto pb-4 sm:pb-6">{children}</div>
+        <div className="bg-white overflow-y-auto pb-4 mb-4 sm:pb-6 border border-[#DDDDDD] rounded-xl max-h-[calc(100vh-240px)]">{children}</div>
       </div>
     </div>
   );

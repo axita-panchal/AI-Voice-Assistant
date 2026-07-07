@@ -15,32 +15,12 @@ export default function ChartCard({
   children: React.ReactNode;
 }) {
   return (
-    <Box className="bg-white rounded-2xl p-4 w-full border border-gray-200 mt-7">
+    <Box className="bg-white rounded-2xl p-4 w-full border border-gray-200 mt-3 min-[1750px]:mt-7">
       {/* Header row */}
       <Box className="flex justify-between items-start mb-2">
         <Typography className=" text-gray-500" sx={{ fontSize: "14px" }}>
           {title}
         </Typography>
-
-        <Button
-          size="small"
-          variant="outlined"
-          sx={{
-            fontSize: "10px",
-            textTransform: "none",
-            gap: "6px",
-            minWidth: "auto",
-            padding: "4px 8px",
-          }}
-        >
-          Export
-          <Image
-            src="/assets/svgs/export.svg"
-            alt="Export"
-            width={12}
-            height={12}
-          />
-        </Button>
       </Box>
 
       {/* Value + percentage */}

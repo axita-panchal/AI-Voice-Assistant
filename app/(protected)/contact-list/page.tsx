@@ -18,9 +18,10 @@ import {
   MenuItem,
   Stack,
   Switch,
-  TextField,
   Typography,
+  Skeleton,
 } from "@mui/material";
+import CustomTextField from "@/components/common/CustomTextField";
 import { Add, DeleteOutline, EditOutlined } from "@mui/icons-material";
 import {
   useBulkDeleteContacts,
@@ -68,6 +69,7 @@ import IconButtonComp from "@/components/common/IconButton";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isValidPhoneNumber } from "react-phone-number-input";
+import TableActionButton from "@/components/common/TableActionButton";
 
 const listSchema = z.object({
   listName: z
@@ -206,6 +208,7 @@ export default function ContactListPage() {
     state: contact?.state ?? "",
     country: contact?.country ?? "",
     postal_code: contact?.postal_code ?? "",
+    updated_at: contact?.updated_at ?? "",
   });
 
   const mappedContacts = useMemo(
@@ -451,20 +454,16 @@ export default function ContactListPage() {
       className: "text-right min-w-[80px]",
       render: (row) => (
         <>
-          <IconButtonComp
+          <TableActionButton
+            icon="/remove.png"
+            tooltip="Delete"
             onClick={(e) => {
               e.stopPropagation();
               // handleDeleteContactList(row);
               setShowContactDeleteConfirmModal(true);
               setContactToDelete(row);
             }}
-            danger
-          >
-            <DeleteOutline
-              fontSize="small"
-              sx={{ fontSize: 16, cursor: "pointer" }}
-            />
-          </IconButtonComp>
+          />
         </>
       ),
     },
@@ -572,8 +571,8 @@ export default function ContactListPage() {
   };
 
   return (
-    <div className="p-4 sm:p-6 bg-[#F6F8FB]">
-      <Box className="p-6 rounded-2xl bg-white border border-gray-200">
+    <div className="py-6 px-15 bg-[#F6F8FB] h-full">
+      <Box className="bg-white h-full rounded-[20px] border border-[#DDDDDD] p-6">
         <Box
           className="custom-scroll"
           sx={{
@@ -588,67 +587,107 @@ export default function ContactListPage() {
             pb: 1,
           }}
         >
-          {listsWithCounts.map((list) => {
-            const isActive = activeListId === list.id;
-            const isAll = list.id === "all";
+          {isLoading && apiLists.length === 0
+            ? Array.from({ length: 4 }).map((_, index) => (
+                <Skeleton
+                  key={`list-skeleton-${index}`}
+                  variant="rectangular"
+                  width={140}
+                  height={40}
+                  sx={{ borderRadius: "10px", flexShrink: 0 }}
+                />
+              ))
+            : listsWithCounts.map((list) => {
+                const isActive = activeListId === list.id;
+                const isAll = list.id === "all";
 
-            return (
-              <Box
-                key={list.id}
-                onClick={() => setActiveListId(list.id)}
-                sx={{
-                  flexShrink: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  px: 2,
-                  py: 1,
-                  borderRadius: 2,
-                  cursor: "pointer",
-                  border: "1px solid",
-                  borderColor: isActive ? "#2F6AFF99" : "#E5E7EB",
-                  backgroundColor: isActive ? "#2f6aff1a" : "#00000008",
-                  color: isActive ? "#2F6AFF" : "#808080",
-                  "&:hover": {
-                    backgroundColor: isActive ? "#2f6aff26" : "#00000012",
-                  },
-                }}
-              >
-                {list.name}
-                <Chip size="small" label={list.count} sx={{ flexShrink: 0 }} />
-                {!isAll && (
-                  <>
-                    <IconButton
+                return (
+                  <Box
+                    key={list.id}
+                    onClick={() => setActiveListId(list.id)}
+                    sx={{
+                      position: "relative",
+                      flexShrink: 0,
+                      minWidth: "140px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      px: 2,
+                      py: 1,
+                      borderRadius: "10px",
+                      cursor: "pointer",
+                      border: "1px solid",
+                      borderColor: isActive ? "#2F6AFF99" : "#E5E7EB",
+                      backgroundColor: isActive ? "#2f6aff1a" : "#00000008",
+                      color: isActive ? "#2F6AFF" : "#808080",
+
+                      "&:hover .list-content": {
+                        opacity: !isAll ? 0.25 : 1,
+                      },
+
+                      "&:hover .action-buttons": {
+                        opacity: 1,
+                        visibility: "visible",
+                      },
+                    }}
+                  >
+                    {/* Main Content */}
+                    <Box
+                      className="list-content"
                       sx={{
-                        flexShrink: 0,
-                        "&:hover": {
-                          backgroundColor: "#fee2e2",
-                          color: "#dc2626",
-                        },
-                        fontSize: 16,
-                        padding: 0,
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setDeleteListId(list);
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        transition: "opacity 0.2s ease",
                       }}
                     >
-                      <DeleteOutline fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleOpenEditContactList(list.id);
-                      }}
-                      sx={{ fontSize: 16, padding: 0 }}
-                    >
-                      <EditOutlined fontSize="small" />
-                    </IconButton>
-                  </>
-                )}
-              </Box>
-            );
-          })}
+                      {list.name}
+
+                      <Chip
+                        size="small"
+                        label={list.count}
+                        sx={{ flexShrink: 0 }}
+                      />
+                    </Box>
+
+                    {/* Hover Actions */}
+                    {!isAll && (
+                      <Box
+                        className="action-buttons"
+                        sx={{
+                          position: "absolute",
+                          right: 8,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 0.5,
+                          opacity: 0,
+                          visibility: "hidden",
+                          transition: "all 0.2s ease",
+                        }}
+                      >
+                        <TableActionButton
+                          icon="/edit.png"
+                          tooltip="Edit"
+                          size={30}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenEditContactList(list.id);
+                          }}
+                        />
+                        <TableActionButton
+                          icon="/remove.png"
+                          tooltip="Delete"
+                          size={30}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteListId(list);
+                          }}
+                        />
+                      </Box>
+                    )}
+                  </Box>
+                );
+              })}
 
           <IconButton
             onClick={() => setIsListModalOpen(true)}
@@ -659,7 +698,7 @@ export default function ContactListPage() {
         </Box>
 
         {/* HEADER */}
-        <Box className="mt-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+        <Box className="mt-4 pt-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 border-t border-[#DDDDDD]">
           {/* LEFT SECTION */}
           <Stack direction="row" alignItems="center" gap={1}>
             <Image
@@ -676,7 +715,7 @@ export default function ContactListPage() {
           {/* RIGHT SECTION */}
           <Box className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
             {selectedRows?.length > 0 && (
-              <>
+              <Box className="flex items-center gap-2 w-full sm:w-auto px-6">
                 <Button
                   variant="outlined"
                   onClick={handleOpenSelectMenu}
@@ -719,21 +758,21 @@ export default function ContactListPage() {
                 </Menu>
                 {/* ✅ CONFIRM BUTTON RESTORED */}
                 <Button
-                  variant="contained"
+                  variant="outlined"
                   onClick={handleConfirmBulkAction}
                   disabled={!selectedBulkAction}
                   sx={{
-                    backgroundColor: "#2F6AFF",
                     textTransform: "none",
+                    borderRadius: "12px",
                     width: { xs: "100%", sm: "auto" },
                   }}
                 >
                   Confirm
                 </Button>
-              </>
+              </Box>
             )}
 
-            <Button
+            {/* <Button
               startIcon={
                 <Image
                   src="/assets/svgs/filter.svg"
@@ -748,6 +787,7 @@ export default function ContactListPage() {
                 fontSize: 13,
                 textTransform: "none",
                 color: "#909090",
+                borderRadius: "12px",
                 width: { xs: "100%", sm: "auto" },
               }}
             >
@@ -767,11 +807,12 @@ export default function ContactListPage() {
                 fontSize: 13,
                 textTransform: "none",
                 color: "#2F6AFF",
+                borderRadius: "12px",
                 width: { xs: "100%", sm: "auto" },
               }}
             >
               Upload
-            </Button>
+            </Button> */}
             <Button
               startIcon={<Add />}
               variant="contained"
@@ -779,6 +820,7 @@ export default function ContactListPage() {
               sx={{
                 backgroundColor: "#2F6AFF",
                 textTransform: "none",
+                borderRadius: "12px",
                 width: { xs: "100%", sm: "auto" },
               }}
             >
@@ -795,6 +837,7 @@ export default function ContactListPage() {
             selectedRows={selectedRows}
             onSelectionChange={setSelectedRows}
             onRowClick={(row) => handleOpenEdit(row)}
+            isLoading={isContactLoading && mappedContacts.length === 0}
           />
         </Box>
         {/* CREATE LIST MODAL */}
@@ -804,18 +847,45 @@ export default function ContactListPage() {
             setIsListModalOpen(false);
             resetCreateContactList();
           }}
-          fullWidth
-          maxWidth="xs"
-          sx={{ padding: "10px 24px" }}
+          slotProps={{
+            paper: {
+              sx: {
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: {
+                  xs: "92%",
+                  sm: "540px",
+                },
+                borderRadius: "20px",
+                overflow: "hidden",
+                boxShadow: "0px 16px 40px rgba(0,0,0,0.10)",
+                margin: 0,
+                backgroundColor: "#fff",
+              },
+            },
+          }}
         >
           <DialogTitle>Add Contact List</DialogTitle>
           <form
             onSubmit={createContactListHandleSubmit(handleCreateContactList)}
           >
             <DialogContent sx={{ padding: "10px 24px" }}>
-              <TextField
+              <Typography
+                sx={{
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  color: "#474747",
+                  mb: 1,
+                }}
+              >
+                List name
+              </Typography>
+
+              <CustomTextField
                 fullWidth
-                label="List name"
+                placeholder="Enter list name"
                 margin="normal"
                 {...register("listName")}
                 error={!!errors.listName}
@@ -824,13 +894,26 @@ export default function ContactListPage() {
               />
             </DialogContent>
 
-            <DialogActions>
+            <DialogActions sx={{ padding: "16px 24px" }}>
               <Button
                 onClick={() => {
                   setIsListModalOpen(false);
                   resetCreateContactList();
                 }}
-                sx={{ textTransform: "none" }}
+                sx={{
+                  width: "120px",
+                  height: "48px",
+                  borderRadius: "12px",
+                  backgroundColor: "#F3F3F3",
+                  color: "#6D6D6D",
+                  fontSize: "15px",
+                  fontWeight: 500,
+                  textTransform: "none",
+
+                  "&:hover": {
+                    backgroundColor: "#F3F3F3",
+                  },
+                }}
               >
                 Cancel
               </Button>
@@ -839,12 +922,22 @@ export default function ContactListPage() {
                 type="submit"
                 variant="contained"
                 sx={{
-                  textTransform: "capitalize",
-                  backgroundColor: "#1976d2",
-                  color: "#fff",
+                  height: "48px",
+                  width: "120px",
+                  borderRadius: "12px",
+                  backgroundColor: "#2F6AFF",
+                  fontSize: "15px",
+                  fontWeight: 500,
+                  textTransform: "none",
+
                   "&:hover": {
-                    backgroundColor: "#1976d2",
+                    backgroundColor: "#2F6AFF",
+                  },
+
+                  "&.Mui-disabled": {
+                    backgroundColor: "#3366FF",
                     color: "#fff",
+                    opacity: 0.7,
                   },
                 }}
                 disabled={isCreatingContactList}
@@ -863,23 +956,54 @@ export default function ContactListPage() {
         <Dialog
           open={!!deleteListId}
           onClose={() => setDeleteListId(null)}
-          fullWidth
-          maxWidth="xs"
-          PaperProps={{
-            sx: {
-              p: 1,
+          slotProps={{
+            paper: {
+              sx: {
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: {
+                  xs: "92%",
+                  sm: "540px",
+                },
+                borderRadius: "20px",
+                overflow: "hidden",
+                boxShadow: "0px 16px 40px rgba(0,0,0,0.10)",
+                margin: 0,
+                backgroundColor: "#fff",
+              },
             },
           }}
         >
-          <DialogTitle>Delete {deleteListId?.name || ""}?</DialogTitle>
+          <DialogTitle>
+            Delete{" "}
+            <span style={{ color: "#2F6AFF", fontWeight: 900 }}>
+              {deleteListId?.name || ""}
+            </span>
+            ?
+          </DialogTitle>
           <DialogContent>
             Are you sure you want to remove this contact list? This action
             cannot be undone.
           </DialogContent>
-          <DialogActions>
+          <DialogActions sx={{ padding: "16px 24px" }}>
             <Button
               onClick={() => setDeleteListId(null)}
-              sx={{ textTransform: "none", border: "1px solid #1976d2" }}
+              sx={{
+                width: "120px",
+                height: "48px",
+                borderRadius: "12px",
+                backgroundColor: "#F3F3F3",
+                color: "#6D6D6D",
+                fontSize: "15px",
+                fontWeight: 500,
+                textTransform: "none",
+
+                "&:hover": {
+                  backgroundColor: "#F3F3F3",
+                },
+              }}
             >
               Cancel
             </Button>
@@ -889,11 +1013,17 @@ export default function ContactListPage() {
               onClick={handleDeleteList}
               disabled={isDeletingContactList}
               sx={{
+                height: "48px",
+                width: "120px",
+                borderRadius: "12px",
+                fontSize: "15px",
+                fontWeight: 500,
                 textTransform: "none",
+
                 "&.Mui-disabled": {
-                  backgroundColor: "lab(48.4493% 77.4328 61.5452)",
+                  backgroundColor: "#3366FF",
                   color: "#fff",
-                  opacity: 1,
+                  opacity: 0.7,
                 },
               }}
               endIcon={

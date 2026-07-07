@@ -18,7 +18,7 @@ export const contactListService = {
     const res = await http.get(`/contact-list/`, {
       params: { limit, skip },
     });
-    return res?.data;
+    return res?.data || [];
   },
   getContactListById: async ({ contactListId }: { contactListId: string }) => {
     const res = await http.get(`/contact-list/${contactListId}`);
@@ -48,7 +48,7 @@ export const contactListService = {
     const res = await http.get(`/contact/`, {
       params: { limit, skip },
     });
-    return res?.data;
+    return res?.data || [];
   },
   getContactById: async ({ contactId }: { contactId: string }) => {
     const res = await http.get(`/contact/${contactId}`);

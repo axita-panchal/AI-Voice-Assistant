@@ -88,7 +88,7 @@ export default function AgentTabs({
           )}
 
           <button
-            className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="px-4 py-2 text-sm rounded-lg bg-[#2F6AFF] text-white whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-400"
             aria-label="Call me"
           >
             <span aria-hidden="true">📞</span> Call Me

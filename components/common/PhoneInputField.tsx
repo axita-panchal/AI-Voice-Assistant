@@ -10,18 +10,20 @@ type Props<T extends FieldValues> = {
   control: Control<T>;
   name: Path<T>;
   error?: string;
+  filled?: boolean;
 };
 
 export default function PhoneInputField<T extends FieldValues>({
   control,
   name,
   error,
+  filled
 }: Props<T>) {
   const [isFocused, setIsFocused] = useState(false);
 
   return (
     <div>
-      <label className="text-sm font-medium text-gray-700 mb-1 block">
+      <label className="text-sm min-[1750]:text-[18px] font-medium text-gray-700 mb-1 block">
         Phone
       </label>
 
@@ -48,6 +50,7 @@ export default function PhoneInputField<T extends FieldValues>({
             }}
             className={`
               rounded-md border px-3 py-2  transition-colors
+              ${filled ? "!bg-[#F6F8FB]" : "bg-white!"}
               ${
                 error
                   ? "border-red-700"
@@ -60,7 +63,7 @@ export default function PhoneInputField<T extends FieldValues>({
         )}
       />
 
-      {error && <p className="text-xs text-[#d32f2f] mt-1">{error}</p>}
+      {error && <p className="text-xs text-[#d32f2f] mt-1 ml-3">{error}</p>}
     </div>
   );
 }

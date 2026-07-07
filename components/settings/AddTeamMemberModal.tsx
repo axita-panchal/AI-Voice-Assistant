@@ -5,7 +5,6 @@ import {
   Modal,
   Box,
   Typography,
-  TextField,
   Button,
   MenuItem,
   Select,
@@ -14,16 +13,18 @@ import {
   InputLabel,
   CircularProgress,
 } from "@mui/material";
+import CustomTextField from "@/components/common/CustomTextField";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { useCreateUser, useUpdateUser } from "@/hooks/user/useUserMutations";
+import { useCreateUser, useUpdateUserProfile } from "@/hooks/user/useUserMutations";
 import { toast } from "@/utils/toast";
 import { AxiosError } from "axios";
 import { ApiErrorResponse } from "@/hooks/auth/useAuthMutations";
 import { useAllWorkspaces } from "@/hooks/workspace/useWorkspaceQueries";
+import { CustomFormSelect } from "../common/CustomFormSelect";
 
 /* ---------------------------------- */
 /* Types */
@@ -117,7 +118,7 @@ export default function AddTeamMemberModal({
   onSuccess,
 }: Props) {
   const { mutateAsync: createUser, isPending: isCreating } = useCreateUser();
-  const { mutateAsync: updateUser, isPending: isUpdating } = useUpdateUser();
+  const { mutateAsync: updateUserProfile, isPending: isUpdating } = useUpdateUserProfile();
 
   const user = useSelector((state: RootState) => state.auth.user);
   const { data: allWorkspaces } = useAllWorkspaces();
@@ -128,6 +129,7 @@ export default function AddTeamMemberModal({
     handleSubmit,
     control,
     register,
+    getValues,
     reset,
     watch,
     formState: { errors },
@@ -153,7 +155,7 @@ export default function AddTeamMemberModal({
         first_name: "",
         last_name: "",
         email: "",
-        role: "agency-owner",
+        role: "agency-admin",
         workspace: "",
       });
     }
@@ -173,15 +175,23 @@ export default function AddTeamMemberModal({
 
     try {
       if (member?.id) {
-        // update user
-        const updatedUserRes = await updateUser({
-          id: member.id,
-          ...payload,
-        });
+        // update user via FormData
+        const formData = new FormData();
+        formData.append("first_name", payload.first_name);
+        formData.append("last_name", payload.last_name);
+        formData.append("email", payload.email);
+        formData.append("role", payload.role);
+        formData.append("full_name", payload.full_name);
+        formData.append("is_admin", String(payload.is_admin));
+        formData.append("is_agency_owner", String(payload.is_agency_owner));
+        if (payload.sub_account_id) {
+          formData.append("sub_account_id", payload.sub_account_id);
+        }
+        await updateUserProfile({ id: member.id, formData });
         toast.success("User updated successfully");
       } else {
         // create user
-        const createdUserRes = await createUser(payload);
+        await createUser(payload);
         toast.success("User created successfully");
       }
 
@@ -208,7 +218,7 @@ export default function AddTeamMemberModal({
       -translate-x-1/2 -translate-y-1/2
       bg-white rounded-xl shadow-lg
       flex flex-col gap-4
-      w-[92%] sm:w-full max-w-md
+      w-[92%] sm:w-full max-w-xl
       p-4 sm:p-6
       max-h-[90vh] overflow-y-auto
     "
@@ -219,70 +229,117 @@ export default function AddTeamMemberModal({
 
         {/* Responsive grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <TextField
-            label="First Name"
-            size="small"
-            {...register("first_name")}
-            error={!!errors.first_name}
-          />
-          <TextField
-            label="Last Name"
-            size="small"
-            {...register("last_name")}
-            error={!!errors.last_name}
-          />
+          <Box>
+            <Typography
+              sx={{
+                fontSize: "14px",
+                fontWeight: 500,
+                color: "#474747",
+                mb: 1,
+              }}
+            >
+              First name
+            </Typography>
+
+            <CustomTextField
+              fullWidth
+              placeholder="First Name"
+              size="small"
+              {...register("first_name")}
+              error={!!errors.first_name}
+            />
+          </Box>
+          <Box>
+            <Typography
+              sx={{
+                fontSize: "14px",
+                fontWeight: 500,
+                color: "#474747",
+                mb: 1,
+              }}
+            >
+              Last name
+            </Typography>
+            <CustomTextField
+              fullWidth
+              placeholder="Last Name"
+              size="small"
+              {...register("last_name")}
+              error={!!errors.last_name}
+            />
+          </Box>
         </div>
-
-        <TextField
-          label="Email"
-          size="small"
-          {...register("email")}
-          error={!!errors.email}
-        />
-
-        <Controller
-          name="role"
-          control={control}
-          render={({ field }) => (
-            <FormControl size="small" error={!!errors.role}>
-              <InputLabel id="role-label">Role</InputLabel>
-              <Select {...field} label="Role">
-                {ROLES.map((r) => (
-                  <MenuItem key={r.value} value={r.value}>
-                    {r.label}
-                  </MenuItem>
-                ))}
-              </Select>
-              <FormHelperText>{errors.role?.message}</FormHelperText>
-            </FormControl>
-          )}
-        />
+        <Box>
+          <Typography
+            sx={{
+              fontSize: "14px",
+              fontWeight: 500,
+              color: "#474747",
+              mb: 1,
+            }}
+          >
+            Email
+          </Typography>
+          <CustomTextField
+            fullWidth
+            placeholder="Email"
+            size="small"
+            {...register("email")}
+            error={!!errors.email}
+          />
+        </Box>
+        <Box>
+          <CustomFormSelect
+            label="Role"
+            placeholder="Role"
+            defaultValue={getValues("role")}
+            error={errors.role?.message}
+            disabled={ROLES.length === 0}
+            options={ROLES.map((role) => ({
+              label: role.label,
+              value: role.value,
+              disabled:
+                (getValues("role") === "agency-owner" &&
+                  role.value !== "agency-owner") ||
+                role.value === "agency-owner",
+              // member?.role === "agency-owner" &&
+              // role.value !== "agency-owner", // only allow editing role if current role is agency-owner
+            }))}
+            {...register("role")}
+          />
+        </Box>
 
         {(selectedRole === "workspace-editor" ||
           selectedRole === "workspace-viewer") && (
-          <Controller
-            name="workspace"
-            control={control}
-            render={({ field }) => (
-              <FormControl size="small" error={!!errors.workspace}>
-                <InputLabel id="workspace-label">Workspace</InputLabel>
-                <Select {...field} label="Workspace">
-                  <MenuItem value="">
-                    <em>Select workspace</em>
-                  </MenuItem>
-                  {workspaceOptions.map((ws) => (
-                    <MenuItem key={ws.id} value={ws.id}>
-                      {ws.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            )}
-          />
+          <Box>
+            <CustomFormSelect
+              label="Workspace"
+              placeholder="Workspace"
+              defaultValue={getValues("workspace")}
+              error={errors.workspace?.message}
+              disabled={workspaceOptions.length === 0}
+              options={workspaceOptions.map((workspace) => ({
+                label: workspace.name,
+                value: workspace.id,
+              }))}
+              {...register("workspace")}
+            />
+          </Box>
         )}
 
         {/* Buttons responsive */}
-        <div className="flex flex-col sm:flex-row gap-3 mt-4">
+        <div className="flex gap-3 mt-4">
+          <Button
+            fullWidth
+            variant="outlined"
+            onClick={() => {
+              onClose();
+              reset();
+            }}
+            sx={{ textTransform: "capitalize", borderRadius: "10px" }}
+          >
+            Cancel
+          </Button>
           <Button
             fullWidth
             variant="contained"
@@ -290,6 +347,7 @@ export default function AddTeamMemberModal({
             onClick={handleSubmit(onSubmit)}
             sx={{
               textTransform: "capitalize",
+              borderRadius: "10px",
               backgroundColor: "#1976d2",
               color: "#fff",
               "&:hover": {
@@ -309,18 +367,6 @@ export default function AddTeamMemberModal({
             }
           >
             {member ? "Save Changes" : "Add Team Member"}
-          </Button>
-
-          <Button
-            fullWidth
-            variant="outlined"
-            onClick={() => {
-              onClose();
-              reset();
-            }}
-            sx={{ textTransform: "capitalize" }}
-          >
-            Cancel
           </Button>
         </div>
       </Box>

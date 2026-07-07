@@ -20,6 +20,7 @@ import { loginSuccess } from "@/store/slices/authSlice";
 import { ApiErrorResponse, useLogin } from "@/hooks/auth/useAuthMutations";
 import axios from "axios";
 import Image from "next/image";
+import AuthLayout from "@/components/common/AuthLayout";
 
 const schema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email address"),
@@ -57,17 +58,17 @@ export default function LoginPage() {
       if (res?.status === 200) {
         dispatch(
           loginSuccess({
-            user: res?.data?.data?.user,
-            access_token: res?.data?.data?.access_token,
-            refresh_token: res?.data?.data?.refresh_token,
+            user: res?.data?.user,
+            access_token: res?.data?.access_token,
+            refresh_token: res?.data?.refresh_token,
           }),
         );
         localStorage.setItem(
           "auth",
           JSON.stringify({
-            user: res?.data?.data?.user,
-            accessToken: res?.data?.data?.access_token,
-            refreshToken: res?.data?.data?.refresh_token,
+            user: res?.data?.user,
+            accessToken: res?.data?.access_token,
+            refreshToken: res?.data?.refresh_token,
             isAuthenticated: true,
           }),
         );
@@ -75,6 +76,7 @@ export default function LoginPage() {
         router.push("/dashboard");
       }
     } catch (error: unknown) {
+      console.log("Login error:", error);
       let message = "Something went wrong";
 
       if (axios.isAxiosError<ApiErrorResponse>(error)) {
@@ -89,119 +91,115 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="h-screen bg-linear-to-br from-indigo-500 via-blue-500 to-purple-600 p-6 flex items-center">
-      <div className="bg-white w-full flex rounded-3xl shadow-xl overflow-hidden max-w-6xl mx-auto">
-        {/* LEFT FORM */}
-        <div className="w-full min-[800px]:w-1/2 px-10 py-8 flex flex-col justify-center">
-          <h1 className="text-xl font-semibold text-gray-900">
-            Log in to your account
-          </h1>
+    <AuthLayout
+      title="Log in to your account"
+      subtitle="Welcome back! Enter your credentials to access your account"
+      footer={
+        <>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            disabled={isPending}
+             onClick={handleSubmit(onSubmit)}
+            sx={{
+              borderRadius: "10px",
+              textTransform: "none",
+              height: "50px",
+              fontSize: "15px",
+              fontWeight: 500,
+              backgroundColor: "#2563eb",
+              "&:hover": { backgroundColor: "#1d4ed8" },
+            }}
+          >
+            {isPending ? (
+              <CircularProgress size={20} sx={{ color: "#fff" }} />
+            ) : (
+              "Continue"
+            )}
+          </Button>
 
-          <p className="text-sm text-gray-500 mt-1 mb-4">
-            Welcome back! Enter your credentials to access your account
+          <p className="text-xs text-center text-gray-500 mt-4">
+            Don’t have an account?{" "}
+            <Link href="/signup" className="text-blue-600 hover:underline">
+              Sign up
+            </Link>
           </p>
-
-          <form className="space-y-3" onSubmit={handleSubmit(onSubmit)}>
-            {/* Email */}
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">
-                Email
-              </label>
-              <TextField
-                placeholder="Enter your email"
-                fullWidth
-                size="small"
-                sx={{ backgroundColor: "#F7F9FF" }}
-                {...register("email")}
-                error={!!errors.email}
-                helperText={errors.email?.message}
-              />
-            </div>
-
-            {/* Password */}
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">
-                Password
-              </label>
-              <TextField
-                placeholder="Enter your password"
-                type={showPassword ? "text" : "password"}
-                fullWidth
-                size="small"
-                sx={{ backgroundColor: "#F7F9FF" }}
-                {...register("password")}
-                error={!!errors.password}
-                helperText={errors.password?.message}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        size="small"
-                        onClick={() => setShowPassword(!showPassword)}
-                        onMouseDown={(e) => e.preventDefault()}
-                      >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </div>
-
-            {/* Forgot password */}
-            <div className="text-right">
-              <button
-                type="button"
-                className="text-sm text-blue-600 hover:underline cursor-pointer"
-                onClick={() => router.push("forgot-password")}
-              >
-                Forgot password?
-              </button>
-            </div>
-
-            {/* Submit */}
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              disabled={isPending}
-              sx={{
+        </>
+      }
+    >
+      <form
+        className="space-y-4 mx-auto w-full pb-6"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <div>
+          <label className="text-sm min-[1750]:text-[18px] font-medium text-gray-700 mb-2 block">
+            Email
+          </label>
+          <TextField
+            placeholder="Enter your email"
+            fullWidth
+            size="small"
+            autoComplete="new-password"
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                backgroundColor: "#F6F8FB",
                 borderRadius: "10px",
-                textTransform: "none",
-                py: 1.2,
-                mt: 1,
-                backgroundColor: "#2563eb",
-                "&:hover": { backgroundColor: "#1d4ed8" },
-              }}
-            >
-              {isPending ? (
-                <CircularProgress size={20} color="inherit" />
-              ) : (
-                "Continue"
-              )}
-            </Button>
-
-            <p className="text-xs text-center text-gray-500 mt-2">
-              Don’t have an account?{" "}
-              <Link href="/signup" className="text-blue-600 hover:underline">
-                Sign up
-              </Link>
-            </p>
-          </form>
-        </div>
-
-        {/* RIGHT IMAGE */}
-        <div className="hidden min-[800px]:flex w-1/2 p-10 items-center justify-center ">
-          <Image
-            src="/assets/svgs/login_logo.png"
-            alt="Login"
-            width={600}
-            height={600}
-            className="w-full h-full object-contain"
-            priority
+                height: "48px",
+              },
+            }}
+            {...register("email")}
+            error={!!errors.email}
+            helperText={errors.email?.message}
           />
         </div>
-      </div>
-    </div>
+
+        <div>
+          <label className="text-sm min-[1750]:text-[18px] font-medium text-gray-700 mb-2 block">
+            Password
+          </label>
+          <TextField
+            placeholder="Enter your password"
+            type={showPassword ? "text" : "password"}
+            fullWidth
+            size="small"
+            autoComplete="new-password"
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                backgroundColor: "#F6F8FB",
+                borderRadius: "10px",
+                height: "48px",
+              },
+            }}
+            {...register("password")}
+            error={!!errors.password}
+            helperText={errors.password?.message}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    size="small"
+                    onClick={() => setShowPassword(!showPassword)}
+                    onMouseDown={(e) => e.preventDefault()}
+                  >
+                    {showPassword ? <Visibility /> : <VisibilityOff />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </div>
+
+        <div className="text-right">
+          <button
+            type="button"
+            className="text-sm text-blue-600 hover:underline cursor-pointer"
+            onClick={() => router.push("forgot-password")}
+          >
+            Forgot password?
+          </button>
+        </div>
+      </form>
+    </AuthLayout>
   );
 }

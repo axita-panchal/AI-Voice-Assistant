@@ -1,14 +1,10 @@
-import Header from "@/components/common/Header";
-
 export default function CampaignLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="bg-[#F6F8FB] flex-1  overflow-auto">{children}</main>
-    </div>
+    <main className="flex-1 overflow-auto lg:overflow-hidden">{children}</main>
   );
 }
+

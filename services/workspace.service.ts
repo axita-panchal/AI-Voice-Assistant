@@ -9,7 +9,7 @@ export const workspaceService = {
     const res = await http.get("/subaccount", {
       params: { skip, limit },
     });
-    return res.data;
+    return res.data || [];
   },
 
   getWorkspaceById: (id: string) => {

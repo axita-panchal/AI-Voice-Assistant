@@ -45,19 +45,17 @@ export const useCreateUser = () => {
   });
 };
 
-/* ---------------- UPDATE ---------------- */
-export const useUpdateUser = () => {
+/* ---------------- UPDATE PROFILE (FormData) ---------------- */
+export const useUpdateUserProfile = () => {
   const queryClient = useQueryClient();
 
   return useMutation<
     AxiosResponse<CreateUserResponse>,
     AxiosError<ApiErrorResponse>,
-    UpdateUserPayload
+    { id: string; formData: FormData }
   >({
-    mutationFn: userService.updateUser,
-
+    mutationFn: userService.updateUserProfile,
     onSuccess: () => {
-      //  refetch ALL paginated user queries
       queryClient.invalidateQueries({
         queryKey: ["users"],
         exact: false,
@@ -65,7 +63,6 @@ export const useUpdateUser = () => {
     },
   });
 };
-/* ---------------- DELETE ---------------- */
 
 export const useDeleteUser = () => {
   const queryClient = useQueryClient();

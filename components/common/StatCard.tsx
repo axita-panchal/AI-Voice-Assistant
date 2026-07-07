@@ -31,7 +31,7 @@ export default function StatCommonCard({
       </Typography>
 
       {/* Value + SubText */}
-      <Box className="flex flex-wrap items-center gap-2 mt-7">
+      <Box className="flex flex-wrap items-center gap-2 mt-3 min-[1750px]:mt-7">
         <Typography
           sx={{
             fontSize: { xs: "20px", sm: "22px", md: "26px" },

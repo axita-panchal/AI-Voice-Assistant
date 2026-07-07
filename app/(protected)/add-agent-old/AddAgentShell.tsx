@@ -1,12 +1,7 @@
 "use client";
 
-import {
-  Button,
-  MenuItem,
-  Select,
-  TextField,
-  FormControl,
-} from "@mui/material";
+import { Button, MenuItem, Select, FormControl } from "@mui/material";
+import CustomTextField from "@/components/common/CustomTextField";
 import { ArrowBack } from "@mui/icons-material";
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
@@ -81,7 +76,7 @@ export default function AddAgentShell({
                         className={`px-4 py-2 rounded-full text-sm border whitespace-nowrap transition cursor-pointer 
                           ${
                             isActive
-                              ? "bg-blue-600 border-blue-600 text-white"
+                              ? "bg-[#2F6AFF] border-blue-600 text-white"
                               : "border-gray-300 text-gray-600 hover:bg-gray-50"
                           }`}
                       >
@@ -102,7 +97,7 @@ export default function AddAgentShell({
                     ✨ Add Prompt
                   </button>
                 )}
-                <button className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white">
+                <button className="px-4 py-2 text-sm rounded-lg bg-[#2F6AFF] text-white">
                   📞 Call Me
                 </button>
               </div>
@@ -180,7 +175,7 @@ export default function AddAgentShell({
 
             {/* Footer */}
             <div className="px-5 py-4 flex gap-3 ">
-              <button className="bg-blue-600 text-white rounded-lg py-2 px-6 text-sm font-medium hover:bg-blue-700 cursor-pointer">
+              <button className="bg-[#2F6AFF] text-white rounded-lg py-2 px-6 text-sm font-medium hover:bg-blue-700 cursor-pointer">
                 Insert
               </button>
               <button
@@ -213,7 +208,7 @@ function LeftForm({ form, setForm }: LeftFormProps) {
 
       <div className="space-y-4">
         <Field label="Name">
-          <TextField
+          <CustomTextField
             fullWidth
             size="small"
             value={form.name}
@@ -222,7 +217,7 @@ function LeftForm({ form, setForm }: LeftFormProps) {
         </Field>
 
         <Field label="Description">
-          <TextField
+          <CustomTextField
             fullWidth
             size="small"
             value={form.description}
@@ -231,7 +226,7 @@ function LeftForm({ form, setForm }: LeftFormProps) {
         </Field>
 
         <Field label="Opening Line">
-          <TextField
+          <CustomTextField
             fullWidth
             size="small"
             value={form.openingLine}

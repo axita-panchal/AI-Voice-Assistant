@@ -10,6 +10,7 @@ type User = {
   is_admin: boolean;
   is_agency_owner: boolean;
   account_id: string;
+  profile_pic?: string | null;
 };
 
 type AuthState = {
@@ -58,8 +59,15 @@ const authSlice = createSlice({
       state.refreshToken = action.payload.refreshToken;
       state.isAuthenticated = action.payload.isAuthenticated;
     },
+
+    updateUserProfile: (state, action: PayloadAction<Partial<User>>) => {
+      if (state.user) {
+        state.user = { ...state.user, ...action.payload };
+      }
+    },
   },
 });
 
-export const { loginSuccess, logout, hydrateAuth } = authSlice.actions;
+export const { loginSuccess, logout, hydrateAuth, updateUserProfile } =
+  authSlice.actions;
 export default authSlice.reducer;

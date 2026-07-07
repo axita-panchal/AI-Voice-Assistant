@@ -42,9 +42,15 @@ const processQueue = (error: unknown, token: string | null = null) => {
     if (error) prom.reject(error);
     else prom.resolve(token);
   });
-
   failedQueue = [];
 };
+
+/**
+ * Dispatched on window after a successful token refresh.
+ * ReactQueryProvider listens for this and calls queryClient.resetQueries()
+ * so all queries in error/stale state re-fetch with the new token.
+ */
+export const TOKEN_REFRESHED_EVENT = "auth:token-refreshed";
 
 /* ---------------- REQUEST ---------------- */
 
@@ -74,7 +80,6 @@ http.interceptors.response.use(
     }
 
     const originalRequest = error.config as RetryRequest;
-
     const status = error.response?.status;
     const url = originalRequest.url ?? "";
     const isAuthRoute = AUTH_ROUTES.some((r) => url.includes(r));
@@ -83,6 +88,7 @@ http.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    // ── Queue concurrent 401s while a refresh is already in flight ──────────
     if (isRefreshing) {
       return new Promise((resolve, reject) => {
         failedQueue.push({
@@ -91,10 +97,8 @@ http.interceptors.response.use(
               reject(new Error("Token refresh failed"));
               return;
             }
-
             originalRequest.headers = originalRequest.headers ?? {};
             originalRequest.headers.Authorization = `Bearer ${token}`;
-
             resolve(http(originalRequest));
           },
           reject,
@@ -107,38 +111,41 @@ http.interceptors.response.use(
 
     try {
       const refreshToken = localStorage.getItem("refresh_token");
-
       if (!refreshToken) throw new Error("No refresh token");
 
       const refreshRes = await refreshHttp.post(
         "/authentication/refresh-token",
-        {
-          refresh_token: refreshToken,
-        },
+        { refresh_token: refreshToken },
       );
 
       const newToken = refreshRes?.data?.data?.access_token;
-
       if (!newToken) throw new Error("Invalid refresh response");
 
+      // Persist and apply the new token everywhere.
       localStorage.setItem("access_token", newToken);
-
       http.defaults.headers.common.Authorization = `Bearer ${newToken}`;
 
+      // Unblock any queued requests.
       processQueue(null, newToken);
 
       originalRequest.headers = originalRequest.headers ?? {};
       originalRequest.headers.Authorization = `Bearer ${newToken}`;
 
-      return http(originalRequest);
+      // Retry the original request with the new token.
+      const retryResponse = await http(originalRequest);
+
+      // Signal React Query AFTER the retry succeeds so resetQueries()
+      // triggers a clean re-fetch for every other query in the cache.
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event(TOKEN_REFRESHED_EVENT));
+      }
+
+      return retryResponse;
     } catch (err) {
       processQueue(err, null);
-
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
-
       window.location.href = "/login";
-
       return Promise.reject(err);
     } finally {
       isRefreshing = false;

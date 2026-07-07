@@ -1,4 +1,5 @@
-import { Popover, TextField, MenuItem, Button } from "@mui/material";
+import { Popover, MenuItem, Button } from "@mui/material";
+import CustomTextField from "@/components/common/CustomTextField";
 import { Control, Controller, FieldErrors } from "react-hook-form";
 import PhoneInputField from "@/components/common/PhoneInputField";
 import { isValidPhoneNumber } from "react-phone-number-input";
@@ -67,7 +68,7 @@ export default function ContactFilterPopover({
               name="first_name"
               control={control}
               render={({ field }) => (
-                <TextField {...field} fullWidth size="small" />
+                <CustomTextField {...field} fullWidth size="small" />
               )}
             />
           </div>
@@ -79,7 +80,7 @@ export default function ContactFilterPopover({
               name="last_name"
               control={control}
               render={({ field }) => (
-                <TextField {...field} fullWidth size="small" />
+                <CustomTextField {...field} fullWidth size="small" />
               )}
             />
           </div>
@@ -101,11 +102,11 @@ export default function ContactFilterPopover({
               control={control}
               defaultValue="all"
               render={({ field }) => (
-                <TextField {...field} select fullWidth size="small">
+                <CustomTextField {...field} select fullWidth size="small">
                   <MenuItem value="all">All Outcomes</MenuItem>
                   <MenuItem value="answered">Answered</MenuItem>
                   <MenuItem value="missed">Missed</MenuItem>
-                </TextField>
+                </CustomTextField>
               )}
             />
           </div>

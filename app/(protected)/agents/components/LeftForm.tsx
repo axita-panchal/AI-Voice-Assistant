@@ -5,11 +5,12 @@ import {
   Button,
   MenuItem,
   Select,
-  TextField,
   FormControl,
   CircularProgress,
 } from "@mui/material";
+import CustomTextField from "@/components/common/CustomTextField";
 import { useRouter } from "next/navigation";
+import { CustomFormSelect } from "@/components/common/CustomFormSelect";
 
 type AgentForm = {
   name: string;
@@ -56,7 +57,7 @@ export default function LeftForm({
 
       <div className="flex-1 overflow-y-auto pb-6 space-y-4 pr-2 ">
         <Field label="Name" htmlFor="agent-name">
-          <TextField
+          <CustomTextField
             id="agent-name"
             fullWidth
             size="small"
@@ -66,7 +67,7 @@ export default function LeftForm({
         </Field>
 
         <Field label="Description" htmlFor="agent-description">
-          <TextField
+          <CustomTextField
             id="agent-description"
             fullWidth
             size="small"
@@ -78,7 +79,7 @@ export default function LeftForm({
         </Field>
 
         <Field label="Opening Line" htmlFor="agent-first_message">
-          <TextField
+          <CustomTextField
             id="agent-first_message"
             fullWidth
             size="small"
@@ -92,30 +93,30 @@ export default function LeftForm({
         </Field>
 
         <Field label="Language" htmlFor="agent-language">
-          <FormControl fullWidth size="small">
-            <Select
-              id="agent-language"
-              value={form.language}
-              onChange={(e) =>
-                setForm({ ...form, language: e.target.value as string })
-              }
-            >
-              <MenuItem value="English">English</MenuItem>
-            </Select>
-          </FormControl>
+          <CustomFormSelect
+            id="agent-language"
+            label=""
+            fullWidth
+            size="small"
+            value={form.language}
+            onChange={(e) =>
+              setForm({ ...form, language: e.target.value as string })
+            }
+            options={[{ label: "English", value: "English" }]}
+          />
         </Field>
         <Field label="Voice" htmlFor="agent-voice">
-          <FormControl fullWidth size="small">
-            <Select
-              id="agent-voice"
-              value={form.voice}
-              onChange={(e) =>
-                setForm({ ...form, voice: e.target.value as string })
-              }
-            >
-              <MenuItem value="Joseph (English)">Joseph (English)</MenuItem>
-            </Select>
-          </FormControl>
+          <CustomFormSelect
+            id="agent-voice"
+            label=""
+            fullWidth
+            size="small"
+            value={form.voice}
+            onChange={(e) =>
+              setForm({ ...form, voice: e.target.value as string })
+            }
+            options={[{ label: "Joseph (English)", value: "Joseph (English)" }]}
+          />
         </Field>
       </div>
 
