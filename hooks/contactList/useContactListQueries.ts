@@ -1,5 +1,4 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { agentService } from "@/services/agent.service";
 import { contactListService } from "@/services/contactList.service";
 
 //* ================= contactlist Queries ================= */
@@ -12,7 +11,6 @@ export const useGetContactList = (limit: number, skip: number) => {
         skip,
       }),
     enabled: true,
-    staleTime: 0,
   });
 };
 export const useContactListById = (contactListId?: string) => {
@@ -23,7 +21,6 @@ export const useContactListById = (contactListId?: string) => {
         contactListId: contactListId!,
       }),
     enabled: !!contactListId,
-    staleTime: 0,
   });
 };
 
@@ -37,7 +34,6 @@ export const useGetContact = (limit: number, skip: number) => {
         skip,
       }),
     enabled: true,
-    staleTime: 0,
   });
 };
 export const useContactById = (contactId?: string) => {
@@ -48,6 +44,6 @@ export const useContactById = (contactId?: string) => {
         contactId: contactId!,
       }),
     enabled: !!contactId,
-    staleTime: 0,
   });
 };
+

@@ -27,6 +27,8 @@ import { toast } from "@/utils/toast";
 import axios from "axios";
 import { ApiErrorResponse } from "@/hooks/auth/useAuthMutations";
 import Image from "next/image";
+import TableActionButton from "@/components/common/TableActionButton";
+import { API_ROLE_TO_KEY } from "@/utils/enums";
 
 type Agent = {
   id: number;
@@ -47,7 +49,11 @@ const AgentList = () => {
   const limit = 20;
   const skip = (page - 1) * limit;
 
-  const { data: agentsResponse } = useAgents(limit, skip, subaccountId);
+  const { data: agentsResponse, isLoading } = useAgents(
+    limit,
+    skip,
+    subaccountId,
+  );
   const agents = agentsResponse?.data?.agents || [];
 
   const { mutateAsync: deleteAgent, isPending } = useDeleteAgent();
@@ -105,30 +111,28 @@ const AgentList = () => {
       label: "Actions",
       render: (row) => (
         <div className="flex gap-2">
-          <IconButton
+          {/* <TableActionButton
+            icon="/copy.png"
+            tooltip="Copy"
             onClick={(e) => {
               e.stopPropagation();
             }}
-          >
-            <ContentCopyIcon sx={{ fontSize: 16, cursor: "pointer" }} />
-          </IconButton>
-
-          <IconButton
-            danger
+          /> */}
+          <TableActionButton
+            icon="/remove.png"
+            tooltip="Delete"
             onClick={(e) => {
               e.stopPropagation();
               setAgentToDelete(row);
               setDeleteOpen(true);
             }}
-          >
-            <DeleteOutlineIcon sx={{ fontSize: 16, cursor: "pointer" }} />
-          </IconButton>
+          />
         </div>
       ),
     },
   ];
 
-  const isEmpty = agents.length === 0;
+  const isEmpty = !isLoading && agents.length === 0;
 
   const handleCreateAgent = () => {
     if (!subaccountId) {
@@ -140,9 +144,9 @@ const AgentList = () => {
   };
 
   return (
-    <div className="p-6 bg-[#F6F8FB]">
-      {!isEmpty ? (
-        <Box className="p-6 rounded-2xl bg-white shadow-sm border border-gray-200">
+    <div className="py-6 px-15 bg-[#F6F8FB] h-full">
+      {!subaccountId || isLoading || !isEmpty ? (
+        <Box className="p-6 h-full rounded-[20px] bg-white border border-[#DDDDDD]">
           {/* Header */}
           <div className="flex items-center justify-between">
             <h2 className="text-base sm:text-lg font-semibold text-gray-800 flex items-center gap-2">
@@ -155,13 +159,17 @@ const AgentList = () => {
               List of agents
             </h2>
 
-            <button
-              onClick={() => setOpenModal(true)}
-              className="flex items-center gap-2 bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
-            >
-              <AddIcon sx={{ fontSize: 16 }} />
-              New Agent
-            </button>
+            {user &&
+              (API_ROLE_TO_KEY[user.role] === "agency-owner" ||
+                API_ROLE_TO_KEY[user.role] === "agency-admin") && (
+                <button
+                  onClick={() => setOpenModal(true)}
+                  className="flex items-center gap-2 bg-[#2F6AFF] text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
+                >
+                  <AddIcon sx={{ fontSize: 16 }} />
+                  New Agent
+                </button>
+              )}
           </div>
 
           {/* Table */}
@@ -170,6 +178,7 @@ const AgentList = () => {
               columns={columns}
               data={agents}
               onRowClick={handleRowClick}
+              isLoading={!subaccountId || (isLoading && agents.length === 0)}
             />
           </div>
         </Box>
@@ -177,11 +186,11 @@ const AgentList = () => {
         // ✅ Empty State
         <Box className="flex items-center justify-center min-h-[70vh] bg-gray-100 rounded-xl">
           <Box className="text-center max-w-2xl px-6">
-            <Typography variant="h4" sx={{ fontWeight: 700, mb: 2 }}>
+            <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
               Welcome {user?.first_name || "User"}!
             </Typography>
 
-            <Typography sx={{ fontSize: 18, mb: 4, lineHeight: 1.6 }}>
+            <Typography sx={{ fontSize: 14, mb: 4, lineHeight: 1.6 }}>
               To get started, create your first AI agent by clicking the button
               below.
             </Typography>

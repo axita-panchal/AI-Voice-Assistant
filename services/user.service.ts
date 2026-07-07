@@ -11,7 +11,7 @@ export const userService = {
     const res = await http.get("/users", {
       params: { limit, skip },
     });
-    return res?.data;
+    return res?.data || [];
   },
 
   getUserById: async (id: string) => {
@@ -26,8 +26,14 @@ export const userService = {
     const res = await http.delete(`/users/${id}`);
     return res;
   },
-  updateUser: async (payload: UpdateUserPayload) => {
-    const res = await http.patch(`/users/${payload?.id}`, payload);
+  updateUserProfile: async ({
+    id,
+    formData,
+  }: {
+    id: string;
+    formData: FormData;
+  }) => {
+    const res = await http.patch(`/users/${id}`, formData);
     return res;
   },
 };

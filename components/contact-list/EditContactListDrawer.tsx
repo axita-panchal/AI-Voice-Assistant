@@ -6,12 +6,12 @@ import {
   Checkbox,
   Drawer,
   IconButton,
-  TextField,
   Typography,
   Avatar,
   Stack,
   MenuItem,
 } from "@mui/material";
+import CustomTextField from "@/components/common/CustomTextField";
 import { Close } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import {
@@ -122,17 +122,40 @@ export default function EditContactListDrawer({
         {/* ================= FORM (SCROLLABLE) ================= */}
         <Box className="flex-1 overflow-y-auto px-4 sm:px-6 py-4">
           <Box>
-            <TextField
+            <Typography
+              sx={{
+                fontSize: "14px",
+                fontWeight: 500,
+                color: "#474747",
+              }}
+            >
+              List name
+            </Typography>
+
+            <CustomTextField
               fullWidth
-              label="List name"
+              size="small"
+              placeholder="List name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               margin="normal"
             />
-            <TextField
+
+             <Typography
+              sx={{
+                fontSize: "14px",
+                fontWeight: 500,
+                color: "#474747",
+                marginTop: "16px",
+              }}
+            >
+              Campaign
+            </Typography>
+            <CustomTextField
               select
               fullWidth
-              label="Campaign"
+              size="small"
+              placeholder="Campaign"
               value={campaign ?? ""}
               onChange={(e) => setCampaign(e.target.value)}
               margin="normal"
@@ -146,7 +169,7 @@ export default function EditContactListDrawer({
                   {item.name}
                 </MenuItem>
               ))}
-            </TextField>
+            </CustomTextField>
           </Box>
 
           {/* ================= CONTACTS ================= */}
@@ -184,21 +207,20 @@ export default function EditContactListDrawer({
         {/* ================= FOOTER (STICKY) ================= */}
         <Box className="px-4 sm:px-6 py-4 bg-white flex flex-col sm:flex-row gap-2">
           <Button
-            variant="contained"
-            onClick={handleSubmit}
-            fullWidth
-            sx={{ textTransform: "none" }}
-          >
-            Finish
-          </Button>
-
-          <Button
             onClick={onClose}
             variant="outlined"
             fullWidth
-            sx={{ textTransform: "none" }}
+            sx={{ textTransform: "none", borderRadius: "12px" }}
           >
             Cancel
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleSubmit}
+            fullWidth
+            sx={{ textTransform: "none", borderRadius: "12px" }}
+          >
+            Finish
           </Button>
         </Box>
       </Box>

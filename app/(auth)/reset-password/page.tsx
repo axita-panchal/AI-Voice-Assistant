@@ -21,6 +21,7 @@ import {
 } from "@/hooks/auth/useAuthMutations";
 import axios from "axios";
 import Image from "next/image";
+import AuthLayout from "@/components/common/AuthLayout";
 
 const schema = z
   .object({
@@ -100,118 +101,123 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="h-screen bg-linear-to-br from-indigo-500 via-blue-500 to-purple-600 p-6 flex items-center">
-      <div className="bg-white w-full flex rounded-3xl shadow-xl overflow-hidden max-w-6xl mx-auto">
-        {/* LEFT FORM */}
-        <div className="w-full min-[800px]:w-1/2 px-10 py-8 flex flex-col justify-center">
-          <h1 className="text-xl font-semibold text-gray-900">
-            Reset your Password
-          </h1>
+    <AuthLayout
+      title="Reset your Password"
+      subtitle="Please kindly set your new password"
+      footer={
+        <>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            disabled={isPending}
+            onClick={handleSubmit(onSubmit)}
+            sx={{
+              borderRadius: "10px",
+              textTransform: "none",
+              height: "50px",
+              fontSize: "15px",
+              fontWeight: 500,
+              backgroundColor: "#2563eb",
+              "&:hover": {
+                backgroundColor: "#1d4ed8",
+                "&:hover": {
+                  backgroundColor: "#1d4ed8",
+                },
+              },
+            }}
+          >
+            {isPending ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              "Update"
+            )}
+          </Button>
 
-          <p className="text-sm text-gray-500 mt-1 mb-4">
-            Please kindly set your new password
+          <p className="text-xs text-center text-gray-500 mt-4">
+            Don’t have an account?{" "}
+            <Link href="/signup" className="text-blue-600 hover:underline">
+              Sign up
+            </Link>
           </p>
-
-          <form className="space-y-3" onSubmit={handleSubmit(onSubmit)}>
-            {/* Password */}
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">
-                New password
-              </label>
-              <TextField
-                placeholder="*****************"
-                type={showPassword ? "text" : "password"}
-                fullWidth
-                size="small"
-                sx={{ backgroundColor: "#F7F9FF" }}
-                {...register("password")}
-                error={!!errors.password}
-                helperText={errors.password?.message}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        size="small"
-                        onClick={() => setShowPassword(!showPassword)}
-                        onMouseDown={(e) => e.preventDefault()}
-                      >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </div>
-
-            {/* confirm Password */}
-            <TextField
-              placeholder="*****************"
-              type={showConfirmPassword ? "text" : "password"}
-              fullWidth
-              size="small"
-              sx={{ backgroundColor: "#F7F9FF" }}
-              {...register("confirm_password")}
-              error={!!errors.confirm_password}
-              helperText={errors.confirm_password?.message}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      size="small"
-                      onClick={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                      }
-                      onMouseDown={(e) => e.preventDefault()}
-                    >
-                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-
-            {/* Submit */}
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              disabled={isPending}
-              sx={{
+        </>
+      }
+    >
+      <form
+        className="space-y-4 mx-auto w-full pb-6"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        {/* Password */}
+        <div>
+          <label className="text-sm font-medium text-gray-700 mb-2 block">
+            New password
+          </label>
+          <TextField
+            placeholder="*****************"
+            type={showPassword ? "text" : "password"}
+            fullWidth
+            size="small"
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                backgroundColor: "#F6F8FB",
                 borderRadius: "10px",
-                textTransform: "none",
-                py: 1.2,
-                mt: 1,
-                backgroundColor: "#2563eb",
-                "&:hover": { backgroundColor: "#1d4ed8" },
-              }}
-            >
-              {isPending ? (
-                <CircularProgress size={20} color="inherit" />
-              ) : (
-                "Send Email"
-              )}
-            </Button>
-
-            <p className="text-xs text-center text-gray-500 mt-2">
-              Don’t have an account?{" "}
-              <Link href="/signup" className="text-blue-600 hover:underline">
-                Sign up
-              </Link>
-            </p>
-          </form>
-        </div>
-
-        {/* RIGHT IMAGE */}
-        <div className="hidden min-[800px]:flex w-1/2 p-10 items-center justify-center ">
-          <Image
-            src="/assets/svgs/login_logo.png"
-            alt="Login"
-            className="object-contain"
-            width={600}
-            height={600}
+                height: "48px",
+              },
+            }}
+            {...register("password")}
+            error={!!errors.password}
+            helperText={errors.password?.message}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    size="small"
+                    onClick={() => setShowPassword(!showPassword)}
+                    onMouseDown={(e) => e.preventDefault()}
+                  >
+                    {showPassword ? <Visibility /> : <VisibilityOff />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
         </div>
-      </div>
-    </div>
+        <div>
+          <label className="text-sm font-medium text-gray-700 mb-2 block">
+            Confirm password
+          </label>
+          {/* confirm Password */}
+          <TextField
+            placeholder="*****************"
+            type={showConfirmPassword ? "text" : "password"}
+            fullWidth
+            size="small"
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                backgroundColor: "#F6F8FB",
+                borderRadius: "10px",
+                height: "48px",
+              },
+            }}
+            {...register("confirm_password")}
+            error={!!errors.confirm_password}
+            helperText={errors.confirm_password?.message}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    size="small"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    onMouseDown={(e) => e.preventDefault()}
+                  >
+                    {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </div>
+      </form>
+    </AuthLayout>
   );
 }

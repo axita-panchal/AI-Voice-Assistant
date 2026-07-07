@@ -120,7 +120,7 @@ function ActionRow({
             ${
               isOpen
                 ? "bg-gray-200 text-gray-700"
-                : "bg-blue-600 hover:bg-blue-700 text-white"
+                : "bg-[#2F6AFF] hover:bg-blue-700 text-white"
             }`}
         >
           <span className="text-base leading-none">{isOpen ? "−" : "+"}</span>

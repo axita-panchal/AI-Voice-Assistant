@@ -16,7 +16,6 @@ export const useAgents = (
         subaccountId: subaccountId as string,
       }),
     enabled: !!subaccountId,
-    staleTime: 0,
     retry: 1,
     refetchOnWindowFocus: false,
     placeholderData: keepPreviousData,

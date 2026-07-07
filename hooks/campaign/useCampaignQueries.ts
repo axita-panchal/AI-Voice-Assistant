@@ -14,6 +14,6 @@ export const useCampaigns = (limit: number, skip: number) =>
     queryFn: () => campaignService.getCampaigns({ limit, skip }),
     placeholderData: keepPreviousData,
     retry: 1,
-    staleTime: 0, // ✅ force refetch on invalidate retry: 1,
     refetchOnWindowFocus: false,
   });
+

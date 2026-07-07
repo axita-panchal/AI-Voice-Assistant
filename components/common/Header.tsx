@@ -16,8 +16,10 @@ import {
   Menu,
   Divider,
   ListItemIcon,
+  Button,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import CallIcon from "@mui/icons-material/Call";
 import clsx from "clsx";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
@@ -29,6 +31,7 @@ import {
 import { useAllWorkspaces } from "@/hooks/workspace/useWorkspaceQueries";
 import { subAccountsType } from "@/types/workspace.types";
 import Image from "next/image";
+import MakeCallDrawer from "@/components/common/MakeCallDrawer";
 
 const NAV_ITEMS = [
   {
@@ -43,12 +46,14 @@ const NAV_ITEMS = [
     href: "/contact-list",
     icon: "/assets/svgs/contacts.svg",
   },
-  {
-    label: "Recordings",
-    href: "/recordings",
-    icon: "/assets/svgs/recordings.svg",
-  },
+  // {
+  //   label: "Recordings",
+  //   href: "/recordings",
+  //   icon: "/assets/svgs/recordings.svg",
+  // },
 ];
+
+const EMPTY_SUBACCOUNTS: subAccountsType[] = [];
 
 export default function Header() {
   const router = useRouter();
@@ -66,7 +71,7 @@ export default function Header() {
 
   const { data: allWorkspaces, isLoading } = useAllWorkspaces(skip, limit);
 
-  const subaccounts = allWorkspaces?.data?.subaccounts || [];
+  const subaccounts = allWorkspaces?.data?.subaccounts ?? EMPTY_SUBACCOUNTS;
 
   useEffect(() => {
     if (!subaccounts || subaccounts.length === 0) {
@@ -94,8 +99,14 @@ export default function Header() {
     }
   }, [subaccounts, activeWorkspace, dispatch]);
 
+  const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL ?? "";
+  const avatarSrc = user?.profile_pic
+    ? `${frontendUrl}${user.profile_pic}`
+    : "/avatar.png";
+
   const isSmallScreen = useMediaQuery("(max-width:1000px)");
   const [open, setOpen] = useState(false);
+  const [makeCallOpen, setMakeCallOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const openMenu = Boolean(anchorEl);
 
@@ -125,15 +136,24 @@ export default function Header() {
       <AppBar
         position="sticky"
         elevation={0}
-        className="border-b border-gray-200"
-        sx={{ backgroundColor: "#fff", height: 84, justifyContent: "center" }}
+        sx={{
+          backgroundColor: "#fff",
+          borderBottom: "1px solid #E5E7EB",
+          height: 72,
+          justifyContent: "center",
+        }}
       >
         <Toolbar
-          sx={{ height: 84, minHeight: 84 }}
-          className="flex justify-between px-4"
+          sx={{
+            height: 72,
+            minHeight: "72px !important",
+            px: { xs: 2, md: 8 },
+            alignItems: "center",
+          }}
+          className="flex justify-between"
         >
-          {/* LEFT */}
-          <Box className="flex items-center gap-4">
+          {/* LEFT SECTION */}
+          <Box className="flex items-center gap-30">
             {isSmallScreen && (
               <IconButton onClick={() => setOpen(true)}>
                 <MenuIcon />
@@ -142,43 +162,35 @@ export default function Header() {
 
             {!isSmallScreen && (
               <>
+                {/* LOGO */}
                 <Image
-                  src="/assets/svgs/ai_voice.svg"
+                  src="/assets/svgs/ai_voice.png"
                   alt="AI Voice"
-                  className=" rounded-lg cursor-pointer"
-                  height={40}
-                  width={40}
-                  onClick={() => router?.push("/dashboard")}
+                  className="cursor-pointer object-contain"
+                  width={110}
+                  height={32}
+                  onClick={() => router.push("/dashboard")}
                 />
-                <div
-                  className="flex flex-col leading-none cursor-pointer"
-                  onClick={() => router?.push("/dashboard")}
-                >
-                  <span className="font-medium text-gray-800 text-base">
-                    AI Voice
-                  </span>
-                  <span className="font-medium text-gray-800 text-base">
-                    Assistant
-                  </span>
-                </div>
 
-                <nav className="flex items-center gap-1 lg:gap-3 xl:gap-6 whitespace-nowrap flex-1">
+                {/* NAVIGATION */}
+                <nav className="flex items-center gap-2 whitespace-nowrap">
                   {NAV_ITEMS.map((item) => {
                     const isActive = isNavItemActive(item.href, pathname || "");
+
                     return (
                       <Link
                         key={item.href}
                         href={item.href}
                         className={clsx(
-                          "flex items-center gap-2 px-2 lg:px-3 py-2 rounded-lg text-sm xl:text-base font-medium transition whitespace-nowrap",
+                          "flex items-center gap-2 px-4 py-2 rounded-xl text-[14px] font-medium transition-all duration-200",
                           isActive
-                            ? "text-[#2F6AFF] bg-[#2F6AFF1A]"
-                            : "text-gray-500 hover:text-gray-900",
+                            ? "bg-[#EEF3FF] text-[#3B82F6]"
+                            : "text-[#6B7280] hover:bg-[#F9FAFB] hover:text-[#111827]",
                         )}
                       >
                         <Image
                           src={item.icon}
-                          alt={item?.label}
+                          alt={item.label}
                           height={20}
                           width={20}
                         />
@@ -191,32 +203,59 @@ export default function Header() {
             )}
           </Box>
 
-          <Box className="flex items-center gap-3 sm:gap-2">
-            {/* Workspace Selector */}
+          {/* RIGHT SECTION */}
+          <Box className="flex items-center gap-3">
+            <Button
+              fullWidth
+              variant="contained"
+              size="small"
+              startIcon={<CallIcon sx={{ fontSize: 18 }} />}
+              onClick={() => setMakeCallOpen(true)}
+              sx={{
+                textTransform: "none",
+                borderRadius: "10px",
+                bgcolor: "#2F6AFF",
+                "&:hover": { bgcolor: "#1d4ed8" },
+                px: { xs: 1, sm: 2 },
+                whiteSpace: "nowrap",
+              }}
+              aria-label="Make a call"
+            >
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", sm: "inline" } }}
+              >
+                Make a call
+              </Box>
+              <Box
+                component="span"
+                sx={{ display: { xs: "inline", sm: "none" } }}
+              >
+                Call
+              </Box>
+            </Button>
             {subaccounts?.length > 0 && (
               <Box
                 sx={{
                   display: "flex",
                   alignItems: "center",
-                  backgroundColor: "#F3F4F6",
-                  borderRadius: "12px",
-                  px: 1,
-                  py: 1,
+                  backgroundColor: "#F9FAFB",
+                  border: "1px solid #E5E7EB",
+                  borderRadius: "10px",
+                  px: 1.5,
+                  py: 0.75,
                   minWidth: 180,
                   maxWidth: 220,
-                  width: "100%",
                 }}
               >
-                {/* Left Icon */}
                 <Image
                   src="/assets/svgs/subaccounts.svg"
                   alt="workspace"
-                  width={18}
-                  height={18}
+                  width={16}
+                  height={16}
                   style={{ marginRight: 8 }}
                 />
 
-                {/* Select */}
                 <Select
                   value={activeWorkspace?.id || ""}
                   variant="standard"
@@ -234,6 +273,7 @@ export default function Header() {
                           name: selected.name,
                         }),
                       );
+
                       localStorage.setItem(
                         "activeWorkspace",
                         JSON.stringify(selected),
@@ -242,11 +282,11 @@ export default function Header() {
                   }}
                   sx={{
                     flex: 1,
-                    fontWeight: 500,
-                    fontSize: 16,
-                    color: "#374151",
                     minWidth: 0,
-                    paddingRight: "10px",
+                    fontSize: 14,
+                    fontWeight: 500,
+                    color: "#374151",
+
                     "& .MuiSelect-select": {
                       padding: 0,
                       overflow: "hidden",
@@ -258,8 +298,8 @@ export default function Header() {
                     <Image
                       src="/assets/svgs/down_vector.svg"
                       alt="down_vector"
-                      height={12}
-                      width={12}
+                      height={10}
+                      width={10}
                     />
                   )}
                 >
@@ -272,12 +312,19 @@ export default function Header() {
               </Box>
             )}
 
-            {/* User Section */}
+            {/* USER PROFILE */}
             <Box
-              className="flex items-center gap-1 cursor-pointer"
+              className="flex items-center gap-2 cursor-pointer"
               onClick={handleUserClick}
             >
-              <Avatar src="/assets/svgs/user_profile.svg" className="w-8 h-8" />
+              <Avatar
+                src={avatarSrc}
+                sx={{
+                  width: 34,
+                  height: 34,
+                }}
+              />
+
               <Image
                 src="/assets/svgs/down_vector.svg"
                 alt="down_vector"
@@ -289,7 +336,7 @@ export default function Header() {
         </Toolbar>
       </AppBar>
 
-      {/* ================= SIDEBAR ================= */}
+      {/* MOBILE DRAWER */}
       <Drawer anchor="left" open={open} onClose={() => setOpen(false)}>
         <Box className="w-65 p-4">
           <Box className="flex items-center gap-3 mb-6">
@@ -300,11 +347,32 @@ export default function Header() {
               height={40}
               width={40}
             />
+
             <div>
               <p className="font-semibold">AI Voice</p>
               <p className="font-semibold">Assistant</p>
             </div>
           </Box>
+
+          <Button
+            fullWidth
+            variant="contained"
+            startIcon={<CallIcon />}
+            onClick={() => {
+              setOpen(false);
+              setMakeCallOpen(true);
+            }}
+            sx={{
+              textTransform: "none",
+              borderRadius: "10px",
+              bgcolor: "#2F6AFF",
+              mb: 2,
+              py: 1.25,
+              "&:hover": { bgcolor: "#2F6AFF" },
+            }}
+          >
+            Make a call
+          </Button>
 
           <nav className="flex flex-col gap-2">
             {NAV_ITEMS.map((item) => {
@@ -316,18 +384,19 @@ export default function Header() {
                   href={item.href}
                   onClick={() => setOpen(false)}
                   className={clsx(
-                    "flex items-center gap-3 px-3 py-2 rounded-lg text-base",
+                    "flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200",
                     isActive
-                      ? "bg-[#2F6AFF1A] text-[#2F6AFF]"
-                      : "text-gray-600 hover:bg-gray-100",
+                      ? "bg-[#EEF3FF] text-[#3B82F6]"
+                      : "text-[#6B7280] hover:bg-[#F9FAFB]",
                   )}
                 >
                   <Image
                     src={item.icon}
-                    height={20}
-                    width={20}
-                    alt={item?.label}
+                    height={18}
+                    width={18}
+                    alt={item.label}
                   />
+
                   {item.label}
                 </Link>
               );
@@ -336,6 +405,7 @@ export default function Header() {
         </Box>
       </Drawer>
 
+      {/* PROFILE MENU */}
       <Menu
         anchorEl={anchorEl}
         open={openMenu}
@@ -350,20 +420,23 @@ export default function Header() {
         }}
         PaperProps={{
           sx: {
-            mt: 1,
+            mt: 1.5,
             borderRadius: "16px",
             minWidth: 260,
             p: 1,
+            boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
           },
         }}
       >
-        {/* Profile Header */}
+        {/* PROFILE HEADER */}
         <div className="flex items-center gap-3 px-3 py-2">
-          <Avatar src="/avatar.png" className="w-10! h-10!" />
+          <Avatar src={avatarSrc} className="w-10! h-10!" />
+
           <div>
-            <p className="text-lg font-semibold leading-tight text-neutral-700">
-              {user?.full_name}
+            <p className="text-base font-semibold leading-tight text-neutral-700">
+              {user?.first_name} {user?.last_name}
             </p>
+
             <p className="text-sm text-[#909090]">{user?.email}</p>
           </div>
         </div>
@@ -371,9 +444,9 @@ export default function Header() {
         <Divider className="my-2!" />
 
         {/* Menu Items */}
-        <MenuItem
+        {/* <MenuItem
           onClick={handleClose}
-          sx={{ fontSize: "16px", color: "#565656" }}
+          sx={{ fontSize: "15px", color: "#565656", borderRadius: "10px" }}
         >
           <ListItemIcon>
             <Image
@@ -384,11 +457,11 @@ export default function Header() {
             />
           </ListItemIcon>
           Profile
-        </MenuItem>
+        </MenuItem> */}
 
         <MenuItem
           onClick={() => handleNavigate("/settings")}
-          sx={{ fontSize: "16px", color: "#565656" }}
+          sx={{ fontSize: "15px", color: "#565656", borderRadius: "10px" }}
         >
           <ListItemIcon>
             <Image
@@ -401,35 +474,35 @@ export default function Header() {
           Settings
         </MenuItem>
 
-        <MenuItem
+        {/* <MenuItem
           onClick={handleClose}
-          sx={{ fontSize: "16px", color: "#565656" }}
+          sx={{ fontSize: "15px", color: "#565656", borderRadius: "10px" }}
         >
           <ListItemIcon>
             <Image
               src="/assets/svgs/integration.svg"
               height={20}
               width={20}
-              alt="intergration"
+              alt="integration"
             />
           </ListItemIcon>
           Integrations
-        </MenuItem>
+        </MenuItem> */}
 
-        <MenuItem
+        {/* <MenuItem
           onClick={handleClose}
-          sx={{ fontSize: "16px", color: "#565656" }}
+          sx={{ fontSize: "15px", color: "#565656", borderRadius: "10px" }}
         >
           <ListItemIcon>
             <Image
               src="/assets/svgs/billing.svg"
               height={20}
               width={20}
-              alt="billings"
+              alt="billing"
             />
           </ListItemIcon>
           Billing
-        </MenuItem>
+        </MenuItem> */}
 
         <Divider className="my-2!" />
 
@@ -440,10 +513,13 @@ export default function Header() {
             localStorage.clear();
             router.push("/login");
           }}
-          className="text-red-600"
-          sx={{ fontSize: "16px", color: "#565656" }}
+          sx={{
+            fontSize: "15px",
+            color: "#DC2626",
+            borderRadius: "10px",
+          }}
         >
-          <ListItemIcon className="text-red-600!">
+          <ListItemIcon>
             <Image
               src="/assets/svgs/logout.svg"
               height={20}
@@ -454,6 +530,11 @@ export default function Header() {
           Log out
         </MenuItem>
       </Menu>
+
+      <MakeCallDrawer
+        open={makeCallOpen}
+        onClose={() => setMakeCallOpen(false)}
+      />
     </>
   );
 }

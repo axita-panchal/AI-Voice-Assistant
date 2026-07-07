@@ -6,9 +6,11 @@ import {
   Drawer,
   IconButton as MuiIconButton,
   Slider,
+  MenuItem,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { useEffect } from "react";
+import React, { useEffect, forwardRef } from "react";
+import CustomTextField from "@/components/common/CustomTextField";
 import clsx from "clsx";
 import { formatTime } from "@/utils/helper";
 import { useSelector } from "react-redux";
@@ -25,6 +27,7 @@ import { toast } from "@/utils/toast";
 import Image from "next/image";
 import { Campaign } from "@/types/campaign.types";
 import { Agent } from "@/types/agent.types";
+import { CustomFormSelect } from "../common/CustomFormSelect";
 
 const campaignSchema = z.object({
   name: z.string().min(1, "Campaign name is required"),
@@ -42,7 +45,7 @@ const campaignSchema = z.object({
       (val) => Number(val) >= 0 && Number(val) <= 35,
       "Must be between 0 and 35",
     ),
-  selectedDays: z.array(z.string()).min(1, "Select at least one day"),
+  campaign_days: z.array(z.string()).min(1, "Select at least one day"),
   hours: z.tuple([z.number(), z.number()]).refine(([min, max]) => min < max, {
     message: "Start hour must be less than end hour",
   }),
@@ -55,7 +58,7 @@ const defaultValues: CampaignFormValues = {
   agentId: "",
   dailyCap: "",
   maxFollowUps: "",
-  selectedDays: [],
+  campaign_days: [],
   hours: [9, 20],
 };
 
@@ -68,11 +71,6 @@ interface CampaignDrawerProps {
   onClose: () => void;
   mode: "create" | "edit";
   campaign?: Campaign | null;
-}
-
-interface optionsTypes {
-  label: string;
-  value: string;
 }
 
 export default function CampaignDrawer({
@@ -97,7 +95,15 @@ export default function CampaignDrawer({
 
   const agents = agentsResponse?.data?.agents ?? [];
 
-  const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const DAYS = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
 
   const {
     register,
@@ -105,6 +111,7 @@ export default function CampaignDrawer({
     setValue,
     watch,
     control,
+    getValues,
     reset,
     formState: { errors },
   } = useForm<CampaignFormValues>({
@@ -112,7 +119,7 @@ export default function CampaignDrawer({
     defaultValues,
   });
 
-  const selectedDays = watch("selectedDays");
+  const campaign_days = watch("campaign_days");
   const hours = watch("hours");
 
   useEffect(() => {
@@ -125,12 +132,13 @@ export default function CampaignDrawer({
 
   useEffect(() => {
     if (open && isEdit && campaign) {
+      console.log("Prefilling form with campaign data:", campaign);
       reset({
         name: campaign.name || "",
         agentId: campaign.agent_id || "",
         dailyCap: String(campaign.daily_usage_cap || ""),
         maxFollowUps: String(campaign.max_dials_per_contact || ""),
-        selectedDays: campaign?.calling_days || [],
+        campaign_days: campaign?.campaign_days || [],
         hours: [
           campaign.min_calls_per_hour || 9,
           campaign.max_calls_per_hour || 20,
@@ -142,11 +150,11 @@ export default function CampaignDrawer({
   /* ===================== TOGGLE DAYS ===================== */
 
   const toggleDay = (day: string) => {
-    const updated = selectedDays.includes(day)
-      ? selectedDays.filter((d) => d !== day)
-      : [...selectedDays, day];
+    const updated = campaign_days.includes(day)
+      ? campaign_days.filter((d) => d !== day)
+      : [...campaign_days, day];
 
-    setValue("selectedDays", updated, { shouldValidate: true });
+    setValue("campaign_days", updated, { shouldValidate: true });
   };
 
   const onSubmit = async (data: CampaignFormValues) => {
@@ -158,7 +166,7 @@ export default function CampaignDrawer({
         max_calls_per_hour: data.hours[1],
         daily_usage_cap: Number(data.dailyCap),
         max_dials_per_contact: Number(data.maxFollowUps),
-        calling_days: data.selectedDays,
+        campaign_days: data.campaign_days,
         start_time: hourToTimeString(data.hours[0]),
         end_time: hourToTimeString(data.hours[1]),
       };
@@ -192,220 +200,212 @@ export default function CampaignDrawer({
   };
 
   return (
-    <Drawer
-      anchor="right"
-      open={open}
-      onClose={onClose}
-      PaperProps={{
-        className: "w-full sm:w-[420px] max-w-full ",
-      }}
-    >
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="h-full flex flex-col p-4 sm:p-6"
+    console.log("Agents in drawer:", agents),
+    (
+      <Drawer
+        anchor="right"
+        open={open}
+        onClose={onClose}
+        PaperProps={{
+          className: "w-full sm:w-[420px] max-w-full ",
+        }}
       >
-        {/* HEADER */}
-        <div className="flex items-center justify-between mb-6 gap-4">
-          <div className="flex items-center gap-3">
-            <div className="p-1 border border-gray-300 rounded-md">
-              <Image
-                src="/assets/svgs/campaign.svg"
-                alt="Campaign"
-                width={16}
-                height={16}
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="h-full flex flex-col p-4 sm:p-6"
+        >
+          {/* HEADER */}
+          <div className="flex items-center justify-between mb-6 gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-1 border border-gray-300 rounded-md">
+                <Image
+                  src="/assets/svgs/campaign.svg"
+                  alt="Campaign"
+                  width={16}
+                  height={16}
+                />
+              </div>
+              <span className="text-base text-[#464646]">
+                {isEdit ? "Edit Campaign" : "Add Campaign"}
+              </span>
+            </div>
+
+            <MuiIconButton onClick={onClose}>
+              <CloseIcon />
+            </MuiIconButton>
+          </div>
+
+          {/* BODY */}
+          <div className="flex-1 space-y-5 overflow-y-auto text-sm pr-1 sm:pr-2">
+            <FormInput
+              label="Name"
+              placeholder="John"
+              error={errors.name?.message}
+              {...register("name")}
+            />
+            <CustomFormSelect
+              label="Agent"
+              placeholder="Choose an option.."
+              error={errors.agentId?.message}
+              disabled={isLoading || agents.length === 0}
+              defaultValue={getValues("agentId")}
+              options={agents.map((agent: Agent) => ({
+                label: agent.name,
+                value: agent.id,
+              }))}
+              {...register("agentId")}
+            />
+            <FormInput
+              label="Daily Usage Cap"
+              placeholder="20"
+              error={errors.dailyCap?.message}
+              {...register("dailyCap")}
+            />
+            <FormInput
+              label="Maximum Follow Ups"
+              placeholder="0 - 15"
+              error={errors.maxFollowUps?.message}
+              {...register("maxFollowUps")}
+            />
+            {/* CALLING DAYS */}
+            <div>
+              <p className="text-sm font-medium mb-2">Calling days</p>
+
+              <div className="grid grid-cols-4 sm:flex sm:flex-wrap gap-3">
+                {DAYS.map((day) => {
+                  console.log("Selected days:", getValues("campaign_days"));
+                  const checked =
+                    campaign_days.includes(day) ||
+                    getValues("campaign_days").includes(day);
+                  return (
+                    <div
+                      key={day}
+                      onClick={() => toggleDay(day)}
+                      className={clsx(
+                        "h-14 flex flex-col items-center justify-center cursor-pointer rounded-lg",
+                        "transition-colors",
+                      )}
+                    >
+                      <Checkbox
+                        checked={checked}
+                        size="small"
+                        sx={{
+                          // borderRadius: "6px",
+                          color: "#C3C3C3",
+                          "&.Mui-checked": {
+                            color: "bg-[#2F6AFF]",
+                          },
+                        }}
+                      />
+                      <span className="text-sm text-[#808080]">
+                        {day.slice(0, 3)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {errors.campaign_days && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.campaign_days.message}
+                </p>
+              )}
+            </div>
+
+            {/* HOURS */}
+            <div>
+              <p className="text-sm font-medium mb-2">Local calling hours</p>
+              <Controller
+                control={control}
+                name="hours"
+                render={({ field }) => (
+                  <Slider
+                    {...field}
+                    value={field.value}
+                    min={0}
+                    max={24}
+                    step={1}
+                    disableSwap
+                    onChange={(_, value) => {
+                      const [min, max] = value as number[];
+                      if (min >= max) return;
+                      field.onChange([min, max]);
+                    }}
+                  />
+                )}
               />
+              <div className="flex justify-between text-xs mt-1">
+                <span>{formatTime(hours[0])}</span>
+                <span>{formatTime(hours[1])}</span>
+              </div>
+              {errors.hours && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.hours.message}
+                </p>
+              )}
             </div>
-            <span className="text-base text-[#464646]">
-              {isEdit ? "Edit Campaign" : "Add Campaign"}
-            </span>
           </div>
 
-          <MuiIconButton onClick={onClose}>
-            <CloseIcon />
-          </MuiIconButton>
-        </div>
-
-        {/* BODY */}
-        <div className="flex-1 space-y-5 overflow-y-auto text-sm pr-1 sm:pr-2">
-          <FormInput
-            label="Name"
-            error={errors.name?.message}
-            {...register("name")}
-          />
-          <FormSelect
-            label="Agent"
-            error={errors.agentId?.message}
-            disabled={isLoading || agents.length === 0}
-            options={agents.map((agent: Agent) => ({
-              label: agent.name,
-              value: agent.id,
-            }))}
-            {...register("agentId")}
-          />
-          <FormInput
-            label="Daily Usage Cap"
-            error={errors.dailyCap?.message}
-            {...register("dailyCap")}
-          />
-          <FormInput
-            label="Maximum Follow Ups"
-            error={errors.maxFollowUps?.message}
-            {...register("maxFollowUps")}
-          />
-          {/* CALLING DAYS */}
-          <div>
-            <p className="text-sm font-medium mb-2">Calling days</p>
-
-            <div className="grid grid-cols-4 sm:flex sm:flex-wrap gap-3">
-              {DAYS.map((day) => {
-                const checked = selectedDays.includes(day);
-                return (
-                  <div
-                    key={day}
-                    onClick={() => toggleDay(day)}
-                    className={clsx(
-                      "h-14 flex flex-col items-center justify-center cursor-pointer border rounded-lg",
-                      "transition-colors",
-                      checked
-                        ? "border-blue-600 bg-blue-50"
-                        : "border-gray-300",
-                    )}
-                  >
-                    <Checkbox checked={checked} size="small" />
-                    <span className="text-sm">{day}</span>
-                  </div>
-                );
-              })}
-            </div>
-
-            {errors.selectedDays && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.selectedDays.message}
-              </p>
-            )}
-          </div>
-
-          {/* HOURS */}
-          <div>
-            <p className="text-sm font-medium mb-2">Local calling hours</p>
-            <Controller
-              control={control}
-              name="hours"
-              render={({ field }) => (
-                <Slider
-                  {...field}
-                  value={field.value}
-                  min={0}
-                  max={24}
-                  step={1}
-                  disableSwap
-                  onChange={(_, value) => {
-                    const [min, max] = value as number[];
-                    if (min >= max) return;
-                    field.onChange([min, max]);
-                  }}
+          {/* FOOTER */}
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-full sm:flex-1 bg-gray-100 py-2 rounded-lg text-sm cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isCreating || isUpdating}
+              className="w-full sm:flex-1 bg-[#2F6AFF] text-white py-2 rounded-lg text-sm cursor-pointer"
+            >
+              {(isUpdating || isCreating) && (
+                <CircularProgress
+                  size={18}
+                  sx={{ color: "#fff", mr: 1 }}
+                  aria-hidden="true"
                 />
               )}
-            />
-            <div className="flex justify-between text-xs mt-1">
-              <span>{formatTime(hours[0])}</span>
-              <span>{formatTime(hours[1])}</span>
-            </div>
-            {errors.hours && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.hours.message}
-              </p>
-            )}
+              {isEdit
+                ? isUpdating
+                  ? "Updating..."
+                  : "Update"
+                : isCreating
+                  ? "Creating..."
+                  : "Finish"}
+            </button>
           </div>
-        </div>
-
-        {/* FOOTER */}
-        <div className="flex flex-col sm:flex-row gap-3 pt-4">
-          <button
-            type="submit"
-            disabled={isCreating || isUpdating}
-            className="w-full sm:flex-1 bg-blue-600 text-white py-2 rounded-lg text-sm cursor-pointer"
-          >
-            {(isUpdating || isCreating) && (
-              <CircularProgress
-                size={18}
-                sx={{ color: "#fff", mr: 1 }}
-                aria-hidden="true"
-              />
-            )}
-            {isEdit
-              ? isUpdating
-                ? "Updating..."
-                : "Update"
-              : isCreating
-                ? "Creating..."
-                : "Finish"}
-          </button>
-
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-full sm:flex-1 bg-gray-100 py-2 rounded-lg text-sm cursor-pointer"
-          >
-            Cancel
-          </button>
-        </div>
-      </form>
-    </Drawer>
+        </form>
+      </Drawer>
+    )
   );
 }
 
 /* ===================== REUSABLE INPUT ===================== */
 
-function FormInput({
-  label,
-  error,
-  ...props
-}: {
-  label: string;
-  error: string | undefined;
-}) {
+const FormInput = forwardRef<
+  HTMLDivElement,
+  Omit<React.ComponentPropsWithoutRef<typeof CustomTextField>, "error"> & {
+    label: string;
+    error?: string;
+  }
+>(({ label, error, ...props }, ref) => {
   return (
     <div>
-      <label className="text-sm text-gray-600">{label}</label>
-      <input
+      <label className="text-sm font-medium text-gray-700 mb-1 block">
+        {label}
+      </label>
+      <CustomTextField
+        ref={ref}
+        fullWidth
+        size="small"
+        error={!!error}
+        helperText={error}
         {...props}
-        className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
       />
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
     </div>
   );
-}
+});
 
-/* ===================== REUSABLE SELECT ===================== */
-
-function FormSelect({
-  label,
-  error,
-  options,
-  ...props
-}: {
-  label: string;
-  error: string | undefined;
-  options: optionsTypes[];
-}) {
-  return (
-    <div>
-      <label className="text-sm text-gray-600">{label}</label>
-
-      <select
-        {...props}
-        className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white"
-      >
-        <option value="">Choose an option...</option>
-        {options.map((option: optionsTypes) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-    </div>
-  );
-}
+FormInput.displayName = "FormInput";

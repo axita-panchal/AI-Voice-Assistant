@@ -50,6 +50,7 @@ export interface Contact {
   last_dial_time: string | null | undefined;
   listId: string;
   contact_list_id?: string | null;
+  updated_at: string;
   // add these optional fields
   business_name?: string;
   job_title?: string;
@@ -92,6 +93,7 @@ export interface ApiContact {
   status: string;
   lastOutcome?: string | undefined | null;
   actions?: string;
+  updated_at: string;
 }
 
 export interface deleteContactList {

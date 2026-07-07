@@ -13,7 +13,7 @@ export const campaignService = {
     const res = await http.get(`/campaign/`, {
       params: { limit, skip },
     });
-    return res?.data;
+    return res?.data || [];
   },
   getCampaignById: async ({ campaignId }: { campaignId: string }) => {
     const res = await http.get(`/campaign/${campaignId}`);
