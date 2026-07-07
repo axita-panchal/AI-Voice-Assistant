@@ -2,7 +2,7 @@ import { agentService } from "@/services/agent.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ApiErrorResponse } from "../auth/useAuthMutations";
 import { AxiosError, AxiosResponse } from "axios";
-import { Agent } from "@/types/agent.types";
+import { Agent, AgentCalendar } from "@/types/agent.types";
 
 export type CreateAgentResponse = {
   status_code: number;
@@ -16,8 +16,12 @@ export interface DeleteAgentResponse {
   message: string;
 }
 export type UpdateAgentPayload = {
-  voice: string;
-  language: string;
+  name?: string;
+  description?: string;
+  first_message?: string;
+  voice?: string;
+  language?: string;
+  calendars?: AgentCalendar[];
 };
 
 export const useCreateAgent = () => {

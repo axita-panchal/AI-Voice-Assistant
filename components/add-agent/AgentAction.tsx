@@ -1,18 +1,30 @@
 "use client";
 
 import { useState } from "react";
+import { AgentCalendar } from "@/types/agent.types";
+import AddCalendarModal from "./AddCalendarModal";
 
-type ActionKey = "calendar" | "transfer" | "custom" | "webhook";
+type ActionKey = "transfer" | "custom" | "webhook";
 
 type ActionState = {
   [key in ActionKey]?: string;
 };
 
-export default function AgentAction() {
+type Props = {
+  calendars?: AgentCalendar[];
+  onAddCalendar?: (calendar: AgentCalendar) => Promise<void>;
+  isAddingCalendar?: boolean;
+};
+
+export default function AgentAction({
+  calendars = [],
+  onAddCalendar,
+  isAddingCalendar = false,
+}: Props) {
+  const [calendarModalOpen, setCalendarModalOpen] = useState(false);
   const [openAction, setOpenAction] = useState<ActionKey | null>(null);
 
   const [values, setValues] = useState<ActionState>({
-    calendar: "",
     transfer: "",
     custom: "",
     webhook: "",
@@ -29,20 +41,31 @@ export default function AgentAction() {
     }));
   };
 
+  const handleAddCalendar = async (calendar: AgentCalendar) => {
+    if (!onAddCalendar) return;
+
+    try {
+      await onAddCalendar(calendar);
+      setCalendarModalOpen(false);
+    } catch {
+      // Keep modal open so the user can retry or fix input.
+    }
+  };
+
   return (
     <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-      <ActionRow
-        title="Calendar Booking"
-        description="Connect calendars here so your Agent can schedule meetings."
-        isOpen={openAction === "calendar"}
-        onAdd={() => toggle("calendar")}
-      >
-        <CommonInput
-          placeholder="Enter calendar URL"
-          value={values.calendar || ""}
-          onChange={(v) => updateValue("calendar", v)}
-        />
-      </ActionRow>
+      <CalendarActionRow
+        calendars={calendars}
+        onAdd={() => setCalendarModalOpen(true)}
+      />
+
+      <AddCalendarModal
+        open={calendarModalOpen}
+        onClose={() => setCalendarModalOpen(false)}
+        onSubmit={handleAddCalendar}
+        existingCalendars={calendars}
+        isSubmitting={isAddingCalendar}
+      />
 
       <ActionRow
         title="Call Transfer"
@@ -83,6 +106,63 @@ export default function AgentAction() {
           actionLabel="Test webhook"
         />
       </ActionRow>
+    </div>
+  );
+}
+
+/* ---------------- Calendar Row ---------------- */
+
+function CalendarActionRow({
+  calendars,
+  onAdd,
+}: {
+  calendars: AgentCalendar[];
+  onAdd: () => void;
+}) {
+  return (
+    <div className="border border-gray-200 rounded-lg bg-[#F5F8FF]">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 p-4 sm:p-7">
+        <div className="w-full sm:max-w-[75%]">
+          <h3 className="text-sm sm:text-base font-medium text-gray-600">
+            Calendar Booking
+          </h3>
+          <p className="text-sm sm:text-[15px] text-gray-500 mt-1">
+            Connect calendars here so your Agent can schedule meetings.
+          </p>
+        </div>
+
+        <button
+          onClick={onAdd}
+          className="flex items-center justify-center gap-1 px-3 py-1.5 text-xs rounded-lg shrink-0 transition cursor-pointer w-fit bg-[#2F6AFF] hover:bg-blue-700 text-white"
+        >
+          <span className="text-base leading-none">+</span>
+          Add
+        </button>
+      </div>
+
+      {calendars.length > 0 && (
+        <div className="px-4 sm:px-7 pb-4 sm:pb-6 space-y-3">
+          {calendars.map((calendar) => (
+            <div
+              key={calendar.unique_id}
+              className="bg-white border border-gray-200 rounded-lg p-3 sm:p-4"
+            >
+              <div className="flex flex-wrap items-center gap-2 text-sm">
+                <span className="font-medium text-gray-700">
+                  {calendar.platform}
+                </span>
+                <span className="text-gray-400">•</span>
+                <span className="text-gray-600">ID: {calendar.unique_id}</span>
+              </div>
+              {calendar.description && (
+                <p className="text-sm text-gray-500 mt-1">
+                  {calendar.description}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

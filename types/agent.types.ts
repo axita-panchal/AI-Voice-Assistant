@@ -5,6 +5,12 @@ export type CreateAgentPayload = {
   subaccount_id: string;
 };
 
+export type AgentCalendar = {
+  platform: string;
+  unique_id: string;
+  description?: string;
+};
+
 export type Agent = {
   id: string;
   name: string;
@@ -13,6 +19,7 @@ export type Agent = {
   voice: string;
   subaccount_id: string;
   created_on: string;
+  calendars?: AgentCalendar[];
 };
 
 export interface GetAgentsResponse {

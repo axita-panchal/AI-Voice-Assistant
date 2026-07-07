@@ -10,6 +10,7 @@ import AgentAction from "@/components/add-agent/AgentAction";
 import KnowledgeBase from "@/components/add-agent/KnowledgeBase";
 import { useUpdateAgent } from "@/hooks/agent/useAgentMutations";
 import { useAgentById } from "@/hooks/agent/useAgentQueries";
+import { AgentCalendar } from "@/types/agent.types";
 import { toast } from "@/utils/toast";
 
 type Props = {
@@ -29,6 +30,8 @@ export default function AgentEditorShell({ agentId }: Props) {
   const { mutateAsync: updateAgent, isPending: isUpdatingAgent } =
     useUpdateAgent();
   const { data: agentData, isPending } = useAgentById(agentId);
+  const [isAddingCalendar, setIsAddingCalendar] = useState(false);
+  const [calendars, setCalendars] = useState<AgentCalendar[]>([]);
 
   const searchParams = useSearchParams();
   const activeTab = searchParams.get("setting") || "agent-prompt";
@@ -61,7 +64,33 @@ export default function AgentEditorShell({ agentId }: Props) {
       voice: agent.voice,
       first_message: agent?.first_message ?? "",
     });
+
+    setCalendars(agent.calendars ?? []);
   }, [agentData?.data?.data?.agent]);
+
+  const handleAddCalendar = async (newCalendar: AgentCalendar) => {
+    const updatedCalendars = [...calendars, newCalendar];
+
+    try {
+      setIsAddingCalendar(true);
+
+      const response = await updateAgent({
+        agentId,
+        payload: { calendars: updatedCalendars },
+      });
+
+      if (response.data?.status_code === 200) {
+        setCalendars(updatedCalendars);
+        toast.success(response.data?.message || "Calendar added successfully");
+      }
+    } catch (error) {
+      console.error("Failed to add calendar", error);
+      toast.error("Failed to add calendar");
+      throw error;
+    } finally {
+      setIsAddingCalendar(false);
+    }
+  };
 
   const [form, setForm] = useState<AgentForm>({
     name: "",
@@ -78,7 +107,13 @@ export default function AgentEditorShell({ agentId }: Props) {
       content = <AgentPrompt />;
       break;
     case "action":
-      content = <AgentAction />;
+      content = (
+        <AgentAction
+          calendars={calendars}
+          onAddCalendar={handleAddCalendar}
+          isAddingCalendar={isAddingCalendar}
+        />
+      );
       break;
     case "knowledge-base":
       content = <KnowledgeBase />;
