@@ -18,7 +18,10 @@ import { AgentCalendar } from "@/types/agent.types";
 const calendarSchema = z.object({
   platform: z.literal("cal"),
   unique_id: z.string().trim().min(1, "Unique ID is required"),
-  description: z.string().optional(),
+  description: z
+    .string()
+    .min(1, "Description is required")
+    .max(200, "Description must be at most 200 characters"),
 });
 
 type CalendarFormData = z.infer<typeof calendarSchema>;
@@ -112,9 +115,7 @@ export default function AddCalendarModal({
       <DialogContent className="p-6">
         <div className="flex items-start justify-between mb-2">
           <div>
-            <h2 className="text-lg font-medium text-[#464646]">
-              Add Calendar
-            </h2>
+            <h2 className="text-lg font-medium text-[#464646]">Add Calendar</h2>
             <p className="text-base text-gray-500 mt-1">
               Connect a calendar so your Agent can schedule meetings.
             </p>
@@ -160,8 +161,7 @@ export default function AddCalendarModal({
 
         <div className="mt-4">
           <label className="text-base text-gray-600 mb-1 block">
-            Description{" "}
-            <span className="text-gray-400 text-xs">(optional)</span>
+            Description <span className="text-red-500">*</span>
           </label>
           <CustomTextField
             fullWidth
