@@ -1,8 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useForm, type Path } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { isValidPhoneNumber } from "react-phone-number-input";
 import { AgentCalendar } from "@/types/agent.types";
 import AddCalendarModal from "./AddCalendarModal";
+import PhoneInputField from "@/components/common/PhoneInputField";
 import {
   useAddCalendar,
   useUpdateCalendar,
@@ -11,6 +16,17 @@ import {
 import { IconButton, Dialog, DialogContent, Button } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+
+const transferSchema = z.object({
+  transfer_phone_number: z
+    .string()
+    .optional()
+    .refine((val) => !val || isValidPhoneNumber(val), {
+      message: "Enter a valid phone number",
+    }),
+});
+
+type TransferFormValues = z.infer<typeof transferSchema>;
 
 type ActionKey = "transfer" | "custom" | "webhook";
 
@@ -25,6 +41,10 @@ type Props = {
   isAddingCalendar?: boolean;
   onCalendarUpdate?: (calendars: AgentCalendar[]) => void;
   onCalendarDelete?: (calendars: AgentCalendar[]) => void;
+  transferPhoneNumber?: string;
+  onSaveTransferPhoneNumber?: (phoneNumber: string) => Promise<void>;
+  onDeleteTransferPhoneNumber?: () => Promise<void>;
+  isUpdatingTransfer?: boolean;
 };
 
 export default function AgentAction({
@@ -34,6 +54,10 @@ export default function AgentAction({
   isAddingCalendar = false,
   onCalendarUpdate,
   onCalendarDelete,
+  transferPhoneNumber = "",
+  onSaveTransferPhoneNumber,
+  onDeleteTransferPhoneNumber,
+  isUpdatingTransfer = false,
 }: Props) {
   const [calendarModalOpen, setCalendarModalOpen] = useState(false);
   const [editingCalendar, setEditingCalendar] = useState<AgentCalendar | null>(
@@ -41,7 +65,28 @@ export default function AgentAction({
   );
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [calendarToDelete, setCalendarToDelete] = useState<string | null>(null);
+  const [transferEditMode, setTransferEditMode] = useState(false);
+  const [deleteTransferConfirmOpen, setDeleteTransferConfirmOpen] =
+    useState(false);
   const [openAction, setOpenAction] = useState<ActionKey | null>(null);
+
+  const {
+    control: transferControl,
+    handleSubmit: handleTransferSubmit,
+    reset: resetTransferForm,
+    formState: { errors: transferErrors },
+  } = useForm<TransferFormValues>({
+    resolver: zodResolver(transferSchema),
+    defaultValues: {
+      transfer_phone_number: transferPhoneNumber,
+    },
+  });
+
+  useEffect(() => {
+    resetTransferForm({
+      transfer_phone_number: transferPhoneNumber,
+    });
+  }, [transferPhoneNumber, resetTransferForm]);
 
   const [values, setValues] = useState<ActionState>({
     transfer: "",
@@ -134,6 +179,32 @@ export default function AgentAction({
       setCalendarToDelete(null);
     } catch {
       // Error handled by mutation
+    }
+  };
+
+  const handleSaveTransferPhoneNumber = handleTransferSubmit(
+    async (data: TransferFormValues) => {
+      if (!onSaveTransferPhoneNumber || !data.transfer_phone_number?.trim())
+        return;
+
+      try {
+        await onSaveTransferPhoneNumber(data.transfer_phone_number.trim());
+        setTransferEditMode(false);
+      } catch {
+        // Error handled by parent
+      }
+    },
+  );
+
+  const handleDeleteTransferPhoneNumber = async () => {
+    if (!onDeleteTransferPhoneNumber) return;
+
+    try {
+      await onDeleteTransferPhoneNumber();
+      resetTransferForm({ transfer_phone_number: "" });
+      setDeleteTransferConfirmOpen(false);
+    } catch {
+      // Error handled by parent
     }
   };
 
@@ -235,18 +306,175 @@ export default function AgentAction({
         </DialogContent>
       </Dialog>
 
-      <ActionRow
-        title="Call Transfer"
-        description="Add transfer numbers here so your Agent can forward calls."
-        isOpen={openAction === "transfer"}
-        onAdd={() => toggle("transfer")}
+      {/* Delete Transfer Phone Confirmation Dialog */}
+      <Dialog
+        open={deleteTransferConfirmOpen}
+        onClose={() => setDeleteTransferConfirmOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        slotProps={{
+          paper: {
+            sx: {
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: {
+                xs: "92%",
+                sm: "540px",
+              },
+              borderRadius: "20px",
+              overflow: "hidden",
+              boxShadow: "0px 16px 40px rgba(0,0,0,0.10)",
+              margin: 0,
+              backgroundColor: "#fff",
+            },
+          },
+        }}
       >
-        <CommonInput
-          placeholder="Enter phone number"
-          value={values.transfer || ""}
-          onChange={(v) => updateValue("transfer", v)}
-        />
-      </ActionRow>
+        <DialogContent className="p-6">
+          <div className="mb-4">
+            <h2 className="text-lg font-medium text-[#464646]">
+              Delete Transfer Phone Number
+            </h2>
+            <p className="text-base text-gray-500 mt-2">
+              Are you sure you want to delete this transfer phone number? This
+              action cannot be undone.
+            </p>
+          </div>
+
+          <div className="flex gap-3 justify-end">
+            <Button
+              variant="outlined"
+              className="capitalize!"
+              sx={{ fontSize: "14px", borderRadius: "10px" }}
+              onClick={() => setDeleteTransferConfirmOpen(false)}
+              disabled={isUpdatingTransfer}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              className="capitalize!"
+              sx={{
+                fontSize: "14px",
+                borderRadius: "10px",
+                backgroundColor: "#dc2626",
+                "&:hover": {
+                  backgroundColor: "#b91c1c",
+                },
+                "&.Mui-disabled": {
+                  backgroundColor: "#dc2626",
+                  color: "#fff",
+                  opacity: 0.7,
+                },
+              }}
+              onClick={handleDeleteTransferPhoneNumber}
+              disabled={isUpdatingTransfer}
+            >
+              Delete
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Transfer Phone Number Row - Inline Editable */}
+      <div className="border border-gray-200 rounded-lg bg-[#F5F8FF]">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 p-4 sm:p-7">
+          <div className="w-full sm:max-w-[75%]">
+            <h3 className="text-sm sm:text-base font-medium text-gray-600">
+              Transfer Phone Number
+            </h3>
+            <p className="text-sm sm:text-[15px] text-gray-500 mt-1">
+              Add a phone number where your Agent can forward calls.
+            </p>
+          </div>
+
+          {!transferPhoneNumber && !transferEditMode && (
+            <button
+              onClick={() => setTransferEditMode(true)}
+              className="flex items-center justify-center gap-1 px-3 py-1.5 text-xs rounded-lg shrink-0 transition cursor-pointer w-fit bg-[#2F6AFF] hover:bg-blue-700 text-white disabled:opacity-50"
+              disabled={isUpdatingTransfer}
+            >
+              <span className="text-base leading-none">+</span>
+              Add
+            </button>
+          )}
+        </div>
+
+        {transferEditMode && (
+          <div className="px-4 sm:px-7 pb-4 sm:pb-6">
+            <form
+              onSubmit={handleSaveTransferPhoneNumber}
+              className="space-y-3"
+            >
+              <PhoneInputField<TransferFormValues>
+                name="transfer_phone_number"
+                control={transferControl}
+                error={transferErrors.transfer_phone_number?.message}
+              />
+
+              <div className="flex gap-2 flex-col sm:flex-row">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTransferEditMode(false);
+                    resetTransferForm({
+                      transfer_phone_number: transferPhoneNumber,
+                    });
+                  }}
+                  disabled={isUpdatingTransfer}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isUpdatingTransfer}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isUpdatingTransfer ? "Saving..." : "Save"}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {transferPhoneNumber && !transferEditMode && (
+          <div className="px-4 sm:px-7 pb-4 sm:pb-6">
+            <div className="bg-white border border-gray-200 rounded-lg p-3 sm:p-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-700">
+                    {transferPhoneNumber}
+                  </p>
+                </div>
+
+                <div className="flex gap-2 shrink-0">
+                  <IconButton
+                    size="small"
+                    onClick={() => setTransferEditMode(true)}
+                    disabled={isUpdatingTransfer}
+                    className="text-blue-600 hover:bg-blue-50"
+                    title="Edit transfer phone number"
+                  >
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={() => setDeleteTransferConfirmOpen(true)}
+                    disabled={isUpdatingTransfer}
+                    className="text-red-600 hover:bg-red-50"
+                    title="Delete transfer phone number"
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       <ActionRow
         title="Custom Actions"

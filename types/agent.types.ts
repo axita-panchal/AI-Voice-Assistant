@@ -20,6 +20,7 @@ export type Agent = {
   subaccount_id: string;
   created_on: string;
   calendars?: AgentCalendar[];
+  transfer_phone_number?: string;
 };
 
 export interface GetAgentsResponse {

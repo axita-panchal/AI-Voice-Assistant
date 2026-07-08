@@ -22,6 +22,7 @@ export type UpdateAgentPayload = {
   voice?: string;
   language?: string;
   calendars?: AgentCalendar[];
+  transfer_phone_number?: string;
 };
 
 export const useCreateAgent = () => {
