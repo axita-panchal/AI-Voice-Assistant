@@ -1,4 +1,8 @@
-import { CreateAgentPayload, GetAgentsParams } from "@/types/agent.types";
+import {
+  CreateAgentPayload,
+  GetAgentsParams,
+  AgentCalendar,
+} from "@/types/agent.types";
 import http from "./http";
 import { UpdateAgentPayload } from "@/hooks/agent/useAgentMutations";
 
@@ -29,6 +33,46 @@ export const agentService = {
   },
   deleteAgent: (agentId: string) => {
     const res = http.delete(`/agents/${agentId}`);
+    return res;
+  },
+
+  /* -------- Calendar Methods -------- */
+
+  addCalendar: ({
+    agentId,
+    calendar,
+  }: {
+    agentId: string;
+    calendar: AgentCalendar;
+  }) => {
+    const res = http.post(`/agents/${agentId}/calendars`, calendar);
+    return res;
+  },
+
+  updateCalendar: ({
+    agentId,
+    uniqueId,
+    calendar,
+  }: {
+    agentId: string;
+    uniqueId: string;
+    calendar: Partial<AgentCalendar>;
+  }) => {
+    const res = http.patch(
+      `/agents/${agentId}/calendars/${uniqueId}`,
+      calendar,
+    );
+    return res;
+  },
+
+  deleteCalendar: ({
+    agentId,
+    uniqueId,
+  }: {
+    agentId: string;
+    uniqueId: string;
+  }) => {
+    const res = http.delete(`/agents/${agentId}/calendars/${uniqueId}`);
     return res;
   },
 };

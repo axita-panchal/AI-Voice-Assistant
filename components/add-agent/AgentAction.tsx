@@ -3,6 +3,14 @@
 import { useState } from "react";
 import { AgentCalendar } from "@/types/agent.types";
 import AddCalendarModal from "./AddCalendarModal";
+import {
+  useAddCalendar,
+  useUpdateCalendar,
+  useDeleteCalendar,
+} from "@/hooks/agent/useAgentMutations";
+import { IconButton, Dialog, DialogContent, Button } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 
 type ActionKey = "transfer" | "custom" | "webhook";
 
@@ -11,17 +19,28 @@ type ActionState = {
 };
 
 type Props = {
+  agentId?: string;
   calendars?: AgentCalendar[];
   onAddCalendar?: (calendar: AgentCalendar) => Promise<void>;
   isAddingCalendar?: boolean;
+  onCalendarUpdate?: (calendars: AgentCalendar[]) => void;
+  onCalendarDelete?: (calendars: AgentCalendar[]) => void;
 };
 
 export default function AgentAction({
+  agentId,
   calendars = [],
   onAddCalendar,
   isAddingCalendar = false,
+  onCalendarUpdate,
+  onCalendarDelete,
 }: Props) {
   const [calendarModalOpen, setCalendarModalOpen] = useState(false);
+  const [editingCalendar, setEditingCalendar] = useState<AgentCalendar | null>(
+    null,
+  );
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [calendarToDelete, setCalendarToDelete] = useState<string | null>(null);
   const [openAction, setOpenAction] = useState<ActionKey | null>(null);
 
   const [values, setValues] = useState<ActionState>({
@@ -29,6 +48,10 @@ export default function AgentAction({
     custom: "",
     webhook: "",
   });
+
+  const addCalendarMutation = useAddCalendar();
+  const updateCalendarMutation = useUpdateCalendar();
+  const deleteCalendarMutation = useDeleteCalendar();
 
   const toggle = (key: ActionKey) => {
     setOpenAction((prev) => (prev === key ? null : key));
@@ -42,13 +65,75 @@ export default function AgentAction({
   };
 
   const handleAddCalendar = async (calendar: AgentCalendar) => {
-    if (!onAddCalendar) return;
+    if (!onAddCalendar && !agentId) return;
 
     try {
-      await onAddCalendar(calendar);
+      if (editingCalendar && agentId) {
+        // Update existing calendar
+        await updateCalendarMutation.mutateAsync({
+          agentId,
+          uniqueId: editingCalendar.unique_id,
+          calendar: {
+            unique_id: calendar.unique_id,
+            description: calendar.description,
+          },
+        });
+        // Update parent state with edited calendar
+        if (onCalendarUpdate) {
+          const updatedCalendars = calendars.map((cal) =>
+            cal.unique_id === editingCalendar.unique_id ? calendar : cal,
+          );
+          onCalendarUpdate(updatedCalendars);
+        }
+      } else if (onAddCalendar) {
+        // Add new calendar through prop callback
+        await onAddCalendar(calendar);
+      } else if (agentId) {
+        // Add new calendar directly
+        await addCalendarMutation.mutateAsync({
+          agentId,
+          calendar,
+        });
+        if (onCalendarUpdate) {
+          onCalendarUpdate([...calendars, calendar]);
+        }
+      }
       setCalendarModalOpen(false);
+      setEditingCalendar(null);
     } catch {
       // Keep modal open so the user can retry or fix input.
+    }
+  };
+
+  const handleEditCalendar = (calendar: AgentCalendar) => {
+    setEditingCalendar(calendar);
+    setCalendarModalOpen(true);
+  };
+
+  const handleDeleteClick = (uniqueId: string) => {
+    setCalendarToDelete(uniqueId);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!agentId || !calendarToDelete) return;
+
+    try {
+      await deleteCalendarMutation.mutateAsync({
+        agentId,
+        uniqueId: calendarToDelete,
+      });
+      // Update parent state after successful delete
+      if (onCalendarDelete) {
+        const updatedCalendars = calendars.filter(
+          (cal) => cal.unique_id !== calendarToDelete,
+        );
+        onCalendarDelete(updatedCalendars);
+      }
+      setDeleteConfirmOpen(false);
+      setCalendarToDelete(null);
+    } catch {
+      // Error handled by mutation
     }
   };
 
@@ -57,15 +142,98 @@ export default function AgentAction({
       <CalendarActionRow
         calendars={calendars}
         onAdd={() => setCalendarModalOpen(true)}
+        onEdit={handleEditCalendar}
+        onDelete={handleDeleteClick}
+        isDeleting={deleteCalendarMutation.isPending}
       />
 
       <AddCalendarModal
         open={calendarModalOpen}
-        onClose={() => setCalendarModalOpen(false)}
+        onClose={() => {
+          setCalendarModalOpen(false);
+          setEditingCalendar(null);
+        }}
         onSubmit={handleAddCalendar}
         existingCalendars={calendars}
-        isSubmitting={isAddingCalendar}
+        isSubmitting={
+          isAddingCalendar ||
+          addCalendarMutation.isPending ||
+          updateCalendarMutation.isPending
+        }
+        editingCalendar={editingCalendar}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteConfirmOpen}
+        onClose={() => setDeleteConfirmOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        slotProps={{
+          paper: {
+            sx: {
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: {
+                xs: "92%",
+                sm: "540px",
+              },
+              borderRadius: "20px",
+              overflow: "hidden",
+              boxShadow: "0px 16px 40px rgba(0,0,0,0.10)",
+              margin: 0,
+              backgroundColor: "#fff",
+            },
+          },
+        }}
+      >
+        <DialogContent className="p-6">
+          <div className="mb-4">
+            <h2 className="text-lg font-medium text-[#464646]">
+              Delete Calendar
+            </h2>
+            <p className="text-base text-gray-500 mt-2">
+              Are you sure you want to delete this calendar? This action cannot
+              be undone.
+            </p>
+          </div>
+
+          <div className="flex gap-3 justify-end">
+            <Button
+              variant="outlined"
+              className="capitalize!"
+              sx={{ fontSize: "14px", borderRadius: "10px" }}
+              onClick={() => setDeleteConfirmOpen(false)}
+              disabled={deleteCalendarMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              className="capitalize!"
+              sx={{
+                fontSize: "14px",
+                borderRadius: "10px",
+                backgroundColor: "#dc2626",
+                "&:hover": {
+                  backgroundColor: "#b91c1c",
+                },
+                "&.Mui-disabled": {
+                  backgroundColor: "#dc2626",
+                  color: "#fff",
+                  opacity: 0.7,
+                },
+              }}
+              onClick={handleConfirmDelete}
+              disabled={deleteCalendarMutation.isPending}
+            >
+              Delete
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <ActionRow
         title="Call Transfer"
@@ -115,9 +283,15 @@ export default function AgentAction({
 function CalendarActionRow({
   calendars,
   onAdd,
+  onEdit,
+  onDelete,
+  isDeleting,
 }: {
   calendars: AgentCalendar[];
   onAdd: () => void;
+  onEdit: (calendar: AgentCalendar) => void;
+  onDelete: (uniqueId: string) => void;
+  isDeleting: boolean;
 }) {
   return (
     <div className="border border-gray-200 rounded-lg bg-[#F5F8FF]">
@@ -147,18 +321,44 @@ function CalendarActionRow({
               key={calendar.unique_id}
               className="bg-white border border-gray-200 rounded-lg p-3 sm:p-4"
             >
-              <div className="flex flex-wrap items-center gap-2 text-sm">
-                <span className="font-medium text-gray-700">
-                  {calendar.platform}
-                </span>
-                <span className="text-gray-400">•</span>
-                <span className="text-gray-600">ID: {calendar.unique_id}</span>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex-1">
+                  <div className="flex flex-wrap items-center gap-2 text-sm">
+                    <span className="font-medium text-gray-700">
+                      {calendar.platform}
+                    </span>
+                    <span className="text-gray-400">•</span>
+                    <span className="text-gray-600">
+                      ID: {calendar.unique_id}
+                    </span>
+                  </div>
+                  {calendar.description && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      {calendar.description}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex gap-2 shrink-0">
+                  <IconButton
+                    size="small"
+                    onClick={() => onEdit(calendar)}
+                    className="text-blue-600 hover:bg-blue-50"
+                    title="Edit calendar"
+                  >
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={() => onDelete(calendar.unique_id)}
+                    disabled={isDeleting}
+                    className="text-red-600 hover:bg-red-50"
+                    title="Delete calendar"
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </div>
               </div>
-              {calendar.description && (
-                <p className="text-sm text-gray-500 mt-1">
-                  {calendar.description}
-                </p>
-              )}
             </div>
           ))}
         </div>

@@ -79,3 +79,83 @@ export const useDeleteAgent = () => {
     },
   });
 };
+
+/* -------- Calendar Mutations -------- */
+
+export const useAddCalendar = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    AxiosResponse<{
+      status_code: number;
+      message: string;
+      data: AgentCalendar;
+    }>,
+    AxiosError<ApiErrorResponse>,
+    { agentId: string; calendar: AgentCalendar }
+  >({
+    mutationFn: ({ agentId, calendar }) =>
+      agentService.addCalendar({ agentId, calendar }),
+    onSuccess: (_, { agentId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ["agents"],
+        exact: false,
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["agents", agentId],
+      });
+    },
+  });
+};
+
+export const useUpdateCalendar = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    AxiosResponse<{
+      status_code: number;
+      message: string;
+      data: AgentCalendar;
+    }>,
+    AxiosError<ApiErrorResponse>,
+    {
+      agentId: string;
+      uniqueId: string;
+      calendar: Partial<AgentCalendar>;
+    }
+  >({
+    mutationFn: ({ agentId, uniqueId, calendar }) =>
+      agentService.updateCalendar({ agentId, uniqueId, calendar }),
+    onSuccess: (_, { agentId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ["agents"],
+        exact: false,
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["agents", agentId],
+      });
+    },
+  });
+};
+
+export const useDeleteCalendar = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    AxiosResponse<{ status_code: number; message: string }>,
+    AxiosError<ApiErrorResponse>,
+    { agentId: string; uniqueId: string }
+  >({
+    mutationFn: ({ agentId, uniqueId }) =>
+      agentService.deleteCalendar({ agentId, uniqueId }),
+    onSuccess: (_, { agentId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ["agents"],
+        exact: false,
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["agents", agentId],
+      });
+    },
+  });
+};

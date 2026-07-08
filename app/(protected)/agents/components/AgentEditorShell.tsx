@@ -92,6 +92,16 @@ export default function AgentEditorShell({ agentId }: Props) {
     }
   };
 
+  const handleCalendarUpdate = (updatedCalendars: AgentCalendar[]) => {
+    setCalendars(updatedCalendars);
+    toast.success("Calendar updated successfully");
+  };
+
+  const handleCalendarDelete = (updatedCalendars: AgentCalendar[]) => {
+    setCalendars(updatedCalendars);
+    toast.success("Calendar deleted successfully");
+  };
+
   const [form, setForm] = useState<AgentForm>({
     name: "",
     description: "",
@@ -109,9 +119,12 @@ export default function AgentEditorShell({ agentId }: Props) {
     case "action":
       content = (
         <AgentAction
+          agentId={agentId}
           calendars={calendars}
           onAddCalendar={handleAddCalendar}
           isAddingCalendar={isAddingCalendar}
+          onCalendarUpdate={handleCalendarUpdate}
+          onCalendarDelete={handleCalendarDelete}
         />
       );
       break;

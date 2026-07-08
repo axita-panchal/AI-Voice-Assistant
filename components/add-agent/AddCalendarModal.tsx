@@ -32,6 +32,7 @@ type Props = {
   onSubmit: (data: AgentCalendar) => void;
   existingCalendars: AgentCalendar[];
   isSubmitting?: boolean;
+  editingCalendar?: AgentCalendar | null;
 };
 
 export default function AddCalendarModal({
@@ -40,7 +41,9 @@ export default function AddCalendarModal({
   onSubmit,
   existingCalendars,
   isSubmitting = false,
+  editingCalendar = null,
 }: Props) {
+  const isEditMode = !!editingCalendar;
   const {
     register,
     handleSubmit,
@@ -58,17 +61,28 @@ export default function AddCalendarModal({
 
   useEffect(() => {
     if (open) {
-      reset({
-        platform: "cal",
-        unique_id: "",
-        description: "",
-      });
+      if (isEditMode && editingCalendar) {
+        reset({
+          platform: "cal",
+          unique_id: editingCalendar.unique_id,
+          description: editingCalendar.description || "",
+        });
+      } else {
+        reset({
+          platform: "cal",
+          unique_id: "",
+          description: "",
+        });
+      }
     }
-  }, [open, reset]);
+  }, [open, reset, isEditMode, editingCalendar]);
 
   const handleFormSubmit = (data: CalendarFormData) => {
+    // Check for duplicate IDs, but exclude the current calendar if in edit mode
     const isDuplicate = existingCalendars.some(
-      (calendar) => calendar.unique_id === data.unique_id.trim(),
+      (calendar) =>
+        calendar.unique_id === data.unique_id.trim() &&
+        (isEditMode ? calendar.unique_id !== editingCalendar?.unique_id : true),
     );
 
     if (isDuplicate) {
@@ -115,9 +129,13 @@ export default function AddCalendarModal({
       <DialogContent className="p-6">
         <div className="flex items-start justify-between mb-2">
           <div>
-            <h2 className="text-lg font-medium text-[#464646]">Add Calendar</h2>
+            <h2 className="text-lg font-medium text-[#464646]">
+              {isEditMode ? "Edit Calendar" : "Add Calendar"}
+            </h2>
             <p className="text-base text-gray-500 mt-1">
-              Connect a calendar so your Agent can schedule meetings.
+              {isEditMode
+                ? "Update your calendar details."
+                : "Connect a calendar so your Agent can schedule meetings."}
             </p>
           </div>
           <IconButton onClick={onClose} aria-label="Close">
@@ -209,7 +227,7 @@ export default function AddCalendarModal({
               ) : null
             }
           >
-            Add Calendar
+            {isEditMode ? "Update Calendar" : "Add Calendar"}
           </Button>
         </div>
       </DialogContent>
