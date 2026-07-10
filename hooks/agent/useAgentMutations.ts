@@ -2,7 +2,7 @@ import { agentService } from "@/services/agent.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ApiErrorResponse } from "../auth/useAuthMutations";
 import { AxiosError, AxiosResponse } from "axios";
-import { Agent } from "@/types/agent.types";
+import { Agent, AgentCalendar } from "@/types/agent.types";
 
 export type CreateAgentResponse = {
   status_code: number;
@@ -16,8 +16,13 @@ export interface DeleteAgentResponse {
   message: string;
 }
 export type UpdateAgentPayload = {
-  voice: string;
-  language: string;
+  name?: string;
+  description?: string;
+  first_message?: string;
+  voice?: string;
+  language?: string;
+  calendars?: AgentCalendar[];
+  transfer_phone_number?: string;
 };
 
 export const useCreateAgent = () => {
@@ -72,6 +77,86 @@ export const useDeleteAgent = () => {
     mutationFn: (id: string) => agentService.deleteAgent(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["agents"] });
+    },
+  });
+};
+
+/* -------- Calendar Mutations -------- */
+
+export const useAddCalendar = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    AxiosResponse<{
+      status_code: number;
+      message: string;
+      data: AgentCalendar;
+    }>,
+    AxiosError<ApiErrorResponse>,
+    { agentId: string; calendar: AgentCalendar }
+  >({
+    mutationFn: ({ agentId, calendar }) =>
+      agentService.addCalendar({ agentId, calendar }),
+    onSuccess: (_, { agentId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ["agents"],
+        exact: false,
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["agents", agentId],
+      });
+    },
+  });
+};
+
+export const useUpdateCalendar = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    AxiosResponse<{
+      status_code: number;
+      message: string;
+      data: AgentCalendar;
+    }>,
+    AxiosError<ApiErrorResponse>,
+    {
+      agentId: string;
+      uniqueId: string;
+      calendar: Partial<AgentCalendar>;
+    }
+  >({
+    mutationFn: ({ agentId, uniqueId, calendar }) =>
+      agentService.updateCalendar({ agentId, uniqueId, calendar }),
+    onSuccess: (_, { agentId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ["agents"],
+        exact: false,
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["agents", agentId],
+      });
+    },
+  });
+};
+
+export const useDeleteCalendar = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    AxiosResponse<{ status_code: number; message: string }>,
+    AxiosError<ApiErrorResponse>,
+    { agentId: string; uniqueId: string }
+  >({
+    mutationFn: ({ agentId, uniqueId }) =>
+      agentService.deleteCalendar({ agentId, uniqueId }),
+    onSuccess: (_, { agentId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ["agents"],
+        exact: false,
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["agents", agentId],
+      });
     },
   });
 };

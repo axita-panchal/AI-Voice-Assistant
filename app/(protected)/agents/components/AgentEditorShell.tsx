@@ -10,6 +10,7 @@ import AgentAction from "@/components/add-agent/AgentAction";
 import KnowledgeBase from "@/components/add-agent/KnowledgeBase";
 import { useUpdateAgent } from "@/hooks/agent/useAgentMutations";
 import { useAgentById } from "@/hooks/agent/useAgentQueries";
+import { AgentCalendar } from "@/types/agent.types";
 import { toast } from "@/utils/toast";
 
 type Props = {
@@ -29,6 +30,10 @@ export default function AgentEditorShell({ agentId }: Props) {
   const { mutateAsync: updateAgent, isPending: isUpdatingAgent } =
     useUpdateAgent();
   const { data: agentData, isPending } = useAgentById(agentId);
+  const [isAddingCalendar, setIsAddingCalendar] = useState(false);
+  const [calendars, setCalendars] = useState<AgentCalendar[]>([]);
+  const [transferPhoneNumber, setTransferPhoneNumber] = useState<string>("");
+  const [isUpdatingTransfer, setIsUpdatingTransfer] = useState(false);
 
   const searchParams = useSearchParams();
   const activeTab = searchParams.get("setting") || "agent-prompt";
@@ -61,7 +66,88 @@ export default function AgentEditorShell({ agentId }: Props) {
       voice: agent.voice,
       first_message: agent?.first_message ?? "",
     });
+
+    setCalendars(agent.calendars ?? []);
+    setTransferPhoneNumber(agent.transfer_phone_number ?? "");
   }, [agentData?.data?.data?.agent]);
+
+  const handleAddCalendar = async (newCalendar: AgentCalendar) => {
+    const updatedCalendars = [...calendars, newCalendar];
+
+    try {
+      setIsAddingCalendar(true);
+
+      const response = await updateAgent({
+        agentId,
+        payload: { calendars: updatedCalendars },
+      });
+
+      if (response.data?.status_code === 200) {
+        setCalendars(updatedCalendars);
+        toast.success(response.data?.message || "Calendar added successfully");
+      }
+    } catch (error) {
+      console.error("Failed to add calendar", error);
+      toast.error("Failed to add calendar");
+      throw error;
+    } finally {
+      setIsAddingCalendar(false);
+    }
+  };
+
+  const handleCalendarUpdate = (updatedCalendars: AgentCalendar[]) => {
+    setCalendars(updatedCalendars);
+    toast.success("Calendar updated successfully");
+  };
+
+  const handleCalendarDelete = (updatedCalendars: AgentCalendar[]) => {
+    setCalendars(updatedCalendars);
+    toast.success("Calendar deleted successfully");
+  };
+
+  const handleSaveTransferPhoneNumber = async (phoneNumber: string) => {
+    try {
+      setIsUpdatingTransfer(true);
+
+      const response = await updateAgent({
+        agentId,
+        payload: { transfer_phone_number: phoneNumber },
+      });
+
+      if (response.data?.status_code === 200) {
+        setTransferPhoneNumber(phoneNumber);
+        toast.success("Transfer phone number saved successfully");
+      }
+    } catch (error) {
+      console.error("Failed to save transfer phone number", error);
+      toast.error("Failed to save transfer phone number");
+      throw error;
+    } finally {
+      setIsUpdatingTransfer(false);
+    }
+  };
+
+  const handleDeleteTransferPhoneNumber = async () => {
+    try {
+      setIsUpdatingTransfer(true);
+
+      const response = await updateAgent({
+        agentId,
+        payload: { transfer_phone_number: "" },
+      });
+
+      if (response.data?.status_code === 200) {
+        setTransferPhoneNumber("");
+        toast.success("Transfer phone number deleted successfully");
+      }
+    } catch (error) {
+      console.error("Failed to delete transfer phone number", error);
+      toast.error("Failed to delete transfer phone number");
+      throw error;
+    } finally {
+      setIsUpdatingTransfer(false);
+    }
+  };
 
   const [form, setForm] = useState<AgentForm>({
     name: "",
@@ -78,7 +164,20 @@ export default function AgentEditorShell({ agentId }: Props) {
       content = <AgentPrompt />;
       break;
     case "action":
-      content = <AgentAction />;
+      content = (
+        <AgentAction
+          agentId={agentId}
+          calendars={calendars}
+          onAddCalendar={handleAddCalendar}
+          isAddingCalendar={isAddingCalendar}
+          onCalendarUpdate={handleCalendarUpdate}
+          onCalendarDelete={handleCalendarDelete}
+          transferPhoneNumber={transferPhoneNumber}
+          onSaveTransferPhoneNumber={handleSaveTransferPhoneNumber}
+          onDeleteTransferPhoneNumber={handleDeleteTransferPhoneNumber}
+          isUpdatingTransfer={isUpdatingTransfer}
+        />
+      );
       break;
     case "knowledge-base":
       content = <KnowledgeBase />;

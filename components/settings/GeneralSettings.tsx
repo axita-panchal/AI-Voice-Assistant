@@ -85,8 +85,8 @@ export default function GeneralSettings() {
       phone: (user as any)?.phone ?? "",
       timezone: (user as any)?.business?.timezone ?? "",
       contact_name: (user as any)?.business?.contact_name ?? "",
-      contact_email: (user as any)?.business?.business_email ?? "",
-      contact_phone: (user as any)?.business?.business_phone ?? "",
+      contact_email: (user as any)?.business?.contact_email ?? "",
+      contact_phone: (user as any)?.business?.contact_phone ?? "",
       business_name: (user as any)?.business?.business_name ?? "",
       street_address: (user as any)?.business?.street_address ?? "",
       city: (user as any)?.business?.city ?? "",
@@ -122,7 +122,7 @@ export default function GeneralSettings() {
     formData.append("first_name", data.first_name);
     formData.append("last_name", data.last_name);
     formData.append("email", data.email);
-    formData.append("phone_number", data.phone ?? "");
+    formData.append("phone", data.phone ?? "");
     formData.append("timezone", data.timezone ?? "");
     formData.append("contact_name", data.contact_name ?? "");
     formData.append("contact_email", data.contact_email ?? "");
@@ -146,7 +146,7 @@ export default function GeneralSettings() {
         const updatedUser = res?.data?.data?.user;
         if (updatedUser) {
           dispatch(updateUserProfileAction(updatedUser));
-          
+
           // Also update localStorage so it persists across page reloads
           const auth = localStorage.getItem("auth");
           if (auth) {
@@ -196,7 +196,7 @@ export default function GeneralSettings() {
               value={
                 user?.first_name && user?.last_name
                   ? `${user.first_name} ${user.last_name}`
-                  : user?.full_name ?? ""
+                  : (user?.full_name ?? "")
               }
               disabled
               placeholder="Full name"
@@ -329,10 +329,7 @@ export default function GeneralSettings() {
               <label className="block text-gray-700 font-medium mb-1">
                 City
               </label>
-              <SmallTextField
-                placeholder="Enter city"
-                {...register("city")}
-              />
+              <SmallTextField placeholder="Enter city" {...register("city")} />
             </div>
 
             {/* Zip / Postal Code */}
