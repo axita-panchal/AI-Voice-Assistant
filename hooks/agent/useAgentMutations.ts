@@ -160,3 +160,27 @@ export const useDeleteCalendar = () => {
     },
   });
 };
+
+/* -------- Knowledge Base Mutations -------- */
+
+export const useUploadKnowledgeBase = () => {
+  return useMutation<
+    AxiosResponse<{ status_code: number; message: string; data: unknown }>,
+    AxiosError<ApiErrorResponse>,
+    { agentId: string; files: File[] }
+  >({
+    mutationFn: ({ agentId, files }) =>
+      agentService.uploadKnowledgeBase({ agentId, files }),
+  });
+};
+
+export const useDeleteKnowledgeBaseFile = () => {
+  return useMutation<
+    AxiosResponse<{ status_code: number; message: string }>,
+    AxiosError<ApiErrorResponse>,
+    { agentId: string; fileName: string }
+  >({
+    mutationFn: ({ agentId, fileName }) =>
+      agentService.deleteKnowledgeBaseFile({ agentId, fileName }),
+  });
+};

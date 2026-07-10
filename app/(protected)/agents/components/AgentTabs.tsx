@@ -15,7 +15,7 @@ const TABS = [
     slug: "knowledge-base",
     icon: "/assets/svgs/tabler_book.svg",
   },
-  { label: "Advanced", slug: "advanced", icon: "/assets/svgs/uil_setting.svg" },
+  // { label: "Advanced", slug: "advanced", icon: "/assets/svgs/uil_setting.svg" },
 ];
 
 export default function AgentTabs({

@@ -476,7 +476,7 @@ export default function AgentAction({
         )}
       </div>
 
-      <ActionRow
+      {/* <ActionRow
         title="Custom Actions"
         description="Add flows or automations your Agent can trigger mid-call."
         isOpen={openAction === "custom"}
@@ -487,9 +487,9 @@ export default function AgentAction({
           value={values.custom || ""}
           onChange={(v) => updateValue("custom", v)}
         />
-      </ActionRow>
+      </ActionRow> */}
 
-      <ActionRow
+      {/* <ActionRow
         title="Post-Call Webhook"
         description="Add the URL where you want the end of call report to be sent."
         isOpen={openAction === "webhook"}
@@ -501,7 +501,7 @@ export default function AgentAction({
           onChange={(v) => updateValue("webhook", v)}
           actionLabel="Test webhook"
         />
-      </ActionRow>
+      </ActionRow> */}
     </div>
   );
 }
