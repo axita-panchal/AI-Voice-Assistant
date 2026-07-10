@@ -180,7 +180,7 @@ export default function AgentEditorShell({ agentId }: Props) {
       );
       break;
     case "knowledge-base":
-      content = <KnowledgeBase />;
+      content = <KnowledgeBase agentId={agentId} />;
       break;
     default:
       content = <div className="p-6">No content</div>;

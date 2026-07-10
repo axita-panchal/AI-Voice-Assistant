@@ -15,7 +15,7 @@ const TABS = [
     slug: "knowledge-base",
     icon: "/assets/svgs/tabler_book.svg",
   },
-  { label: "Advanced", slug: "advanced", icon: "/assets/svgs/uil_setting.svg" },
+  // { label: "Advanced", slug: "advanced", icon: "/assets/svgs/uil_setting.svg" },
 ];
 
 export default function AgentTabs({
@@ -87,12 +87,12 @@ export default function AgentTabs({
             </button>
           )}
 
-          <button
+          {/* <button
             className="px-4 py-2 text-sm rounded-lg bg-[#2F6AFF] text-white whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-400"
             aria-label="Call me"
           >
             <span aria-hidden="true">📞</span> Call Me
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

@@ -75,4 +75,39 @@ export const agentService = {
     const res = http.delete(`/agents/${agentId}/calendars/${uniqueId}`);
     return res;
   },
+
+  /* -------- Knowledge Base Methods -------- */
+
+  uploadKnowledgeBase: ({
+    agentId,
+    files,
+  }: {
+    agentId: string;
+    files: File[];
+  }) => {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append("files", file);
+    });
+
+    const res = http.post(`/agents/${agentId}/knowledge_base`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return res;
+  },
+
+  deleteKnowledgeBaseFile: ({
+    agentId,
+    fileName,
+  }: {
+    agentId: string;
+    fileName: string;
+  }) => {
+    const res = http.delete(
+      `/agents/${agentId}/knowledge_base/${encodeURIComponent(fileName)}`,
+    );
+    return res;
+  },
 };
