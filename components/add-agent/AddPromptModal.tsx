@@ -9,27 +9,9 @@ import {
   Tooltip,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import { useEffect, useState } from "react";
 import CustomTextField from "@/components/common/CustomTextField";
-
-export const DEFAULT_PROMPT_TEMPLATE = `# Identity
-You are Emma, a human-like AI Voice Agent representing our company. You place outbound sales calls to prospective customers. You address the contact respectfully and keep interactions compliant and friendly. You operate within call best practices, honoring do-not-call requests.
-
-# Style
-You are confident yet collaborative, blending assertive momentum with consultative curiosity. Keep sentences short and jargon-free; mirror key phrases to build rapport. Maintain a professional tone with moments of warmth. Ask one question at a time and avoid interrupting.
-
-# Task
-You are to qualify the prospect using BANT criteria (Budget, Authority, Need, Timeline) and secure a meeting with a specialist. Verify contact details required for scheduling and follow-up. Propose the next step and book the appointment.
-
-# Goals
-Book a calendar appointment with the right decision-maker. Confirm fit by establishing key requirements. Keep the call succinct while driving clarity and commitment.
-
-# Error Handling
-- Gatekeeper or wrong contact: request the correct decision-maker's name and connection path; ask for a warm transfer.
-- Pricing or guarantee requests: explain that details are covered in the appointment and refocus on scheduling.
-- Do Not Call or opt-out: apologize, confirm removal immediately, cease outreach, and end respectfully.`;
 
 type Props = {
   open: boolean;
@@ -57,11 +39,6 @@ export default function AddPromptModal({
       setError(null);
     }
   }, [open, initialPrompt]);
-
-  const handleInsertTemplate = () => {
-    setPromptText(DEFAULT_PROMPT_TEMPLATE);
-    setError(null);
-  };
 
   const handleClear = () => {
     setPromptText("");
@@ -147,33 +124,19 @@ export default function AddPromptModal({
               System Prompt <span className="text-red-500">*</span>
             </label>
 
-            <div className="flex items-center gap-2">
-              <Tooltip title="Populate with a comprehensive voice agent template">
+            {promptText && (
+              <Tooltip title="Clear prompt text">
                 <button
                   type="button"
-                  onClick={handleInsertTemplate}
+                  onClick={handleClear}
                   disabled={isSubmitting}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-purple-700 bg-purple-50 hover:bg-purple-100 rounded-md transition cursor-pointer disabled:opacity-50"
+                  className="inline-flex items-center gap-1 px-2 py-1 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition cursor-pointer disabled:opacity-50"
                 >
-                  <AutoAwesomeIcon sx={{ fontSize: 14 }} />
-                  <span>Insert Template</span>
+                  <RestartAltIcon sx={{ fontSize: 14 }} />
+                  <span>Clear</span>
                 </button>
               </Tooltip>
-
-              {promptText && (
-                <Tooltip title="Clear prompt text">
-                  <button
-                    type="button"
-                    onClick={handleClear}
-                    disabled={isSubmitting}
-                    className="inline-flex items-center gap-1 px-2 py-1 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition cursor-pointer disabled:opacity-50"
-                  >
-                    <RestartAltIcon sx={{ fontSize: 14 }} />
-                    <span>Clear</span>
-                  </button>
-                </Tooltip>
-              )}
-            </div>
+            )}
           </div>
 
           <CustomTextField

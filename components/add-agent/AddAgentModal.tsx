@@ -22,6 +22,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { toast } from "@/utils/toast";
+import axios from "axios";
+import { ApiErrorResponse } from "@/hooks/auth/useAuthMutations";
 
 const PHONE_COLLECTIONS = [
   {
@@ -98,8 +100,28 @@ export default function AddAgentModal({ open, onClose }: Props) {
       queryClient.invalidateQueries({ queryKey: ["agents"] });
 
       onClose();
-    } catch (error) {
-      console.error(error);
+    } catch (error: unknown) {
+      console.error("Failed to create agent:", error);
+      let message = "Failed to create agent";
+
+      if (
+        axios.isAxiosError<{
+          detail?: string | Array<{ msg?: string; message?: string }>;
+          message?: string;
+        }>(error)
+      ) {
+        const resData = error.response?.data;
+        if (typeof resData?.detail === "string") {
+          message = resData.detail;
+        } else if (Array.isArray(resData?.detail) && resData.detail.length > 0) {
+          message =
+            resData.detail[0]?.msg || resData.detail[0]?.message || message;
+        } else if (typeof resData?.message === "string") {
+          message = resData.message;
+        }
+      }
+
+      toast.error(message);
     }
   };
 

@@ -12,6 +12,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { useSelector } from "react-redux";
@@ -55,6 +56,7 @@ const AgentList = () => {
     subaccountId,
   );
   const agents = agentsResponse?.data?.agents || [];
+  const isAgentLimitReached = agents.length >= 1;
 
   const { mutateAsync: deleteAgent, isPending } = useDeleteAgent();
 
@@ -162,13 +164,34 @@ const AgentList = () => {
             {user &&
               (API_ROLE_TO_KEY[user.role] === "agency-owner" ||
                 API_ROLE_TO_KEY[user.role] === "agency-admin") && (
-                <button
-                  onClick={() => setOpenModal(true)}
-                  className="flex items-center gap-2 bg-[#2F6AFF] text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
-                >
-                  <AddIcon sx={{ fontSize: 16 }} />
-                  New Agent
-                </button>
+                isAgentLimitReached ? (
+                  <Tooltip
+                    title="Agent limit reached. Please upgrade to Pro plan."
+                    arrow
+                    placement="bottom"
+                  >
+                    <span>
+                      <button
+                        type="button"
+                        disabled
+                        className="flex items-center gap-2 bg-gray-200 text-gray-400 text-sm px-4 py-2 rounded-lg cursor-not-allowed border border-gray-300 font-medium"
+                        aria-label="Agent limit reached. Please upgrade to Pro plan."
+                      >
+                        <AddIcon sx={{ fontSize: 16 }} />
+                        New Agent
+                      </button>
+                    </span>
+                  </Tooltip>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setOpenModal(true)}
+                    className="flex items-center gap-2 bg-[#2F6AFF] text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer font-medium"
+                  >
+                    <AddIcon sx={{ fontSize: 16 }} />
+                    New Agent
+                  </button>
+                )
               )}
           </div>
 

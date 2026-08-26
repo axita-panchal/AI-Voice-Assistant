@@ -1,10 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { Button, Tooltip } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import CheckIcon from "@mui/icons-material/Check";
+import { Button } from "@mui/material";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 
 type PromptCardProps = {
@@ -77,20 +73,8 @@ export default function AgentPrompt({
   onOpenPromptModal,
   isLoading = false,
 }: Props) {
-  const [copied, setCopied] = useState(false);
-
   const hasPrompt = !!prompt?.trim();
   const sections = parsePromptSections(prompt);
-
-  const handleCopy = () => {
-    if (!prompt) return;
-    navigator.clipboard.writeText(prompt);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const wordCount = prompt.trim() ? prompt.trim().split(/\s+/).length : 0;
-  const characterCount = prompt.length;
 
   if (isLoading) {
     return (
@@ -111,7 +95,7 @@ export default function AgentPrompt({
           </div>
 
           <h3 className="text-lg font-semibold text-gray-800 mb-1">
-            No Prompt Configured
+            No prompt available
           </h3>
           <p className="text-sm text-gray-500 mb-6 max-w-sm">
             Add system instructions, personality, conversation goals, and
@@ -143,50 +127,6 @@ export default function AgentPrompt({
 
   return (
     <div className="py-2 space-y-4 min-h-0">
-      {/* ACTION & INFO TOOLBAR */}
-      <div className="flex items-center justify-between bg-white border border-gray-200/80 rounded-xl px-4 py-2.5 shadow-xs">
-        <div className="flex items-center gap-3">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-700 border border-purple-100">
-            <span>✨</span> System Prompt
-          </span>
-          <span className="text-xs text-gray-400">
-            {wordCount} {wordCount === 1 ? "word" : "words"} &middot;{" "}
-            {characterCount} characters
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Tooltip title={copied ? "Copied!" : "Copy full prompt"}>
-            <button
-              onClick={handleCopy}
-              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition cursor-pointer"
-              aria-label="Copy prompt"
-            >
-              {copied ? (
-                <>
-                  <CheckIcon sx={{ fontSize: 15, color: "#16a34a" }} />
-                  <span className="text-green-600">Copied</span>
-                </>
-              ) : (
-                <>
-                  <ContentCopyIcon sx={{ fontSize: 14 }} />
-                  <span>Copy</span>
-                </>
-              )}
-            </button>
-          </Tooltip>
-
-          <button
-            onClick={onOpenPromptModal}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#2F6AFF] hover:bg-blue-600 rounded-lg transition cursor-pointer"
-            aria-label="Edit prompt"
-          >
-            <EditIcon sx={{ fontSize: 14 }} />
-            <span>Edit Prompt</span>
-          </button>
-        </div>
-      </div>
-
       {/* RENDERED PROMPT SECTIONS */}
       <div className="space-y-4">
         {sections.map((sec, idx) => (

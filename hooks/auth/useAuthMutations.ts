@@ -41,10 +41,10 @@ export type User = {
 export type LoginResponse = {
   status_code: number;
   message: string;
-    token_type: string;
-    access_token: string;
-    refresh_token: string;
-    user: User;
+  token_type: string;
+  access_token: string;
+  refresh_token: string;
+  user: User;
 };
 
 export type RegisterResponse = {
