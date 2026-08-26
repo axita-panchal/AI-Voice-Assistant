@@ -6,6 +6,7 @@ import LeftForm from "./LeftForm";
 import AgentTabs from "./AgentTabs";
 
 import AgentPrompt from "@/components/add-agent/AgentPrompt";
+import AddPromptModal from "@/components/add-agent/AddPromptModal";
 import AgentAction from "@/components/add-agent/AgentAction";
 import KnowledgeBase from "@/components/add-agent/KnowledgeBase";
 import { useUpdateAgent } from "@/hooks/agent/useAgentMutations";
@@ -34,6 +35,9 @@ export default function AgentEditorShell({ agentId }: Props) {
   const [calendars, setCalendars] = useState<AgentCalendar[]>([]);
   const [transferPhoneNumber, setTransferPhoneNumber] = useState<string>("");
   const [isUpdatingTransfer, setIsUpdatingTransfer] = useState(false);
+  const [prompt, setPrompt] = useState<string>("");
+  const [isUpdatingPrompt, setIsUpdatingPrompt] = useState(false);
+  const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
 
   const searchParams = useSearchParams();
   const activeTab = searchParams.get("setting") || "agent-prompt";
@@ -42,7 +46,10 @@ export default function AgentEditorShell({ agentId }: Props) {
     try {
       const response = await updateAgent({
         agentId,
-        payload: form,
+        payload: {
+          ...form,
+          ...(prompt ? { prompt } : {}),
+        },
       });
 
       if (response.data?.status_code === 200) {
@@ -69,6 +76,7 @@ export default function AgentEditorShell({ agentId }: Props) {
 
     setCalendars(agent.calendars ?? []);
     setTransferPhoneNumber(agent.transfer_phone_number ?? "");
+    setPrompt(agent.prompt ?? "");
   }, [agentData?.data?.data?.agent]);
 
   const handleAddCalendar = async (newCalendar: AgentCalendar) => {
@@ -149,6 +157,29 @@ export default function AgentEditorShell({ agentId }: Props) {
     }
   };
 
+  const handleSavePrompt = async (newPrompt: string) => {
+    try {
+      setIsUpdatingPrompt(true);
+
+      const response = await updateAgent({
+        agentId,
+        payload: { prompt: newPrompt },
+      });
+
+      if (response.data?.status_code === 200) {
+        setPrompt(newPrompt);
+        toast.success(response.data?.message || "Prompt saved successfully");
+        setIsPromptModalOpen(false);
+      }
+    } catch (error) {
+      console.error("Failed to save prompt", error);
+      toast.error("Failed to save prompt");
+      throw error;
+    } finally {
+      setIsUpdatingPrompt(false);
+    }
+  };
+
   const [form, setForm] = useState<AgentForm>({
     name: "",
     description: "",
@@ -161,7 +192,13 @@ export default function AgentEditorShell({ agentId }: Props) {
 
   switch (activeTab) {
     case "agent-prompt":
-      content = <AgentPrompt />;
+      content = (
+        <AgentPrompt
+          prompt={prompt}
+          onOpenPromptModal={() => setIsPromptModalOpen(true)}
+          isLoading={isPending}
+        />
+      );
       break;
     case "action":
       content = (
@@ -201,7 +238,12 @@ export default function AgentEditorShell({ agentId }: Props) {
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-200">
-          <AgentTabs agentId={agentId} activeTab={activeTab} />
+          <AgentTabs
+            agentId={agentId}
+            activeTab={activeTab}
+            onAddPrompt={() => setIsPromptModalOpen(true)}
+            hasPrompt={!!prompt?.trim()}
+          />
           <div className="p-5">{content}</div>
         </div>
       </div>
@@ -223,7 +265,12 @@ export default function AgentEditorShell({ agentId }: Props) {
           <section className="flex-1 flex flex-col overflow-hidden">
             {/* Tabs */}
             <div className="shrink-0 border-b border-gray-200">
-              <AgentTabs agentId={agentId} activeTab={activeTab} />
+              <AgentTabs
+                agentId={agentId}
+                activeTab={activeTab}
+                onAddPrompt={() => setIsPromptModalOpen(true)}
+                hasPrompt={!!prompt?.trim()}
+              />
             </div>
 
             {/* Scroll area */}
@@ -233,6 +280,15 @@ export default function AgentEditorShell({ agentId }: Props) {
           </section>
         </div>
       </div>
+
+      {/* ADD / EDIT PROMPT MODAL */}
+      <AddPromptModal
+        open={isPromptModalOpen}
+        onClose={() => setIsPromptModalOpen(false)}
+        onSave={handleSavePrompt}
+        initialPrompt={prompt}
+        isSubmitting={isUpdatingPrompt}
+      />
     </div>
   );
 }

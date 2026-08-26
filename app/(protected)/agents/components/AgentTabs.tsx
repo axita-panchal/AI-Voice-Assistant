@@ -22,10 +22,12 @@ export default function AgentTabs({
   agentId,
   activeTab,
   onAddPrompt,
+  hasPrompt = false,
 }: {
   agentId: string;
   activeTab: string;
   onAddPrompt?: () => void;
+  hasPrompt?: boolean;
 }) {
   const router = useRouter();
 
@@ -80,10 +82,10 @@ export default function AgentTabs({
           {activeTab === "agent-prompt" && (
             <button
               onClick={onAddPrompt}
-              className="px-4 py-2 text-sm rounded-lg bg-gradient-to-b from-[#9450FF] to-[#435CFE] text-white whitespace-nowrap"
-              aria-label="Add new agent prompt"
+              className="px-4 py-2 text-sm rounded-lg bg-gradient-to-b from-[#9450FF] to-[#435CFE] text-white whitespace-nowrap cursor-pointer transition hover:opacity-90"
+              aria-label={hasPrompt ? "Edit agent prompt" : "Add new agent prompt"}
             >
-              <span aria-hidden="true">✨</span> Add Prompt
+              <span aria-hidden="true">✨</span> {hasPrompt ? "Edit Prompt" : "Add Prompt"}
             </button>
           )}
 

@@ -3,6 +3,7 @@ export type CreateAgentPayload = {
   phone_number_option: string;
   description?: string;
   subaccount_id: string;
+  prompt?: string;
 };
 
 export type AgentCalendar = {
@@ -21,6 +22,9 @@ export type Agent = {
   created_on: string;
   calendars?: AgentCalendar[];
   transfer_phone_number?: string;
+  prompt?: string;
+  description?: string;
+  first_message?: string;
 };
 
 export interface GetAgentsResponse {
