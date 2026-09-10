@@ -101,7 +101,7 @@ export default function LoginPage() {
             fullWidth
             variant="contained"
             disabled={isPending}
-             onClick={handleSubmit(onSubmit)}
+            onClick={handleSubmit(onSubmit)}
             sx={{
               borderRadius: "10px",
               textTransform: "none",

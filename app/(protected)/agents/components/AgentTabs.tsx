@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
 const TABS = [
   {
@@ -22,10 +23,14 @@ export default function AgentTabs({
   agentId,
   activeTab,
   onAddPrompt,
+  onDeletePrompt,
+  hasPrompt = false,
 }: {
   agentId: string;
   activeTab: string;
   onAddPrompt?: () => void;
+  onDeletePrompt?: () => void;
+  hasPrompt?: boolean;
 }) {
   const router = useRouter();
 
@@ -76,15 +81,30 @@ export default function AgentTabs({
         </div>
 
         {/* Actions */}
-        <div className="flex gap-2 shrink-0 flex-wrap sm:flex-nowrap">
+        <div className="flex gap-2 shrink-0 flex-wrap sm:flex-nowrap items-center">
           {activeTab === "agent-prompt" && (
-            <button
-              onClick={onAddPrompt}
-              className="px-4 py-2 text-sm rounded-lg bg-gradient-to-b from-[#9450FF] to-[#435CFE] text-white whitespace-nowrap"
-              aria-label="Add new agent prompt"
-            >
-              <span aria-hidden="true">✨</span> Add Prompt
-            </button>
+            <div className="flex items-center gap-2">
+              {hasPrompt && onDeletePrompt && (
+                <button
+                  type="button"
+                  onClick={onDeletePrompt}
+                  className="flex items-center gap-1.5 px-3.5 py-2 text-sm rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 font-medium whitespace-nowrap cursor-pointer transition"
+                  aria-label="Delete agent prompt"
+                >
+                  <DeleteOutlineIcon sx={{ fontSize: 18 }} />
+                  <span>Delete Prompt</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={onAddPrompt}
+                className="flex items-center gap-1.5 px-4 py-2 text-sm rounded-lg bg-gradient-to-b from-[#9450FF] to-[#435CFE] text-white whitespace-nowrap cursor-pointer transition hover:opacity-90 font-medium"
+                aria-label={hasPrompt ? "Edit agent prompt" : "Add new agent prompt"}
+              >
+                <span aria-hidden="true">✨</span> {hasPrompt ? "Edit Prompt" : "Add Prompt"}
+              </button>
+            </div>
           )}
 
           {/* <button

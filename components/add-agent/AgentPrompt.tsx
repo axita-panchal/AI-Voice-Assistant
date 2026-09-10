@@ -1,47 +1,138 @@
-import { Button, Drawer } from "@mui/material";
+"use client";
+
+import { Button } from "@mui/material";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 
 type PromptCardProps = {
-  title: string;
+  title?: string;
   text: string;
 };
 
 const PromptCard = ({ title, text }: PromptCardProps) => (
-  <div className="bg-[#F5F8FF] rounded-xl p-4">
-    <p className="text-base font-semibold text-gray-600 mb-2"># {title}</p>
-    <p className="text-[15px] text-gray-400 whitespace-pre-line leading-relaxed">
+  <div className="bg-[#F5F8FF] rounded-xl p-5 border border-[#E5EEFF] transition-all hover:border-[#D0E2FF]">
+    {title && (
+      <p className="text-base font-semibold text-gray-700 mb-2"># {title}</p>
+    )}
+    <p className="text-[15px] text-gray-600 whitespace-pre-line leading-relaxed">
       {text}
     </p>
   </div>
 );
 
-export default function AgentPrompt() {
+interface ParsedSection {
+  title?: string;
+  text: string;
+}
+
+function parsePromptSections(rawPrompt: string): ParsedSection[] {
+  const trimmed = rawPrompt.trim();
+  if (!trimmed) return [];
+
+  // Check if contains markdown headers like # Header
+  const headerRegex = /^(?:#{1,3})\s+(.+)$/gm;
+  const matches = [...trimmed.matchAll(headerRegex)];
+
+  if (matches.length === 0) {
+    return [{ text: trimmed }];
+  }
+
+  const sections: ParsedSection[] = [];
+
+  // If there is text before the first header
+  if (matches[0].index && matches[0].index > 0) {
+    const preText = trimmed.substring(0, matches[0].index).trim();
+    if (preText) {
+      sections.push({ text: preText });
+    }
+  }
+
+  for (let i = 0; i < matches.length; i++) {
+    const match = matches[i];
+    const title = match[1].trim();
+    const startIndex = (match.index ?? 0) + match[0].length;
+    const endIndex =
+      i + 1 < matches.length
+        ? (matches[i + 1].index ?? trimmed.length)
+        : trimmed.length;
+    const content = trimmed.substring(startIndex, endIndex).trim();
+
+    sections.push({ title, text: content });
+  }
+
+  return sections;
+}
+
+type Props = {
+  prompt?: string;
+  onOpenPromptModal?: () => void;
+  isLoading?: boolean;
+};
+
+export default function AgentPrompt({
+  prompt = "",
+  onOpenPromptModal,
+  isLoading = false,
+}: Props) {
+  const hasPrompt = !!prompt?.trim();
+  const sections = parsePromptSections(prompt);
+
+  if (isLoading) {
+    return (
+      <div className="py-8 space-y-4">
+        <div className="h-28 bg-gray-100 rounded-xl animate-pulse" />
+        <div className="h-36 bg-gray-100 rounded-xl animate-pulse" />
+        <div className="h-28 bg-gray-100 rounded-xl animate-pulse" />
+      </div>
+    );
+  }
+
+  if (!hasPrompt) {
+    return (
+      <div className="py-8 flex flex-col items-center justify-center">
+        <div className="bg-white border-2 border-dashed border-gray-200 rounded-2xl p-10 max-w-lg w-full flex flex-col items-center text-center">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#9450FF1A] to-[#435CFE1A] flex items-center justify-center text-2xl mb-4">
+            ✨
+          </div>
+
+          <h3 className="text-lg font-semibold text-gray-800 mb-1">
+            No prompt available
+          </h3>
+          <p className="text-sm text-gray-500 mb-6 max-w-sm">
+            Add system instructions, personality, conversation goals, and
+            objection handling for your AI voice agent.
+          </p>
+
+          <Button
+            variant="contained"
+            onClick={onOpenPromptModal}
+            startIcon={<AutoAwesomeIcon />}
+            sx={{
+              textTransform: "none",
+              fontSize: "14px",
+              borderRadius: "12px",
+              px: 3,
+              py: 1,
+              background: "linear-gradient(to bottom, #9450FF, #435CFE)",
+              "&:hover": {
+                background: "linear-gradient(to bottom, #8338EC, #3A50E0)",
+              },
+            }}
+          >
+            Add Prompt
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className=" py-4 space-y-4 min-h-0">
-      <PromptCard
-        title="Identity"
-        text="You are Emma, a human-like AI Voice Agent representing Suzie Davis. You place outbound sales calls to prospective customers. You address the contact by {{contactFirstName}} and keep
-interactions compliant and respectful. You operate within call best practices, honoring do-not-call requests. You never misrepresent yourself or the company."
-      />
-      <PromptCard
-        title="Style"
-        text="You are confident yet collaborative, blending assertive momentum with consultative curiosity. Keep sentences short and jargon-free; mirror key phrases and label emotions to build rapport. Maintain a professional tone with moments of casual wit when appropriate. Do not fabricate information, do not discuss pricing, and do not make guarantees; redirect those topics to the scheduled appointment. Ask one question at a time and avoid interrupting. Occasionally, add an um or ah to sound more human-like. Keep your conversation natural by confirming what the user says, or saying something about what they said."
-      />
-      <PromptCard
-        title="Task"
-        text="You are to qualify the prospect using BANT and secure a meeting with a human specialist. Capture decision-maker status, current pains or goals, relevant timelines, and buying-process
- context. Verify contact details required for scheduling and follow-up. Propose the next step and, upon acceptance, book the appointment. If not a fit, exit gracefully & record the disposition."
-      />
-      <PromptCard
-        title="Goals"
-        text="Book a calendar appointment with the right decision-maker. Confirm fit by establishing Budget sensitivity, Authority, Needs, and Timing. Gather preferred confirmation channel & stakeholders
-// to include. Keep the call succinct while driving clarity and commitment. Protect brand trust by staying within the stated constraints."
-      />
-      <PromptCard
-        title="Error Handling"
-        text="- Gatekeeper or wrong contact: request the correct decision-maker's name and connection path; ask for warm transfer.
-- Pricing or guarantee requests: explain that details are covered in the appointment and refocus on the value of a brief meeting; move to scheduling.
-- Do Not Call or opt-out: apologize, confirm removal immediately, cease outreach, and end respectfully."
-      />
+    <div className="py-2 space-y-4 min-h-0">
+      {/* RENDERED PROMPT SECTIONS */}
+      <div className="space-y-4">
+        {sections.map((sec, idx) => (
+          <PromptCard key={idx} title={sec.title} text={sec.text} />
+        ))}
+      </div>
     </div>
   );
 }

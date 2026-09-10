@@ -23,6 +23,7 @@ export type UpdateAgentPayload = {
   language?: string;
   calendars?: AgentCalendar[];
   transfer_phone_number?: string;
+  prompt?: string;
 };
 
 export const useCreateAgent = () => {
@@ -56,9 +57,12 @@ export const useUpdateAgent = () => {
         exact: false,
       });
 
-      // optional: invalidate single agent cache
+      // invalidate single agent cache
       queryClient.invalidateQueries({
         queryKey: ["agents", variables.agentId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["agent", variables.agentId],
       });
     },
   });

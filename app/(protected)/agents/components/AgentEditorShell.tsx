@@ -6,12 +6,16 @@ import LeftForm from "./LeftForm";
 import AgentTabs from "./AgentTabs";
 
 import AgentPrompt from "@/components/add-agent/AgentPrompt";
+import AddPromptModal from "@/components/add-agent/AddPromptModal";
 import AgentAction from "@/components/add-agent/AgentAction";
 import KnowledgeBase from "@/components/add-agent/KnowledgeBase";
+import ConfirmModal from "@/components/common/ConfirmModal";
 import { useUpdateAgent } from "@/hooks/agent/useAgentMutations";
 import { useAgentById } from "@/hooks/agent/useAgentQueries";
 import { AgentCalendar } from "@/types/agent.types";
 import { toast } from "@/utils/toast";
+import axios from "axios";
+import { ApiErrorResponse } from "@/hooks/auth/useAuthMutations";
 
 type Props = {
   agentId: string;
@@ -34,6 +38,11 @@ export default function AgentEditorShell({ agentId }: Props) {
   const [calendars, setCalendars] = useState<AgentCalendar[]>([]);
   const [transferPhoneNumber, setTransferPhoneNumber] = useState<string>("");
   const [isUpdatingTransfer, setIsUpdatingTransfer] = useState(false);
+  const [prompt, setPrompt] = useState<string>("");
+  const [isUpdatingPrompt, setIsUpdatingPrompt] = useState(false);
+  const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
+  const [isDeletingPrompt, setIsDeletingPrompt] = useState(false);
+  const [isDeletePromptModalOpen, setIsDeletePromptModalOpen] = useState(false);
 
   const searchParams = useSearchParams();
   const activeTab = searchParams.get("setting") || "agent-prompt";
@@ -42,15 +51,36 @@ export default function AgentEditorShell({ agentId }: Props) {
     try {
       const response = await updateAgent({
         agentId,
-        payload: form,
+        payload: {
+          ...form,
+          ...(prompt ? { prompt } : {}),
+        },
       });
 
       if (response.data?.status_code === 200) {
         toast.success(response.data?.message || "Agent updated successfully");
         router.push("/agents");
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Update failed", error);
+      let message = "Failed to update agent";
+      if (
+        axios.isAxiosError<{
+          detail?: string | Array<{ msg?: string; message?: string }>;
+          message?: string;
+        }>(error)
+      ) {
+        const resData = error.response?.data;
+        if (typeof resData?.detail === "string") {
+          message = resData.detail;
+        } else if (Array.isArray(resData?.detail) && resData.detail.length > 0) {
+          message =
+            resData.detail[0]?.msg || resData.detail[0]?.message || message;
+        } else if (typeof resData?.message === "string") {
+          message = resData.message;
+        }
+      }
+      toast.error(message);
     }
   };
 
@@ -69,6 +99,7 @@ export default function AgentEditorShell({ agentId }: Props) {
 
     setCalendars(agent.calendars ?? []);
     setTransferPhoneNumber(agent.transfer_phone_number ?? "");
+    setPrompt(agent.prompt ?? "");
   }, [agentData?.data?.data?.agent]);
 
   const handleAddCalendar = async (newCalendar: AgentCalendar) => {
@@ -149,6 +180,84 @@ export default function AgentEditorShell({ agentId }: Props) {
     }
   };
 
+  const handleSavePrompt = async (newPrompt: string) => {
+    try {
+      setIsUpdatingPrompt(true);
+
+      const response = await updateAgent({
+        agentId,
+        payload: { prompt: newPrompt },
+      });
+
+      if (response.data?.status_code === 200) {
+        setPrompt(newPrompt);
+        toast.success("Prompt saved successfully");
+        setIsPromptModalOpen(false);
+      }
+    } catch (error: unknown) {
+      console.error("Failed to save prompt", error);
+      let message = "Failed to save prompt";
+      if (
+        axios.isAxiosError<{
+          detail?: string | Array<{ msg?: string; message?: string }>;
+          message?: string;
+        }>(error)
+      ) {
+        const resData = error.response?.data;
+        if (typeof resData?.detail === "string") {
+          message = resData.detail;
+        } else if (Array.isArray(resData?.detail) && resData.detail.length > 0) {
+          message =
+            resData.detail[0]?.msg || resData.detail[0]?.message || message;
+        } else if (typeof resData?.message === "string") {
+          message = resData.message;
+        }
+      }
+      toast.error(message);
+    } finally {
+      setIsUpdatingPrompt(false);
+    }
+  };
+
+  const handleDeletePrompt = async () => {
+    try {
+      setIsDeletingPrompt(true);
+
+      const response = await updateAgent({
+        agentId,
+        payload: { prompt: "" },
+      });
+
+      if (response.data?.status_code === 200) {
+        setPrompt("");
+        toast.success("Prompt deleted successfully");
+        setIsDeletePromptModalOpen(false);
+      }
+    } catch (error: unknown) {
+      console.error("Failed to delete prompt", error);
+      let message = "Failed to delete prompt";
+      if (
+        axios.isAxiosError<{
+          detail?: string | Array<{ msg?: string; message?: string }>;
+          message?: string;
+        }>(error)
+      ) {
+        const resData = error.response?.data;
+        if (typeof resData?.detail === "string") {
+          message = resData.detail;
+        } else if (Array.isArray(resData?.detail) && resData.detail.length > 0) {
+          message =
+            resData.detail[0]?.msg || resData.detail[0]?.message || message;
+        } else if (typeof resData?.message === "string") {
+          message = resData.message;
+        }
+      }
+      toast.error(message);
+    } finally {
+      setIsDeletingPrompt(false);
+    }
+  };
+
   const [form, setForm] = useState<AgentForm>({
     name: "",
     description: "",
@@ -161,7 +270,13 @@ export default function AgentEditorShell({ agentId }: Props) {
 
   switch (activeTab) {
     case "agent-prompt":
-      content = <AgentPrompt />;
+      content = (
+        <AgentPrompt
+          prompt={prompt}
+          onOpenPromptModal={() => setIsPromptModalOpen(true)}
+          isLoading={isPending}
+        />
+      );
       break;
     case "action":
       content = (
@@ -201,7 +316,13 @@ export default function AgentEditorShell({ agentId }: Props) {
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-200">
-          <AgentTabs agentId={agentId} activeTab={activeTab} />
+          <AgentTabs
+            agentId={agentId}
+            activeTab={activeTab}
+            onAddPrompt={() => setIsPromptModalOpen(true)}
+            onDeletePrompt={() => setIsDeletePromptModalOpen(true)}
+            hasPrompt={!!prompt?.trim()}
+          />
           <div className="p-5">{content}</div>
         </div>
       </div>
@@ -223,7 +344,13 @@ export default function AgentEditorShell({ agentId }: Props) {
           <section className="flex-1 flex flex-col overflow-hidden">
             {/* Tabs */}
             <div className="shrink-0 border-b border-gray-200">
-              <AgentTabs agentId={agentId} activeTab={activeTab} />
+              <AgentTabs
+                agentId={agentId}
+                activeTab={activeTab}
+                onAddPrompt={() => setIsPromptModalOpen(true)}
+                onDeletePrompt={() => setIsDeletePromptModalOpen(true)}
+                hasPrompt={!!prompt?.trim()}
+              />
             </div>
 
             {/* Scroll area */}
@@ -233,6 +360,27 @@ export default function AgentEditorShell({ agentId }: Props) {
           </section>
         </div>
       </div>
+
+      {/* ADD / EDIT PROMPT MODAL */}
+      <AddPromptModal
+        open={isPromptModalOpen}
+        onClose={() => setIsPromptModalOpen(false)}
+        onSave={handleSavePrompt}
+        initialPrompt={prompt}
+        isSubmitting={isUpdatingPrompt}
+      />
+
+      {/* DELETE PROMPT CONFIRMATION MODAL */}
+      <ConfirmModal
+        open={isDeletePromptModalOpen}
+        title="Delete Agent Prompt"
+        description="Are you sure you want to delete this prompt? Your agent will have no system prompt until you add a new one."
+        confirmText="Delete"
+        variant="danger"
+        loading={isDeletingPrompt}
+        onCancel={() => setIsDeletePromptModalOpen(false)}
+        onConfirm={handleDeletePrompt}
+      />
     </div>
   );
 }
